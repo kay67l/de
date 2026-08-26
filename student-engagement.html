@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Engagement — ARSRC</title>
+<link rel="icon" type="image/png" sizes="any" href="/favicon.png?v=2">
+<link rel="shortcut icon" href="/favicon.png?v=2">
+<link rel="apple-touch-icon" href="/favicon.png?v=2">
+<meta name="description" content="Student engagement across the four ARSRC zones, the Writers &amp; Debaters Society, and the Literary Group.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,650;0,9..144,900;1,9..144,600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* ── Pulled directly from your homepage's own root variables, so this page
+       and the homepage read as one brand instead of two different sites ── */
+    --ink: #0f1c3f;
+    --paper: #f4f7fc;
+    --paper-2: #e8eefb;
+    --card: #ffffff;
+    --line: rgba(16,42,107,0.12);
+    --gray: #64748b;
+
+    --brand-blue-deep: #102a6b; --brand-blue: #1d4ed8; --brand-blue-light: #3b82f6;
+    --brand-red: #dc2626;       --brand-red-deep: #9f1414;
+
+    /* Zone accents: still four distinguishable colors, but each is a shade
+       reconciled against the site's actual blue/red brand pair rather than
+       an unrelated four-color scheme. */
+    --red: #dc2626;       --red-deep: #9f1414;
+    --amber: #b45309;     --amber-deep: #78350f;
+    --teal: #0f766e;      --teal-deep: #0b4f4a;
+    --blue: #1d4ed8;      --blue-deep: #102a6b;
+
+    --heading: #102a6b;
+    --shadow: 0 18px 40px rgba(16,42,107,0.14);
+    --shadow-hover: 0 30px 60px rgba(16,42,107,0.24);
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  html[data-theme="dark"] {
+    --ink: #e8ecf7; --paper: #0c1120; --paper-2: #131a2e; --card: #131a2e;
+    --line: rgba(255,255,255,0.1); --gray: #9aa7c2;
+    --heading: #7fa1f5;
+    --shadow: 0 18px 40px rgba(0,0,0,0.5);
+    --shadow-hover: 0 30px 60px rgba(0,0,0,0.65);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; width:100%; max-width:100%; overflow-x:clip; }
+  body { font-family: var(--font-body); background: var(--paper); color: var(--ink); overflow-x:clip; width:100%; max-width:100%; transition: background .25s ease, color .25s ease; }
+  main, section, header, footer, .hero-inner, .zone-split, .zone-main, .field-inner, .event-grid { width:100%; max-width:100%; min-width:0; }
+  .gallery-row, .school-ticker, .event-grid { overflow-x:auto; }
+
+  a { text-decoration:none; color:inherit; }
+  ul { list-style:none; }
+  ::selection { background: var(--brand-blue-light); color: #fff; }
+
+  /* ===== NAV ===== */
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:100; padding:18px 6%;
+    display:flex; align-items:center; justify-content:space-between;
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-brand { display:flex; align-items:center; gap:12px; }
+  .nav-badge { width:38px; height:38px; border-radius:8px; overflow:hidden; flex-shrink:0; border:1px solid var(--line); }
+  .nav-badge img { width:100%; height:100%; object-fit:cover; display:block; }
+  .nav-name { font-family: var(--font-display); font-weight:650; font-size:16px; letter-spacing:.2px; }
+  .jump-links { display:flex; gap:22px; }
+  .jump-links a { font-size:12.5px; font-weight:600; color:var(--gray); text-transform:uppercase; letter-spacing:.6px; position:relative; padding-bottom:3px; }
+  .jump-links a::after { content:''; position:absolute; left:0; bottom:0; width:0; height:1.5px; background:var(--red); transition:width .25s ease; }
+  .jump-links a:hover { color:var(--ink); }
+  .jump-links a:hover::after { width:100%; }
+  @media (max-width:900px) { .jump-links { display:none; } }
+  .site-search-button { display:flex; align-items:center; justify-content:center; width:36px; height:36px; border:1px solid var(--line); border-radius:50%; background:var(--card); color:var(--ink); cursor:pointer; transition:transform .2s ease, box-shadow .2s ease; }
+  .site-search-button:hover { transform:translateY(-2px); box-shadow:0 6px 16px rgba(16,42,107,.18); }
+  .site-search-button svg { width:17px; height:17px; }
+  .site-search-dialog { position:fixed; inset:0; z-index:2000; display:flex; align-items:flex-start; justify-content:center; padding:clamp(80px, 13vh, 150px) 20px 30px; background:rgba(8,13,28,.62); backdrop-filter:blur(7px); }
+  .site-search-dialog[hidden] { display:none; }
+  .site-search-panel { width:min(680px, 100%); max-height:min(680px, 78vh); overflow:auto; padding:22px; border-radius:18px; background:var(--card); box-shadow:0 24px 70px rgba(0,0,0,.3); }
+  .site-search-head { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:16px; }
+  .site-search-head h2 { color:var(--heading); font-family:var(--font-display); font-size:22px; }
+  .site-search-close { width:32px; height:32px; border:0; border-radius:50%; background:var(--paper-2); color:var(--ink); cursor:pointer; font-size:22px; line-height:1; }
+  .site-search-input { width:100%; padding:13px 15px; border:1px solid var(--line); border-radius:10px; background:var(--paper); color:var(--ink); font:inherit; outline:none; }
+  .site-search-input:focus { border-color:var(--brand-blue); box-shadow:0 0 0 3px rgba(59,130,246,.18); }
+  .site-search-results { display:grid; gap:9px; margin-top:16px; }
+  .site-search-result { display:grid; gap:5px; padding:13px 14px; border:1px solid var(--line); border-radius:10px; color:var(--ink); transition:border-color .2s ease, background .2s ease; }
+  .site-search-result:hover { border-color:var(--brand-blue-light); background:var(--paper-2); }
+  .site-search-result strong { color:var(--heading); }
+  .site-search-result span { color:var(--gray); font-size:13px; line-height:1.5; }
+  .site-search-result mark { background:#fef08a; color:inherit; }
+  .site-search-hint, .site-search-empty { padding:18px 4px 4px; color:var(--gray); font-size:14px; }
+  body.site-search-open { overflow:hidden; }
+
+  .nav-right { display:flex; align-items:center; gap:16px; }
+  .back-btn { font-size:12.5px; font-weight:700; color:var(--gray); }
+  .back-btn:hover { color:var(--ink); }
+  .theme-toggle {
+    width:36px; height:36px; border-radius:50%; border:1px solid var(--line); background:var(--card);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform .2s ease;
+  }
+  .theme-toggle:hover { transform:scale(1.08); }
+  .theme-toggle svg { width:16px; height:16px; color:var(--ink); }
+  .theme-toggle .icon-sun { display:none; }
+  html[data-theme="dark"] .theme-toggle .icon-moon { display:none; }
+  html[data-theme="dark"] .theme-toggle .icon-sun { display:block; }
+
+  /* ===== MOBILE MENU — hamburger + slide-down panel, replaces the jump
+     links once they're hidden below 900px, so zone navigation isn't lost. ===== */
+  .burger {
+    display:none; width:36px; height:36px; border-radius:9px; border:1px solid var(--line); background:var(--card);
+    align-items:center; justify-content:center; cursor:pointer; flex-direction:column; gap:4px;
+  }
+  .burger span { width:16px; height:1.5px; background:var(--ink); transition:transform .25s ease, opacity .25s ease; }
+  .burger.open span:nth-child(1) { transform:translateY(5.5px) rotate(45deg); }
+  .burger.open span:nth-child(2) { opacity:0; }
+  .burger.open span:nth-child(3) { transform:translateY(-5.5px) rotate(-45deg); }
+  @media (max-width:900px) { .burger { display:flex; } }
+
+  .mobile-menu {
+    display:none; position:fixed; top:73px; left:0; right:0; z-index:99;
+    background:var(--card); border-bottom:1px solid var(--line); box-shadow:0 20px 40px rgba(16,42,107,0.14);
+    padding:10px 6% 18px; flex-direction:column;
+  }
+  .mobile-menu.open { display:flex; }
+  .mobile-menu a {
+    padding:13px 4px; font-size:14px; font-weight:700; color:var(--ink); border-bottom:1px solid var(--line);
+  }
+  .mobile-menu a:last-child { border-bottom:none; }
+
+  /* ===== HERO — video background, matching the homepage hero pattern ===== */
+  .hero {
+    position:relative; padding:150px 6% 0; overflow:hidden;
+    background: var(--brand-blue-deep); /* fallback shown before video loads / if it fails */
+    min-height: 92vh; display:flex; flex-direction:column; justify-content:center;
+  }
+  .hero-video-wrap { position:absolute; inset:0; z-index:0; overflow:hidden; background:var(--brand-blue-deep); }
+  .hero-video { position:absolute; top:50%; left:50%; min-width:100%; min-height:100%; width:auto; height:auto; transform:translate(-50%,-50%); object-fit:cover; z-index:1; display:none; }
+  .hero-scrim {
+    position:absolute; inset:0; z-index:1; pointer-events:none;
+    background: linear-gradient(180deg, rgba(8,13,28,0.62) 0%, rgba(8,13,28,0.78) 100%);
+  }
+  .hero-flagbar { position:absolute; top:0; left:0; right:0; height:5px; display:flex; z-index:3; }
+  .hero-flagbar span { flex:1; }
+  .hero-inner { width:100%; max-width:1180px; min-width:0; margin:0 auto; position:relative; z-index:2; padding:60px 0; }
+  .hero-eyebrow {
+    display:inline-flex; align-items:center; gap:8px; font-size:12px; font-weight:700;
+    letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.92); margin-bottom:22px;
+  }
+  .hero-eyebrow::before { content:''; width:22px; height:2px; background:var(--brand-red); }
+  .hero h1 {
+    font-family: var(--font-display); font-weight:650; font-style:normal;
+    font-size: clamp(3.2rem, 9vw, 7.4rem); line-height:.94; letter-spacing:-.015em;
+    max-width: 13ch; color: #ffffff;
+  }
+  .hero h1 em { font-style:italic; font-weight:500; color: var(--brand-red); }
+  .hero-lede {
+    max-width:46ch; font-size:17px; line-height:1.7; color:rgba(255,255,255,0.82); margin:30px 0 0 2px;
+  }
+  .stat-strip {
+    display:flex; flex-wrap:wrap; gap:0; margin-top:64px; border-top:1px solid rgba(255,255,255,0.2); max-width:900px;
+  }
+  .stat {
+    flex:1 1 160px; padding:26px 26px 0 0; border-right:1px solid rgba(255,255,255,0.2);
+  }
+  .stat:last-child { border-right:none; }
+  .stat .n { font-family:var(--font-display); font-weight:650; font-size:clamp(1.8rem,3.4vw,2.6rem); line-height:1; color:#ffffff; }
+  .stat .l { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.8px; color:rgba(255,255,255,0.75); margin-top:8px; }
+  @media (max-width:640px) { .stat { flex:1 1 45%; border-right:none; border-bottom:1px solid rgba(255,255,255,0.2); padding:20px 0; } }
+  @media (max-width:640px) {
+    .hero { padding:110px 6% 0; min-height:0; }
+    .hero-inner { padding:40px 0 50px; }
+    .hero-lede { margin-top:20px; }
+    .stat-strip { margin-top:40px; }
+  }
+  /* Placeholder shown until engagement-video.mp4/webm loads; same fallback pattern as the homepage hero. */
+  .video-placeholder {
+    position:absolute; inset:0; z-index:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:14px; text-align:center; padding:20px;
+    background: linear-gradient(125deg, var(--brand-blue-deep) 0%, var(--brand-blue) 55%, var(--brand-red-deep) 100%);
+  }
+  .video-placeholder .vp-icon { font-size:36px; opacity:.9; }
+  .video-placeholder .vp-label { color:#fff; font-weight:800; font-size:14.5px; letter-spacing:.4px; }
+  .video-placeholder .vp-sub { color:rgba(255,255,255,0.7); font-size:12.5px; max-width:360px; line-height:1.5; }
+
+  /* ===== reveal ===== */
+  .reveal { opacity:0; transform:translateY(22px); transition:opacity .6s ease, transform .6s ease; }
+  .reveal.in-view { opacity:1; transform:translateY(0); }
+  .stagger-2 { transition-delay:.08s; }
+
+  /* ===== ZONE SECTIONS — real two-column layout, alternating sides. ===== */
+  section.zone { padding:0; border-top:1px solid var(--line); }
+  .zone-split {
+    display:grid; grid-template-columns: 300px 1fr; min-height:640px;
+  }
+  section.zone:nth-of-type(even) .zone-split { grid-template-columns: 1fr 300px; }
+  section.zone:nth-of-type(even) .zone-rail { order:2; }
+  section.zone:nth-of-type(even) .zone-main { order:1; }
+  @media (max-width:900px) {
+    .zone-split { grid-template-columns:1fr !important; min-height:0; }
+    section.zone .zone-rail, section.zone .zone-main { order:0 !important; }
+    .zone-rail { padding:36px 28px !important; }
+    .zone-num { font-size:3.2rem !important; }
+    .zone-logo-placeholder { width:112px !important; height:112px !important; aspect-ratio:auto !important; font-size:30px !important; margin:6px 0 16px !important; }
+    .zone-main { padding:40px 6% 48px !important; }
+  }
+
+  /* Left rail: solid zone-color block carrying the number + identity — this is
+     what makes each zone visually distinct at a glance, not just a recolored badge. */
+  .zone-rail {
+    background: linear-gradient(165deg, var(--zc), var(--zc-deep));
+    color:#fff; padding:56px 32px; display:flex; flex-direction:column; justify-content:space-between;
+    position:relative; overflow:hidden;
+  }
+  .zone-num { font-family:var(--font-display); font-weight:900; font-size:clamp(4.2rem,8vw,6.4rem); line-height:.8; opacity:.92; }
+  .zone-rail-top .zone-eyebrow { font-size:11px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; opacity:.85; margin-bottom:8px; }
+  .zone-rail-top h2 { font-family:var(--font-display); font-weight:650; font-size:1.9rem; margin-bottom:12px; }
+  .zone-logo-placeholder {
+    width:100%; aspect-ratio:1/1; height:auto; border-radius:20px; margin:6px 0 22px;
+    background:rgba(255,255,255,0.14); border:2px dashed rgba(255,255,255,0.5);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-weight:650; font-size:44px; color:#fff;
+    flex-shrink:0; overflow:hidden;
+  }
+  .zone-logo-placeholder img { width:100%; height:100%; object-fit:cover; display:block; }
+  .zone-slogan { font-style:italic; font-size:13.5px; opacity:.85; max-width:32ch; line-height:1.6; }
+  .zone-slogan.placeholder { opacity:.6; }
+  .zone-stat-row { display:flex; gap:28px; margin-top:26px; }
+  .zone-stat-row .zone-stat b { font-family:var(--font-display); font-size:1.7rem; font-weight:650; display:block; }
+  .zone-stat-row .zone-stat span { display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:.6px; opacity:.8; margin-top:3px; }
+
+  .zone-main { padding:56px 6% 64px 5%; min-width:0; overflow-x:clip; }
+  .zone-subhead {
+    font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1.2px;
+    color:var(--zc-deep); margin:0 0 18px; display:flex; align-items:center; gap:12px;
+  }
+  .zone-subhead:not(:first-child) { margin-top:40px; }
+  .zone-subhead::after { content:''; flex:1; height:1px; background:var(--line); }
+
+  /* ===== GALLERY — editorial viewbook rhythm (staggered heights, serif
+     captions that lift on hover), the way admissions photo strips on
+     Ivy-tier sites read: unhurried, a little asymmetric, image-first. ===== */
+  .gallery-row {
+    display:flex; align-items:flex-start; gap:22px; overflow-x:auto; scroll-snap-type:x mandatory;
+    padding:6px 4px 22px;
+  }
+  .gallery-row::-webkit-scrollbar { height:6px; }
+  .gallery-row::-webkit-scrollbar-track { background:transparent; }
+  .gallery-row::-webkit-scrollbar-thumb { background:var(--line); border-radius:10px; }
+
+  .gallery-item {
+    scroll-snap-align:start; flex:0 0 232px; height:296px; border-radius:16px; overflow:hidden;
+    position:relative; background:var(--card); box-shadow:var(--shadow);
+    transition:transform .45s cubic-bezier(.22,.68,0,1), box-shadow .45s cubic-bezier(.22,.68,0,1);
+  }
+  /* gentle stagger on every third card — the asymmetric rhythm that keeps a
+     photo strip from reading like a spreadsheet */
+  .gallery-item:nth-child(3n+2) { margin-top:30px; }
+  .gallery-item:nth-child(3n) { margin-top:14px; }
+  .gallery-item:hover { transform:translateY(-8px); box-shadow:var(--shadow-hover); }
+
+  .gallery-item img {
+    width:100%; height:100%; object-fit:cover; display:block;
+    transition:transform .7s cubic-bezier(.22,.68,0,1);
+  }
+  .gallery-item:hover img { transform:scale(1.07); }
+
+  .gallery-item::after {
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(180deg, transparent 50%, rgba(6,12,31,0.82) 100%);
+  }
+  .gallery-caption {
+    position:absolute; left:0; right:0; bottom:0; z-index:2; padding:20px 18px 16px;
+    color:#fff; font-family:var(--font-display); font-weight:600; font-size:14.5px; line-height:1.35;
+    transform:translateY(6px); opacity:.92; transition:transform .4s ease, opacity .4s ease;
+  }
+  .gallery-item:hover .gallery-caption { transform:translateY(0); opacity:1; }
+
+  .gallery-empty {
+    flex:0 0 232px; height:296px; border-radius:16px; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:10px; text-align:center; padding:24px;
+    background:var(--card); border:1.5px dashed var(--line); color:var(--gray);
+  }
+  .gallery-empty .ge-icon {
+    width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background:color-mix(in srgb, var(--zc) 14%, transparent); color:var(--zc-deep);
+  }
+  .gallery-empty .ge-icon svg { width:17px; height:17px; }
+  .gallery-empty span { font-size:12.5px; font-weight:600; line-height:1.5; }
+
+  @media (max-width:640px) {
+    .gallery-item, .gallery-empty { flex-basis:200px; height:260px; }
+    .gallery-item:nth-child(3n+2), .gallery-item:nth-child(3n) { margin-top:0; }
+  }
+
+  .school-chip-grid { display:flex; flex-wrap:wrap; gap:9px; }
+  .school-chip {
+    padding:8px 14px; background:var(--card); border-radius:6px; font-size:12.5px; font-weight:500; color:var(--ink);
+    border:1px solid var(--line); display:flex; align-items:center; gap:8px;
+  }
+  .school-chip .dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; background:var(--zc); }
+  .tech-note { font-size:12px; color:var(--gray); margin:16px 0 10px; font-style:italic; }
+
+  /* ===== WDS / LG ===== */
+  .field-section { background:var(--paper-2); padding:96px 6%; border-top:1px solid var(--line); }
+  .field-inner { width:100%; max-width:1180px; min-width:0; margin:0 auto; }
+  .field-head { max-width:640px; margin-bottom:48px; }
+  .field-head .tag { display:inline-block; font-size:11.5px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:var(--fc-deep); margin-bottom:12px; }
+  .field-head h2 { font-family:var(--font-display); font-weight:650; font-size:clamp(1.7rem,3.2vw,2.4rem); margin-bottom:14px; }
+  .field-head p { font-style:italic; color:var(--gray); font-size:15px; line-height:1.7; }
+
+  .event-grid { display:grid; grid-template-columns:1.1fr .9fr; gap:0; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--card); }
+  .event-grid > .event-card:first-child { border-right:1px solid var(--line); }
+  @media (max-width:860px) { .event-grid { grid-template-columns:1fr; } .event-grid > .event-card:first-child { border-right:none; border-bottom:1px solid var(--line); } }
+  .event-card { padding:38px 34px; border-top:3px solid var(--fc); }
+  .event-card h3 { font-family:var(--font-display); font-weight:650; font-size:20px; margin-bottom:12px; }
+  .event-card p { font-size:14px; color:var(--gray); line-height:1.75; margin-bottom:14px; }
+  .event-card ul { margin:0 0 14px 0; }
+  .event-card ul li { font-size:13px; color:var(--gray); line-height:1.85; padding-left:16px; position:relative; }
+  .event-card ul li::before { content:'—'; position:absolute; left:0; opacity:.55; }
+  .event-photo-row { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+  .event-photo-placeholder {
+    flex:1; min-width:110px; aspect-ratio:4/3; border-radius:8px; border:1px dashed var(--line); background:var(--paper);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; color:var(--gray); font-size:11px; text-align:center; padding:8px;
+  }
+  .event-photo-placeholder svg { width:20px; height:20px; opacity:.4; }
+  .event-photo-full { flex:1; min-width:110px; aspect-ratio:4/3; border-radius:8px; overflow:hidden; }
+  .event-photo-full img { width:100%; height:100%; object-fit:cover; display:block; }
+
+  .source-note { font-size:12px; color:var(--gray); margin-top:30px; font-style:italic; }
+
+  footer { background:var(--ink); color: color-mix(in srgb, var(--paper) 65%, transparent); text-align:center; padding:38px 6%; font-size:12.5px; }
+  html[data-theme="dark"] footer { background:#0a0805; }
+  footer a { color:var(--brand-blue-light); font-weight:700; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { transition:none; opacity:1; transform:none; }
+  }
+</style>
+<script>
+  (function () {
+    try {
+      const saved = localStorage.getItem('arsrc-theme');
+      const theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) { /* localStorage unavailable — default light theme applies */ }
+  })();
+</script>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="/">
+    <div class="nav-badge"><img src="assets/images/ar.png" alt="ARSRC Logo"></div>
+    <span class="nav-name">ARSRC</span>
+  </a>
+  <div class="jump-links">
+    <a href="#zone1">Zone 1</a>
+    <a href="#zone2">Zone 2</a>
+    <a href="#zone3">Zone 3</a>
+    <a href="#zone4">Zone 4</a>
+    <a href="#wds">WDS</a>
+    <a href="#lg">LG</a>
+  </div>
+  <div class="nav-right">
+    <button class="site-search-button" id="siteSearchButton" type="button" aria-label="Search this page" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button>
+    <a class="back-btn" href="/">← Back to home</a>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" type="button">
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    </button>
+    <button class="burger" id="burger" aria-label="Toggle menu" aria-expanded="false" type="button">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#zone1">Zone 1</a>
+  <a href="#zone2">Zone 2</a>
+  <a href="#zone3">Zone 3</a>
+  <a href="#zone4">Zone 4</a>
+  <a href="#wds">WDS</a>
+  <a href="#lg">LG</a>
+</div>
+
+<div class="site-search-dialog" id="siteSearchDialog" role="dialog" aria-modal="true" aria-labelledby="siteSearchTitle" hidden>
+  <div class="site-search-panel">
+    <div class="site-search-head"><h2 id="siteSearchTitle">Search ARSRC</h2><button class="site-search-close" id="siteSearchClose" type="button" aria-label="Close search">×</button></div>
+    <input class="site-search-input" id="siteSearchInput" type="search" placeholder="Search this page…" autocomplete="off">
+    <div class="site-search-results" id="siteSearchResults" aria-live="polite"></div>
+  </div>
+</div>
+
+<header class="hero">
+  <!-- Drop engagement-video.mp4 (and ideally .webm) + engagement-poster.jpg into
+       assets/videos/. Until those exist, the branded gradient placeholder below
+       stays visible — same safe-fallback approach as the homepage hero video. -->
+  <div class="hero-video-wrap">
+    <video class="hero-video" id="engagementVideo" autoplay muted loop playsinline poster="assets/videos/engagement-poster.jpg">
+      <source src="assets/videos/hero-video.mp4" type="video/mp4">
+      <source src="assets/videos/engagement-video.webm" type="video/webm">
+    </video>
+    <div class="video-placeholder" id="videoPlaceholder">
+      <div class="vp-icon">▶</div>
+      <div class="vp-label">Engagement in motion</div>
+      <div class="vp-sub">Add engagement-video.mp4 to assets/videos/ and this becomes a highlight reel from council activities across all four zones.</div>
+    </div>
+  </div>
+  <div class="hero-scrim"></div>
+  <div class="hero-flagbar"><span style="background:var(--brand-blue-deep)"></span><span style="background:var(--brand-blue)"></span><span style="background:var(--brand-red)"></span></div>
+  <div class="hero-inner">
+    <div class="reveal">
+      <span class="hero-eyebrow">Ashanti Regional SRC · Est. 1997</span>
+      <h1>Where <em>student voice</em><br>becomes student leadership.</h1>
+      <p class="hero-lede">Four zones, thirty-plus member schools apiece, and two flagship societies — the Writers &amp; Debaters Society and the Literary Group. This is what engagement looks like on the ground, zone by zone.</p>
+    </div>
+    <div class="stat-strip reveal">
+      <div class="stat"><div class="n">4</div><div class="l">Zones</div></div>
+      <div class="stat"><div class="n">150+</div><div class="l">Member schools</div></div>
+      <div class="stat"><div class="n">2</div><div class="l">Flagship societies</div></div>
+      <div class="stat"><div class="n">1997</div><div class="l">Founded</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= ZONE 1 — RED ================= -->
+<section class="zone" id="zone1" style="--zc:var(--red); --zc-deep:var(--red-deep);">
+  <div class="zone-split">
+    <div class="zone-rail reveal">
+      <div class="zone-rail-top">
+        <div class="zone-eyebrow">Zone One</div>
+        <h2>Zone 1</h2>
+        <div class="zone-logo-placeholder" id="z1-logo">Z1</div>
+        <p class="zone-slogan placeholder" id="z1-slogan">[ Zone 1 slogan — to be supplied by the Zonal Executive ]</p>
+      </div>
+      <div>
+        <div class="zone-num">01</div>
+        <div class="zone-stat-row">
+          <div class="zone-stat"><b id="z1-shs-count">0</b><span>SHS / SHTS</span></div>
+          <div class="zone-stat"><b id="z1-tech-count">0</b><span>Technical</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="zone-main">
+      <div class="zone-subhead reveal">Students of Zone 1 in action</div>
+      <div class="gallery-row reveal" id="z1-avatars"></div>
+
+      <div class="zone-subhead reveal">Senior High &amp; Technical schools</div>
+      <div class="school-chip-grid reveal" id="z1-shs-list"></div>
+
+      <p class="tech-note">Technical institutes under Zone 1</p>
+      <div class="school-chip-grid reveal" id="z1-tech-list"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ZONE 2 — GOLD ================= -->
+<section class="zone" id="zone2" style="--zc:var(--amber); --zc-deep:var(--amber-deep);">
+  <div class="zone-split">
+    <div class="zone-rail reveal">
+      <div class="zone-rail-top">
+        <div class="zone-eyebrow">Zone Two</div>
+        <h2>Zone 2</h2>
+        <div class="zone-logo-placeholder" id="z2-logo">Z2</div>
+        <p class="zone-slogan placeholder" id="z2-slogan">[ Zone 2 slogan — to be supplied by the Zonal Executive ]</p>
+      </div>
+      <div>
+        <div class="zone-num">02</div>
+        <div class="zone-stat-row">
+          <div class="zone-stat"><b id="z2-shs-count">0</b><span>SHS / SHTS</span></div>
+          <div class="zone-stat"><b id="z2-tech-count">0</b><span>Technical</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="zone-main">
+      <div class="zone-subhead reveal">Students of Zone 2 in action</div>
+      <div class="gallery-row reveal" id="z2-avatars"></div>
+
+      <div class="zone-subhead reveal">Senior High &amp; Technical schools</div>
+      <div class="school-chip-grid reveal" id="z2-shs-list"></div>
+
+      <p class="tech-note">Technical institutes under Zone 2</p>
+      <div class="school-chip-grid reveal" id="z2-tech-list"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ZONE 3 — GREEN ================= -->
+<section class="zone" id="zone3" style="--zc:var(--teal); --zc-deep:var(--teal-deep);">
+  <div class="zone-split">
+    <div class="zone-rail reveal">
+      <div class="zone-rail-top">
+        <div class="zone-eyebrow">Zone Three</div>
+        <h2>Zone 3</h2>
+        <div class="zone-logo-placeholder" id="z3-logo">Z3</div>
+        <p class="zone-slogan placeholder" id="z3-slogan">[ Zone 3 slogan — to be supplied by the Zonal Executive ]</p>
+      </div>
+      <div>
+        <div class="zone-num">03</div>
+        <div class="zone-stat-row">
+          <div class="zone-stat"><b id="z3-shs-count">0</b><span>SHS / SHTS</span></div>
+          <div class="zone-stat"><b id="z3-tech-count">0</b><span>Technical</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="zone-main">
+      <div class="zone-subhead reveal">Students of Zone 3 in action</div>
+      <div class="gallery-row reveal" id="z3-avatars"></div>
+
+      <div class="zone-subhead reveal">Senior High &amp; Technical schools</div>
+      <div class="school-chip-grid reveal" id="z3-shs-list"></div>
+
+      <p class="tech-note">Technical institutes under Zone 3</p>
+      <div class="school-chip-grid reveal" id="z3-tech-list"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ZONE 4 — BLUE ================= -->
+<section class="zone" id="zone4" style="--zc:var(--blue); --zc-deep:var(--blue-deep);">
+  <div class="zone-split">
+    <div class="zone-rail reveal">
+      <div class="zone-rail-top">
+        <div class="zone-eyebrow">Zone Four</div>
+        <h2>Zone 4</h2>
+        <div class="zone-logo-placeholder" id="z4-logo">Z4</div>
+        <p class="zone-slogan placeholder" id="z4-slogan">[ Zone 4 slogan — to be supplied by the Zonal Executive ]</p>
+      </div>
+      <div>
+        <div class="zone-num">04</div>
+        <div class="zone-stat-row">
+          <div class="zone-stat"><b id="z4-shs-count">0</b><span>SHS / SHTS</span></div>
+          <div class="zone-stat"><b id="z4-tech-count">0</b><span>Technical</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="zone-main">
+      <div class="zone-subhead reveal">Students of Zone 4 in action</div>
+      <div class="gallery-row reveal" id="z4-avatars"></div>
+
+      <div class="zone-subhead reveal">Senior High &amp; Technical schools</div>
+      <div class="school-chip-grid reveal" id="z4-shs-list"></div>
+
+      <p class="tech-note">Technical institutes under Zone 4</p>
+      <div class="school-chip-grid reveal" id="z4-tech-list"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WDS ================= -->
+<section class="field-section" id="wds" style="--fc:var(--blue); --fc-deep:var(--blue-deep);">
+  <div class="field-inner">
+    <div class="field-head reveal">
+      <span class="tag">Writers &amp; Debaters Society</span>
+      <h2>WDS in action</h2>
+      <p>"I speak, I write, therefore I am." The WDS runs the region's flagship debating competition and represents member schools in public speaking and literary discourse.</p>
+    </div>
+
+    <div class="event-grid" id="wds-event-grid">
+      <div class="event-card reveal">
+        <h3>Luv FM / ARSRC High School Debate</h3>
+        <p>The region's marquee inter-school debate competition, run by Luv FM in partnership with the Ghana Education Service, the Conference of Assisted Secondary Schools (CHASS), and the ARSRC's Writers &amp; Debaters Society. Schools compete through a knockout bracket — Round of 16, quarterfinals, semifinals, and a grand finale — broadcast live on radio and streamed on Facebook and MultiTV's Joy Learning / Joy Prime channels.</p>
+        <ul>
+          <li>Format: knockout rounds building to a live-broadcast grand finale</li>
+          <li>Organizers: Luv FM, GES, CHASS, and ARSRC WDS</li>
+          <li>Notable finalists over the years: Prempeh College, Kumasi Wesley Girls SHS, St. Monica SHS, T.I. Ahmadiyya SHS, Kumasi High School, PRESEC Bompata, and Yaa Asantewaa Girls SHS</li>
+        </ul>
+        <div class="event-photo-row">
+          <div class="event-photo-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Photo — debate round</div>
+          <div class="event-photo-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Photo — grand finale</div>
+        </div>
+      </div>
+
+      <div class="event-card reveal stagger-2" style="border-top-color:var(--gray);">
+        <h3>National Public Speaking Competition</h3>
+        <p style="font-style:italic;">Placeholder section — send over dates, format, and past results through the admin dashboard and this card will fill in automatically with verified details.</p>
+        <div class="event-photo-row">
+          <div class="event-photo-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Photo placeholder</div>
+        </div>
+      </div>
+    </div>
+    <p class="source-note">Debate details summarized from public reporting on the Luv FM/ARSRC High School Debate (MyJoyOnline, Raph Sark, ARSRC news coverage).</p>
+  </div>
+</section>
+
+<!-- ================= LG ================= -->
+<section class="field-section" id="lg" style="--fc:var(--red); --fc-deep:var(--red-deep); background:var(--paper);">
+  <div class="field-inner">
+    <div class="field-head reveal">
+      <span class="tag">Literary Group</span>
+      <h2>LG in action</h2>
+      <p>The Literary Group Executive Committee (LIGEC) coordinates creative and performing-arts talent across member schools, anchored by two signature annual events.</p>
+    </div>
+
+    <div class="event-grid" id="lg-event-grid">
+      <div class="event-card reveal">
+        <h3>Talefest</h3>
+        <p>ARSRC's flagship talent showcase, built to educate and entertain in equal measure — celebrating student creativity while fostering unity across schools. Schools go through a preliminary round hosted at different member schools each year before qualifying for the regional finals.</p>
+        <ul>
+          <li>Categories: poetry, drama, choreography, music, and cultural/traditional dance</li>
+          <li>Recent prelim &amp; finals venues: Nsutaman Catholic SHS, Yaa Asantewaa Girls SHS, and Prempeh College</li>
+          <li>Participating schools include Kumasi Wesley Girls SHS, Osei Tutu SHS, Kofi Agyei SHTS, Barekese SHS, and Jachie Pramso SHS, among many others</li>
+        </ul>
+        <div class="event-photo-row">
+          <div class="event-photo-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Photo — drama category</div>
+          <div class="event-photo-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Photo — cultural dance</div>
+        </div>
+      </div>
+
+      <div class="event-card reveal stagger-2" style="border-top-color:var(--amber);">
+        <h3>Ashanti (High Schools) Music Fiesta</h3>
+        <p>A regional showcase for school bands and choirs, launched by the Ashanti Regional Education Directorate in partnership with ARSRC under the theme "Music Without Borders: United in Harmony" — built to promote unity through music and give talented students a formal stage for their creativity.</p>
+        <ul>
+          <li>Held at venues including Prempeh College and the Baba Yara Sports Stadium</li>
+          <li>Participating schools include Prempeh College, Yaa Asantewaa Girls SHS, St. Monica's SHS, Kumasi Wesley Girls SHS, Kumasi Girls SHS, Asanteman SHS, Kumasi Academy, Osei Tutu SHS, and Namong SHTS</li>
+        </ul>
+        <div class="event-photo-row">
+          <div class="event-photo-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Photo — band performance</div>
+        </div>
+      </div>
+    </div>
+    <p class="source-note">Talefest and Music Fiesta details summarized from ARSRC/school social coverage (Kumasi Wesley Girls HS news, Osei Tutu SHS news, Modern Ghana, and ARSRC TV social posts).</p>
+  </div>
+</section>
+
+<footer>
+  © 2026 Ashanti Regional Students' Representative Council · <a href="/">Back to home</a>
+</footer>
+
+<script>
+(function () {
+  const ZONE_SHS = {
+    z1: ["Aduman SHS","Adugyama Comm. SHS","Adobewura Comm. SHS","Adventist SHS, Kumasi","Afigyaman SHS","Afigya SHTS","Afua Kobi Ampem Girls SHS","Akumadan SHS","Asuoso SHS","Barekese SHS","Dwamena Akenten SHS","Essase SHS","Islamic SHS","Kumasi Girls SHS","Kwasi Oppong SHS","Mabang SHTS","Mankranso SHS","Mapasatia SHS","Namong SHTS","Nkawie SHTS","Nkenkensu SHS","Nyinahin Cath. SHS","Osei Tutu SHS","Osei Tutu II College","Pentecost SHS","Prempeh College","Saburonum SHS","St. Jerome SHS","St. Micheal's Comm. SHS","Spiritan SHS","Tepa SHS","Toase SHS","Wiafe Akenten SHS","Yaa Asantewaa Girls SHS","Yeifi SHS"],
+    z2: ["Akrofuom SHTS","Anum SHS","Apagya Comm SHS","Armed Forces SHTS","Asare Bediako SHS","Atwima Kwanwoma SHS","Beposo SHS","Bodwesango SHS","Bosomtwe STEM Boys SHS","Bosomtwe STEM Girls SHS","Bosomtwe Oyoko SHS","Christ the King SHS","Denyaseman Cath. SHS","Dompoase SHS","International Community School","Jacobu SHTS","Jachie Pramso SHS","J.A. Kuffuor SHS","Kumasi High School","Kumasi Snr. High Tech School","Manso Adubia SHS","Mansoman SHS","New Edubiase SHS","Obuasi SHTS","Ofoase Kokoben SHS","Opoku Ware School","Oppong Memorial SHS","Osei Adutwum SHS","Presbyterian Girls SHS","Prince of Peace Girls","S.D.A. SHS, Bekwai","St. Georges SHS","St. Joseph SHTS, Ahwiren","St. Hubert Seminary School","St. Michael Voc/Tech","The Ridge SHS","T.I. Amass, Fomena","Tweapease SHS","Wesley High School, Bekwai"],
+    z3: ["Achinakrom SHS","Anglican SHS, Kumasi","Agogo State College","Banka Community SHS","Bankoman SHS","Bodomase SHTS","Bonwire SHTS","Bosome SHS","Collins SHS, Agogo","Church of Christ SHS","Dadease Agric SHS","Effiduase SHS Comm.","Effiduase SHTS","Ejisuman SHS","Ejisu SHTS","Ideal College","Juaben SHS","Juaso SHTS","Konongo Odumase SHS","KNUST SHS","Krobea Asante SHS","Kumasi Technical Institute","Kurofa Methodist SHS","Mancel Girls SHTS","Morso SHTS","Ofoase SHTS","Owerriman SHS","Onwe SHS","Oyoko SHS","Presby SHS, Bompata","St. Louis SHS","St. Mary's Girls SHS","St. Sebastian SHS","T.I. Amass Girls' SHS, Asokore","T.I. Amass, Kumasi","Tijjaniya SHS","Tweneboa Kodua SHS","Wesley High School, Konongo"],
+    z4: ["Adugyamfi SHS","Adawomase SHS","Adventist Girls SHS, Ntonso","Agona S.D.A. SHS","Agona SHTS","Akwesi Awobaa SHTS","Antoa SHS","Al-Ahzariya Islamic SHS","Amaniampong SHS","Asanteman SHS","Ejuraman Anglican SHS","Ghana Muslim Mission SHS","Gyamaa Pensan SHTS","Ibadur Rahman Academy","Kofi Agyei SHTS","Kofiase Adventist SHTS","Konadu Yiadom SHS","Kumasi Academy","Kumasi Wesley Girls SHS","Nsutaman Cath. SHS","Osei Kyeretwie SHS","Okomfo Anokye SHS","Our Lady of Grace SHS","Parkoso SHS","Presby SHS, Kwamang","Sakafia Islamic SHS","Serwaa Nyarko Girls SHS","Sekyeredumase SHTS","SIMMS SHS Comm.","St. Joseph Seminary SHS","St. Monica's SHS","Tawheed SHS","Uthmaniya SHS"],
+  };
+  const ZONE_TECH = {
+    z1: ["Heman Bouho Technical Institute","Offinso Technical Institute","Suntreso Technical Institute","Nerebehi Technical Institute","Suame Technical Institute","Twedie Technical Institute","Yaa Pokuaa Technical Institute","Akomadan Technical Institute","Otaakrom Technical Institute","Methodist Technical Institute"],
+    z2: ["Amoafa Technical Institute","Afuako Technical Institute","Business Secondary Technical Institute","Jachie Special Needs","Konkoma Technical Institute","Pakyi Technical Institute","Nana Ampontua Technical Institute","St. Michael Technical Institute","Bekwai TSC","Tetrefu Technical Institute","Ramseyer Technical Institute"],
+    z3: ["Abosamso Technical Institute","Adako Jachie Technical Institute","Asankare Technical Institute","Bawuro Technical Institute","Dwease Praso Technical Institute","Kumawu TSC Technical Institute","Krobea Asante Technical Institute","Kumasi Technical Institute","Konongo TSC","Juaben Technical Institute","Achiase Technical Institute"],
+    z4: ["Agona Technical Institute","Ejuraman Technical Institute","Mampong TSC","Catholic Technical Institute"],
+  };
+
+  function esc(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function renderChips(containerId, list) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    el.innerHTML = list.map(name =>
+      `<div class="school-chip"><span class="dot"></span>${esc(name)}</div>`
+    ).join('');
+  }
+
+  // Calm horizontal gallery — no drag-physics, no 3D transforms.
+  function renderGallery(containerId, photos) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    if (!photos.length) {
+      el.innerHTML = `
+        <div class="gallery-empty">
+          <div class="ge-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>
+          <span>Photos coming soon —<br>added by the zonal executive</span>
+        </div>`;
+      return;
+    }
+    el.innerHTML = photos.map(p => `
+      <div class="gallery-item">
+        <img src="${esc(p.photo_url)}" alt="${esc(p.name || 'Zone student activity')}" loading="lazy">
+        <div class="gallery-caption">${esc(p.name || 'Students engaging in a council activity')}</div>
+      </div>`).join('');
+  }
+
+  function renderEventCard(ev, colorVar) {
+    const photos = Array.isArray(ev.photo_urls) ? ev.photo_urls : [];
+    const photoHtml = photos.length
+      ? photos.map(url => `<div class="event-photo-full"><img src="${esc(url)}" alt="${esc(ev.title)}" loading="lazy"></div>`).join('')
+      : `<div class="event-photo-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Photos coming soon</div>`;
+    return `
+      <div class="event-card reveal" style="border-top-color:${colorVar};">
+        <h3>${esc(ev.title)}</h3>
+        ${ev.description ? `<p>${esc(ev.description)}</p>` : ''}
+        <div class="event-photo-row">${photoHtml}</div>
+      </div>`;
+  }
+
+  async function loadEngagementData() {
+    let data = { zones: {}, schools: {}, students: {}, events: {} };
+    try {
+      const res = await fetch('/api/engagement');
+      if (res.ok) data = await res.json();
+    } catch { /* offline / API not reachable — fall back to built-in content below */ }
+
+    ['z1','z2','z3','z4'].forEach(z => {
+      const zone = data.zones && data.zones[z];
+      if (zone && zone.slogan) {
+        const el = document.getElementById(`${z}-slogan`);
+        el.textContent = zone.slogan;
+        el.classList.remove('placeholder');
+      }
+      if (zone && zone.logo_url) {
+        const logoEl = document.getElementById(`${z}-logo`);
+        if (logoEl) logoEl.innerHTML = `<img src="${esc(zone.logo_url)}" alt="${z.toUpperCase()} logo">`;
+      }
+
+      const adminSchools = (data.schools && data.schools[z]) || { shs: [], tech: [] };
+      const shsList = adminSchools.shs.length ? adminSchools.shs.map(s => s.name) : ZONE_SHS[z];
+      const techList = adminSchools.tech.length ? adminSchools.tech.map(s => s.name) : ZONE_TECH[z];
+      renderChips(`${z}-shs-list`, shsList);
+      renderChips(`${z}-tech-list`, techList);
+      document.getElementById(`${z}-shs-count`).textContent = shsList.length;
+      document.getElementById(`${z}-tech-count`).textContent = techList.length;
+
+      const studentPhotos = (data.students && data.students[z]) || [];
+      renderGallery(`${z}-avatars`, studentPhotos);
+    });
+
+    const wdsEvents = (data.events && data.events.wds) || [];
+    const lgEvents = (data.events && data.events.lg) || [];
+    if (wdsEvents.length) {
+      document.getElementById('wds-event-grid').innerHTML = wdsEvents.map(ev => renderEventCard(ev, 'var(--blue)')).join('');
+    }
+    if (lgEvents.length) {
+      document.getElementById('lg-event-grid').innerHTML = lgEvents.map(ev => renderEventCard(ev, 'var(--red)')).join('');
+    }
+
+    initRevealObserver();
+  }
+
+  loadEngagementData();
+
+  function initRevealObserver() {
+    const targets = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window)) {
+      targets.forEach(t => t.classList.add('in-view'));
+      return;
+    }
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+    targets.forEach(t => observer.observe(t));
+  }
+
+  const themeToggle = document.getElementById('themeToggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('arsrc-theme', next); } catch (e) { /* ignore */ }
+    });
+  }
+
+  // ── Mobile menu ──────────────────────────────────────────────────────────
+  const burger = document.getElementById('burger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  if (burger && mobileMenu) {
+    burger.addEventListener('click', () => {
+      const isOpen = burger.classList.toggle('open');
+      mobileMenu.classList.toggle('open', isOpen);
+      burger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+    mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      burger.classList.remove('open');
+      mobileMenu.classList.remove('open');
+      burger.setAttribute('aria-expanded', 'false');
+    }));
+  }
+
+  // ── Hero background video: swap placeholder for the real video once it
+  // loads, fall back silently (placeholder stays) if no file is present. ──
+  (function initHeroVideo() {
+    const vid = document.getElementById('engagementVideo');
+    const ph = document.getElementById('videoPlaceholder');
+    if (!vid || !ph) return;
+
+    vid.addEventListener('loadeddata', () => {
+      vid.style.display = 'block';
+      ph.style.display = 'none';
+      vid.play().catch(() => { /* autoplay blocked — poster/placeholder stays visible */ });
+    });
+    vid.addEventListener('error', () => {
+      vid.style.display = 'none';
+      ph.style.display = 'flex';
+    });
+  })();
+})();
+</script>
+<script src="search.js"></script>
+</body>
+</html>

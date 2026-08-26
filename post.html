@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loading… — ARSRC</title>
+  <link rel="icon" type="image/png" sizes="any" href="/favicon.png?v=2">
+<link rel="shortcut icon" href="/favicon.png?v=2">
+  <link rel="apple-touch-icon" href="/favicon.png?v=2">
+  <meta name="description" content="News, magazines, and stories from the Ashanti Regional Students' Representative Council.">
+  <style>
+    .reading-progress{position:fixed;top:0;left:0;width:100%;height:4px;z-index:40;background:rgba(16,42,107,.12);pointer-events:none}.reading-progress span{display:block;width:0;height:100%;background:linear-gradient(90deg,var(--red),var(--blue));transition:width .08s linear}
+    :root{--navy:#102a6b;--blue:#1d4ed8;--red:#dc2626;--ink:#111d3d;--muted:#64748b;--paper:#f6f8fc;--line:rgba(16,42,107,.13)}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth;width:100%;max-width:100%;overflow-x:clip}
+    body{background:var(--paper);color:var(--ink);font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;overflow-x:clip;width:100%;max-width:100%}
+    body::before{content:'';position:fixed;inset:0;z-index:-1;opacity:.035;pointer-events:none;background-image:radial-gradient(#102a6b .7px,transparent .7px);background-size:13px 13px}
+    a{color:inherit;text-decoration:none}
+    .post-nav{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:24px;padding:14px clamp(20px,6vw,96px);background:rgba(246,248,252,.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+    .nav-brand{display:flex;align-items:center;gap:11px;color:var(--navy);font-size:13px;font-weight:900;letter-spacing:.2px}
+    .nav-mark{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,var(--blue),var(--navy));color:#fff;font-size:9px;letter-spacing:.5px;box-shadow:0 8px 18px rgba(29,78,216,.24)}
+    .nav-back{display:inline-flex;align-items:center;gap:8px;color:var(--red);font-size:12px;font-weight:800}
+    .post-main{width:100%;max-width:1480px;margin:0 auto;padding:clamp(60px,9vw,130px) clamp(20px,6vw,96px) 100px}
+    .post-intro{text-align:center;max-width:1120px;margin:0 auto}
+    .post-kicker{display:inline-flex;align-items:center;gap:10px;color:var(--red);font-size:10px;font-weight:900;letter-spacing:2.3px;text-transform:uppercase;margin-bottom:20px}
+    .post-kicker::before,.post-kicker::after{content:'';width:28px;height:2px;border-radius:99px;background:linear-gradient(90deg,var(--red),var(--blue))}
+    .post-title{font-family:Georgia,'Times New Roman',serif;color:var(--navy);font-size:clamp(2.7rem,7vw,6.8rem);font-weight:500;line-height:.96;letter-spacing:-.055em;text-wrap:balance}
+    .post-excerpt{max-width:700px;margin:28px auto 0;color:var(--muted);font-size:clamp(1rem,1.6vw,1.18rem);line-height:1.75}
+    .post-meta{display:flex;justify-content:center;flex-wrap:wrap;gap:10px 18px;margin-top:25px;color:#8390a5;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.75px}
+    .post-meta span+span{padding-left:18px;border-left:1px solid var(--line)}
+    .post-hero{height:clamp(300px,49vw,610px);margin:56px auto 74px;position:relative;overflow:hidden;border-radius:26px;background:linear-gradient(135deg,#102a6b,#1d4ed8 54%,#9f1414);box-shadow:0 26px 70px rgba(16,42,107,.2);isolation:isolate}
+    .post-hero-img{width:100%;height:100%;display:block;object-fit:cover}
+    .post-hero::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(130deg,rgba(16,42,107,.08),transparent 44%,rgba(8,18,49,.52))}
+    .post-hero::after{content:'ARSRC\A STUDENT DESK';white-space:pre;position:absolute;z-index:2;right:6%;bottom:7%;color:#fff;text-align:right;font-size:clamp(1rem,2.4vw,2rem);font-weight:900;letter-spacing:3px;line-height:1.05;text-shadow:0 4px 20px rgba(0,0,0,.3)}
+    .post-layout{display:grid;grid-template-columns:220px minmax(0,880px) 220px;gap:56px;justify-content:center;align-items:start}
+    .post-aside{padding-top:12px;border-top:3px solid var(--red);color:var(--muted);font-size:11px;line-height:1.7}
+    .post-aside strong{display:block;color:var(--navy);font-size:10px;letter-spacing:1.4px;text-transform:uppercase;margin-bottom:8px}
+    .post-content{font-family:Georgia,'Times New Roman',serif;color:#334155;font-size:clamp(1.08rem,1.4vw,1.22rem);line-height:1.9;min-width:0}
+    .post-content p{margin-bottom:30px}
+    .inline-article-image{margin:44px 0 48px;break-inside:avoid}
+    .inline-article-image img{display:block;width:100%;max-height:650px;object-fit:cover;border-radius:18px;box-shadow:0 20px 48px rgba(16,42,107,.14)}
+    .inline-article-image figcaption{margin-top:12px;color:#7c8aa1;font:600 11px/1.6 'Segoe UI',sans-serif;letter-spacing:.2px}
+    .inline-article-image figcaption::before{content:'↳  ';color:var(--red);font-weight:900}
+    .post-content p:first-child::first-letter{float:left;color:var(--red);font-size:4.8rem;font-weight:700;line-height:.76;padding:9px 10px 0 0}
+    .post-end{padding-top:26px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;font-family:'Segoe UI',sans-serif;line-height:1.6}
+    .story-nav{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:1136px;margin:78px auto 0}.story-nav[hidden],.related-section[hidden]{display:none}.story-nav a{min-height:118px;padding:22px 24px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.72);box-shadow:0 12px 30px rgba(16,42,107,.06);transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}.story-nav a:last-child{text-align:right}.story-nav a:hover{transform:translateY(-5px);border-color:rgba(29,78,216,.32);box-shadow:0 20px 42px rgba(16,42,107,.13)}.story-nav small{display:block;color:var(--red);font:900 10px/1.3 'Segoe UI',sans-serif;letter-spacing:1.3px;text-transform:uppercase;margin-bottom:12px}.story-nav strong{display:block;color:var(--navy);font:600 clamp(1.05rem,2vw,1.45rem)/1.15 Georgia,serif}.related-section{max-width:1136px;margin:74px auto 0;padding-top:30px;border-top:1px solid var(--line)}.related-heading{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:22px}.related-heading h2{color:var(--navy);font:600 clamp(1.8rem,3vw,2.6rem)/1 Georgia,serif}.related-heading p{color:var(--muted);font-size:12px}.related-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.related-card{display:flex;flex-direction:column;min-height:260px;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#fff;box-shadow:0 12px 30px rgba(16,42,107,.06);transition:transform .25s ease,box-shadow .25s ease}.related-card:hover{transform:translateY(-6px);box-shadow:0 20px 42px rgba(16,42,107,.14)}.related-card-art{height:118px;background:linear-gradient(135deg,var(--navy),var(--blue));background-size:cover;background-position:center}.related-card-body{display:flex;flex:1;flex-direction:column;padding:18px}.related-card-kicker{color:var(--red);font:900 9px/1.3 'Segoe UI',sans-serif;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px}.related-card h3{color:var(--navy);font:600 1.18rem/1.12 Georgia,serif}.related-card-meta{margin-top:auto;padding-top:18px;color:var(--muted);font-size:10px;font-weight:800;letter-spacing:.35px;text-transform:uppercase}.post-continue{display:inline-flex;align-items:center;gap:8px;margin-top:20px;color:var(--red);font:900 11px/1.3 'Segoe UI',sans-serif;letter-spacing:.8px;text-transform:uppercase}.post-continue::after{content:'→';font-size:16px;transition:transform .2s ease}.post-continue:hover::after{transform:translateX(4px)}
+    .post-end a{color:var(--red);font-weight:800}
+    .state-screen{min-height:74vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:15px;padding:40px 20px;text-align:center;color:var(--muted)}
+    .state-screen h2{color:var(--navy);font-family:Georgia,serif;font-size:32px;font-weight:500}
+    .state-screen p{font-size:14px}
+    .state-link{color:var(--red);font-size:13px;font-weight:800}
+    .spinner{width:34px;height:34px;border:3px solid rgba(29,78,216,.16);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @media(max-width:980px){.post-layout{grid-template-columns:minmax(0,860px);max-width:860px;margin:0 auto}.post-aside{display:none}}
+    @media(max-width:900px){.related-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:600px){.post-nav{padding:12px 18px}.nav-back{font-size:11px}.post-main{padding:56px 18px 72px}.post-title{font-size:clamp(2.5rem,13vw,4.5rem)}.post-hero{height:280px;margin:42px auto 48px;border-radius:18px}.post-content{font-size:1.05rem;line-height:1.8}.post-meta{gap:8px 12px}.post-meta span+span{padding-left:12px}.story-nav{grid-template-columns:1fr;margin-top:54px}.story-nav a:last-child{text-align:left}.related-grid{grid-template-columns:1fr}.related-heading{display:block}.related-heading p{margin-top:8px}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <div class="reading-progress" aria-hidden="true"><span id="readingProgressBar"></span></div>
+  <nav class="post-nav" aria-label="Article navigation">
+    <a class="nav-brand" href="/"><span class="nav-mark">ARSRC</span><span>Student Desk</span></a>
+    <a class="nav-back" id="backLink" href="/#news">← Back to News</a>
+  </nav>
+
+  <div class="state-screen" id="loadingState"><div class="spinner" aria-hidden="true"></div><p>Loading article…</p></div>
+  <div class="state-screen" id="errorState" style="display:none"><h2>Article not found</h2><p>This article may have been removed or the link is incorrect.</p><a class="state-link" id="errorBackLink" href="/#news">← Browse the latest news</a></div>
+
+  <main class="post-main" id="postContent" hidden>
+    <header class="post-intro">
+      <div class="post-kicker" id="postCategory">ARSRC Stories</div>
+      <h1 class="post-title" id="postTitle"></h1>
+      <p class="post-excerpt" id="postExcerpt"></p>
+      <div class="post-meta"><span id="postAuthor">ARSRC Council</span><span id="postDate"></span><span id="postFormat">Student-led article</span></div>
+    </header>
+    <div class="post-hero" id="postHero"><span id="heroPlaceholder" aria-hidden="true"></span></div>
+    <div class="post-layout">
+      <aside class="post-aside"><strong>About this article</strong><span id="postAsideText">A publication from the Ashanti Regional Students' Representative Council.</span></aside>
+      <article class="post-content" id="postBody"></article>
+      <aside class="post-aside"><strong>Keep reading</strong><span>Explore more student voices, field notes, and council updates in the ARSRC editorial shelf.</span><a class="post-continue" id="asideContinueLink" href="/#news">Browse the collection</a></aside>
+    </div>
+    <nav class="story-nav" id="storyNav" aria-label="Story navigation" hidden>
+      <a id="previousStory" href="#"><small>Previous story</small><strong></strong></a>
+      <a id="nextStory" href="#"><small>Next story</small><strong></strong></a>
+    </nav>
+    <section class="related-section" id="relatedSection" hidden>
+      <div class="related-heading"><h2>More from the Student Desk</h2><p>Continue exploring ARSRC voices and updates.</p></div>
+      <div class="related-grid" id="relatedGrid"></div>
+    </section>
+    <div class="post-end"><a id="footerBackLink" href="/#news">← Return to the collection</a></div>
+  </main>
+
+  <script>
+  (function(){
+    const slug=new URLSearchParams(location.search).get('slug');
+    const seedPosts={
+      'student-leader-field-guide':{title:'What makes a student leader?',category:'Magazine',author:'ARSRC Stories',excerpt:'A practical field guide to listening, showing up, and turning shared concerns into collective action.',content:'Leadership is not only the moment when a name is called. It is the quiet work of listening carefully, making room for another voice, and returning to a shared problem until the group can move forward.\n\nAcross the ARSRC network, student leadership grows through practice: asking better questions, communicating clearly, and choosing responsibility when it would be easier to look away.\n\nThe strongest leaders leave a room with more people feeling capable than when they entered it.',created_at:'2026-08-24T00:00:00Z'},
+      'four-zones-one-voice':{title:'Four zones, one student voice',category:'Story',author:'ARSRC Field Notes',excerpt:'A visual journey through the schools, people, and small rituals that make the network feel like home.',content:'Every zone carries its own rhythm, colors, and traditions. Together they create a regional network that is more than a map of schools. It is a living conversation between students who may be far apart but are working toward the same future.\n\nThe story of ARSRC is found in the small moments: a team arriving early, a debate continuing after the bell, and a new student finding confidence in a room full of peers.',created_at:'2026-08-24T00:00:00Z'},
+      'questions-are-leadership':{title:'Questions are a form of leadership',category:'Story',author:'The Debate Desk',excerpt:'Why the strongest rooms are built by students who ask better questions — and make space for honest answers.',content:'A good question can slow a room down in the best possible way. It can uncover an assumption, invite a quieter perspective, or turn a disagreement into a shared investigation.\n\nFor student leaders, curiosity is not hesitation. It is a discipline: understand the issue, listen for what is missing, and ask what would help everyone take the next step.',created_at:'2026-08-24T00:00:00Z'},
+      'notes-from-the-road-ahead':{title:'Notes from the road ahead',category:'Magazine',author:'ARSRC Letters',excerpt:'Short reflections from students carrying the work forward in their schools, communities, and future careers.',content:'The future is not a single destination. It is built through the habits we practice now: keeping our promises, learning from people unlike ourselves, and leaving systems kinder and more useful than we found them.\n\nThese notes are from students thinking honestly about the road ahead and the kind of leadership they want to carry with them.',created_at:'2026-08-24T00:00:00Z'}
+    };
+    const esc=v=>String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const isEditorial=post=>post.category==='Magazine'||post.category==='Story';
+    let currentPost=null;
+    function storyUrl(post){return 'post.html?slug='+encodeURIComponent(post.slug||'')}
+    function updateReadingProgress(){const bar=document.getElementById('readingProgressBar');if(!bar)return;const max=document.documentElement.scrollHeight-innerHeight;bar.style.width=(max>0?Math.min(100,Math.max(0,(scrollY/max)*100)):0)+'%'}
+    function setLinkCard(id,post,label){const link=document.getElementById(id);if(!post){link.hidden=true;return}link.hidden=false;link.href=storyUrl(post);link.querySelector('small').textContent=label;link.querySelector('strong').textContent=post.title||'Read the next story'}
+    function renderContinuation(post){
+      const fallback=Object.entries(seedPosts).map(([slug,p])=>({...p,slug}));
+      const source=(window.__postFeed&&window.__postFeed.length?window.__postFeed:fallback).filter(p=>p&&p.slug);
+      const list=[post,...source.filter(p=>p.slug!==post.slug)];
+      const index=list.findIndex(p=>p.slug===post.slug);
+      setLinkCard('previousStory',index<list.length-1?list[index+1]:null,'Previous story');
+      setLinkCard('nextStory',index>0?list[index-1]:null,'Next story');
+      const nav=document.getElementById('storyNav');nav.hidden=!((index<list.length-1)||(index>0));
+      const related=list.filter(p=>p.slug!==post.slug).slice(0,3);const section=document.getElementById('relatedSection');const grid=document.getElementById('relatedGrid');
+      grid.innerHTML=related.map(p=>{const img=safeImageUrl(p.image_url||'');const style=img?' style="background-image:linear-gradient(135deg,rgba(16,42,107,.28),rgba(220,38,38,.22)),url(\''+img+'\')"':'';return '<a class="related-card" href="'+storyUrl(p)+'"><div class="related-card-art"'+style+'></div><div class="related-card-body"><div class="related-card-kicker">'+esc(p.category||'ARSRC')+'</div><h3>'+esc(p.title||'Untitled story')+'</h3><div class="related-card-meta">'+esc(p.author||'ARSRC Council')+'</div></div></a>'}).join('');section.hidden=!related.length;
+    }
+    function render(post){
+      if(!post){showError();return}
+      const editorial=isEditorial(post), backHref=editorial?'/#magazines':'/#news';
+      document.title=(post.title||'ARSRC')+' — ARSRC';
+      document.getElementById('postCategory').textContent=post.category||'ARSRC Stories';
+      document.getElementById('postTitle').textContent=post.title||'';
+      document.getElementById('postExcerpt').textContent=post.excerpt||'';
+      document.getElementById('postAuthor').textContent=post.author||'ARSRC Council';
+      document.getElementById('postDate').textContent=post.created_at?new Date(post.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):'ARSRC editorial';
+      document.getElementById('postFormat').textContent=editorial?(post.category==='Magazine'?'Magazine feature':'Student-led story'):'Council update';
+      document.getElementById('postAsideText').textContent=editorial?'A student-led publication from the ARSRC editorial desk.':'An update from the Ashanti Regional Students’ Representative Council.';
+      const hero=document.getElementById('postHero');
+      if(post.image_url){const img=document.createElement('img');img.className='post-hero-img';img.src=post.image_url;img.alt=post.title||'';hero.prepend(img)}
+      ['backLink','footerBackLink'].forEach(id=>{const el=document.getElementById(id);el.href=backHref;el.textContent=editorial?(id==='backLink'?'← Back to Magazines & Stories':'← Return to Magazines & Stories'):(id==='backLink'?'← Back to News':'← Return to News')});
+      post.slug=post.slug||slug;
+      currentPost=post;
+      document.getElementById('asideContinueLink').href=backHref;
+      document.getElementById('asideContinueLink').textContent=editorial?'Browse magazines & stories':'Browse news';
+      document.getElementById('postBody').innerHTML=renderBody(post.content||'');
+      renderContinuation(post);
+      document.getElementById('loadingState').style.display='none';document.getElementById('postContent').hidden=false;
+      updateReadingProgress();
+    }
+    function renderBody(raw){
+      return String(raw).split(/\n\n+/).filter(p=>p.trim()).map(function(block){
+        var trimmed=block.trim();
+        var match=trimmed.match(/^\[\[IMAGE\|([^|]+)\|([^|]*)\|([^\]]*)\]\]$/);
+        if(match){
+          var src=safeImageUrl(match[1]);
+          if(!src) return '';
+          var alt=esc(match[2]||'Article image');
+          var caption=esc(match[3]||'');
+          return '<figure class="inline-article-image"><img src="'+src+'" alt="'+alt+'" loading="lazy">'+(caption?'<figcaption>'+caption+'</figcaption>':'')+'</figure>';
+        }
+        return '<p>'+esc(trimmed).replace(/\n/g,'<br>')+'</p>';
+      }).join('');
+    }
+    function safeImageUrl(url){
+      var value=String(url||'').trim();
+      return /^(https?:\/\/|\/|assets\/)/i.test(value) ? esc(value) : '';
+    }
+    function showError(){document.getElementById('loadingState').style.display='none';document.getElementById('errorState').style.display='flex'}
+    if(!slug){showError();return}
+    window.addEventListener('scroll',updateReadingProgress,{passive:true});
+    fetch('/api/posts?category=all',{credentials:'same-origin'}).then(r=>r.ok?r.json():Promise.reject(r.status)).then(d=>{window.__postFeed=d.posts||[];if(currentPost)renderContinuation(currentPost)}).catch(()=>{window.__postFeed=[];if(currentPost)renderContinuation(currentPost)});
+    fetch('/api/post?slug='+encodeURIComponent(slug),{credentials:'same-origin'}).then(r=>r.ok?r.json():Promise.reject(r.status)).then(d=>render(d.post)).catch(()=>render(seedPosts[slug]));
+  })();
+  </script>
+</body>
+</html>
