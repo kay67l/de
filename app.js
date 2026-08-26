@@ -118,7 +118,15 @@ function downloadFile(fileName) {
   const GROUPED_CATEGORIES = ['zec', 'ligec', 'wds', 'edicom', 'adhoc'];
   // Legacy records created under the former combined Literary & Editorial
   // category remain visible under LiGEC until they are reclassified.
-  const CATEGORY_ALIASES = { ligec: ['ligec', 'lit'], edicom: ['edicom'] };
+  function belongsToCategory(ex, cat) {
+    if (cat === 'edicom') {
+      return ex.category === 'edicom' || (ex.category === 'lit' && /editorial|edicom/i.test(ex.subgroup || ''));
+    }
+    if (cat === 'ligec') {
+      return ex.category === 'ligec' || (ex.category === 'lit' && !/editorial|edicom/i.test(ex.subgroup || ''));
+    }
+    return ex.category === cat;
+  }
 
   function escExec(str) {
     return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -161,8 +169,7 @@ function downloadFile(fileName) {
         const container = document.getElementById(`execGroups-${cat}`);
         if (!container) return;
 
-        const categories = CATEGORY_ALIASES[cat] || [cat];
-        const items = list.filter(e => categories.includes(e.category));
+        const items = list.filter(e => belongsToCategory(e, cat));
         if (!items.length) {
           container.innerHTML = '<div class="news-empty">No members added yet for this section.</div>';
           return;

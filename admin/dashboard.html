@@ -1856,12 +1856,24 @@
   const EXEC_CATEGORY_LABELS = {
     rec: 'Regional Executive Committee (REC)',
     zec: 'Zonal Executive Committee (ZEC)',
-    lit: 'Literary & Editorial',
+    ligec: 'Literary Group Executive Committee (LiGEC)',
     wds: 'Writers & Debaters Society (WDS)',
+    edicom: 'Editorial Committee (EDICOM)',
     sec: 'Secretariat',
-    adhoc: 'ADHOC',
+    adhoc: 'Adhoc',
   };
-  const EXEC_CATEGORY_ORDER = ['rec', 'zec', 'lit', 'wds', 'sec', 'adhoc'];
+  const EXEC_CATEGORY_ORDER = ['rec', 'zec', 'ligec', 'wds', 'edicom', 'sec', 'adhoc'];
+  // Keep old combined Literary & Editorial records visible while they are
+  // being reclassified; new records should use ligec or edicom explicitly.
+  function belongsToExecCategory(ex, cat) {
+    if (cat === 'edicom') {
+      return ex.category === 'edicom' || (ex.category === 'lit' && /editorial|edicom/i.test(ex.subgroup || ''));
+    }
+    if (cat === 'ligec') {
+      return ex.category === 'ligec' || (ex.category === 'lit' && !/editorial|edicom/i.test(ex.subgroup || ''));
+    }
+    return ex.category === cat;
+  }
 
   let execCache = [];
 
@@ -1894,7 +1906,7 @@
 
     let html = '';
     EXEC_CATEGORY_ORDER.forEach(cat => {
-      const inCat = execCache.filter(e => e.category === cat);
+      const inCat = execCache.filter(e => belongsToExecCategory(e, cat));
       if (!inCat.length) return;
 
       html += `<div class="exec-list-group"><h3>${esc(EXEC_CATEGORY_LABELS[cat])}</h3>`;
@@ -2058,7 +2070,7 @@
     execSubgroupInput.placeholder = isRec ? 'Not used for REC' : 'e.g. Zone 1';
     execSubgroupInput.disabled = isRec;
 
-    const options = [...new Set(execCache.filter(e => e.category === cat && e.subgroup).map(e => e.subgroup))];
+      const options = [...new Set(execCache.filter(e => belongsToExecCategory(e, cat) && e.subgroup).map(e => e.subgroup))];
     execSubgroupList.innerHTML = options.map(o => `<option value="${esc(o)}"></option>`).join('');
   }
   execCategorySelect.addEventListener('change', updateExecSubgroupOptions);
@@ -2333,7 +2345,7 @@
       const inYear = filtered.filter(e => e.year === yr);
 
       EXEC_CATEGORY_ORDER.forEach(cat => {
-        const inCat = inYear.filter(e => e.category === cat);
+        const inCat = inYear.filter(e => belongsToExecCategory(e, cat));
         if (!inCat.length) return;
         html += `<div style="font-size:11px;font-weight:700;color:rgba(238,242,255,.4);margin:12px 0 6px;text-transform:uppercase;letter-spacing:.5px;">${esc(EXEC_CATEGORY_LABELS[cat])}</div>`;
 
@@ -2417,7 +2429,7 @@
     pastExecSubgroupInput.placeholder = isRec ? 'Not used for REC' : 'e.g. Zone 1';
     pastExecSubgroupInput.disabled = isRec;
 
-    const options = [...new Set(pastExecCache.filter(e => e.category === cat && e.subgroup).map(e => e.subgroup))];
+      const options = [...new Set(pastExecCache.filter(e => belongsToExecCategory(e, cat) && e.subgroup).map(e => e.subgroup))];
     pastExecSubgroupList.innerHTML = options.map(o => `<option value="${esc(o)}"></option>`).join('');
   }
   pastExecCategorySelect.addEventListener('change', updatePastExecSubgroupOptions);
