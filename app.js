@@ -107,7 +107,7 @@ function downloadFile(fileName) {
 
 // ─── Dynamic executives section ──────────────────────────────────────────────
 // Fetches from /api/executives and renders every tab (REC, Secretariat, and
-// the grouped ZEC/Literary/WDS/ADHOC sub-committees) with the same .exec-card
+// the grouped ZEC/LiGEC/WDS/EDICOM/ADHOC sub-committees) with the same .exec-card
 // style, so all executive cards look identical regardless of category. Falls
 // back to an empty-state message per tab if no executives have been added yet.
 (function () {
@@ -115,7 +115,10 @@ function downloadFile(fileName) {
   const secGrid = document.getElementById('execGrid-sec');
   if (!recGrid) return; // not on a page with the executives section
 
-  const GROUPED_CATEGORIES = ['zec', 'lit', 'wds', 'adhoc'];
+  const GROUPED_CATEGORIES = ['zec', 'ligec', 'wds', 'edicom', 'adhoc'];
+  // Legacy records created under the former combined Literary & Editorial
+  // category remain visible under LiGEC until they are reclassified.
+  const CATEGORY_ALIASES = { ligec: ['ligec', 'lit'], edicom: ['edicom'] };
 
   function escExec(str) {
     return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -158,7 +161,8 @@ function downloadFile(fileName) {
         const container = document.getElementById(`execGroups-${cat}`);
         if (!container) return;
 
-        const items = list.filter(e => e.category === cat);
+        const categories = CATEGORY_ALIASES[cat] || [cat];
+        const items = list.filter(e => categories.includes(e.category));
         if (!items.length) {
           container.innerHTML = '<div class="news-empty">No members added yet for this section.</div>';
           return;
