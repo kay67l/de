@@ -2015,10 +2015,15 @@
   // ── Edit mode ────────────────────────────────────────────────────────────
   let editingExecId = null;
 
-  function enterEditMode(ex) {
+    function enterEditMode(ex) {
     editingExecId = ex.id;
-
-    document.getElementById('execCategory').value = ex.category;
+    // Records created before LiGEC and EDICOM were separated may still have
+    // category "lit". Map them to a valid current option before PATCHing;
+    // otherwise the select becomes blank and the API rejects the update.
+    const editCategory = ex.category === 'lit'
+      ? (/editorial|edicom/i.test(ex.subgroup || '') ? 'edicom' : 'ligec')
+      : ex.category;
+    document.getElementById('execCategory').value = editCategory;
     updateExecSubgroupOptions();
     document.getElementById('execSubgroup').value = ex.subgroup || '';
     document.getElementById('execName').value = ex.name || '';

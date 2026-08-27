@@ -117,7 +117,7 @@ function downloadFile(fileName) {
 
   const GROUPED_CATEGORIES = ['zec', 'ligec', 'wds', 'edicom', 'adhoc'];
   // Legacy records created under the former combined Literary & Editorial
-  // category remain visible under LiGEC until they are reclassified.
+  // category are split by subgroup until they are reclassified.
   function belongsToCategory(ex, cat) {
     if (cat === 'edicom') {
       return ex.category === 'edicom' || (ex.category === 'lit' && /editorial|edicom/i.test(ex.subgroup || ''));
