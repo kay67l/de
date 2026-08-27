@@ -1,0 +1,3107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — ARSRC</title>
+  <link rel="icon" type="image/png" sizes="any" href="/favicon.png?v=2">
+<link rel="shortcut icon" href="/favicon.png?v=2">
+  <link rel="apple-touch-icon" href="/favicon.png?v=2">
+  <meta name="robots" content="noindex, nofollow">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { width:100%; max-width:100%; overflow-x:clip; }
+
+    body {
+      min-height: 100vh;
+      width:100%; max-width:100%;
+      overflow-x:clip;
+      background: #060c1f;
+      font-family: 'Segoe UI', -apple-system, sans-serif;
+      color: #eef2ff;
+    }
+
+    /* Auth guard overlay — shown while verifying, hidden once confirmed */
+    .auth-guard {
+      position: fixed; inset: 0; z-index: 9999;
+      background: #060c1f;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 16px;
+    }
+
+    .auth-guard.hidden { display: none; }
+
+    .spinner {
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 3px solid rgba(59,130,246,0.2);
+      border-top-color: #3b82f6;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .auth-guard p { font-size: 13px; color: rgba(238,242,255,0.4); }
+
+    /* Top navbar */
+    .admin-nav {
+      width:100%; max-width:100%;
+      background: rgba(10,19,48,0.9);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(12px);
+      padding: 0 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px; position: sticky; top: 0; z-index: 100;
+    }
+
+    .admin-nav .brand {
+      display: flex; align-items: center; gap: 12px;
+    }
+
+    .admin-nav .badge {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, #1d4ed8, #102a6b);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 900; color: white;
+    }
+
+    .admin-nav .brand span {
+      font-size: 14px; font-weight: 800; color: #eef2ff;
+    }
+
+    .admin-nav .brand small {
+      display: block; font-size: 10px;
+      color: rgba(238,242,255,0.4); font-weight: 500;
+    }
+
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+
+    .site-link {
+      font-size: 13px; color: rgba(238,242,255,0.5);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .site-link:hover { color: #3b82f6; }
+
+    .logout-btn {
+      padding: 8px 18px; border-radius: 8px; border: none;
+      background: rgba(220,38,38,0.15);
+      border: 1px solid rgba(220,38,38,0.3);
+      color: #fca5a5; font-size: 13px; font-weight: 700;
+      cursor: pointer; font-family: inherit;
+      transition: background 0.2s ease;
+    }
+    .logout-btn:hover { background: rgba(220,38,38,0.25); }
+
+    /* Main content */
+    .main { width:100%; max-width:1100px; margin:0 auto; padding:40px 24px; }
+
+    .welcome {
+      margin-bottom: 36px;
+    }
+
+    .welcome h1 {
+      font-size: 26px; font-weight: 900; margin-bottom: 6px;
+      background: linear-gradient(135deg, #ffffff 30%, #3b82f6 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+
+    .welcome p { font-size: 14px; color: rgba(238,242,255,0.5); }
+
+    /* Stats row */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px; margin-bottom: 36px;
+    }
+
+    .stat-card {
+      background: rgba(10,19,48,0.7);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px; padding: 24px;
+      backdrop-filter: blur(10px);
+    }
+
+    .stat-card .label {
+      font-size: 11px; font-weight: 700; color: rgba(238,242,255,0.4);
+      text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;
+    }
+
+    .stat-card .value {
+      font-size: 32px; font-weight: 900; color: #3b82f6;
+      line-height: 1;
+    }
+
+    .stat-card .sub {
+      font-size: 12px; color: rgba(238,242,255,0.4); margin-top: 6px;
+    }
+
+    /* Section panels */
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    @media (max-width: 700px) { .panels { grid-template-columns: 1fr; } }
+
+    .panel {
+      background: rgba(10,19,48,0.7);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px; padding: 28px;
+      backdrop-filter: blur(10px);
+    }
+
+    .panel-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .panel-head h2 { font-size: 16px; font-weight: 800; color: #eef2ff; }
+
+    .badge-pill {
+      padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+      background: rgba(59,130,246,0.15); color: #3b82f6;
+      border: 1px solid rgba(59,130,246,0.25);
+    }
+
+    .coming-soon {
+      background: rgba(59,130,246,0.15);
+      border: 1px solid rgba(59,130,246,0.25);
+      border-radius: 10px;
+    }
+
+    .badge-pill.orange {
+      background: rgba(245,158,11,0.15); color: #fbbf24;
+      border-color: rgba(245,158,11,0.25);
+    }
+
+    /* Message preview list */
+    .msg-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .msg-item {
+      padding: 14px 16px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+    }
+
+    .msg-item .meta {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .msg-item .name { font-size: 13px; font-weight: 700; color: #eef2ff; }
+    .msg-item .time { font-size: 11px; color: rgba(238,242,255,0.35); }
+    .msg-item .subject { font-size: 12px; color: rgba(238,242,255,0.55); }
+    .msg-item .preview { font-size: 12px; color: rgba(238,242,255,0.35); margin-top: 2px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .empty-state {
+      text-align: center; padding: 32px;
+      color: rgba(238,242,255,0.3); font-size: 13px;
+    }
+
+    /* Coming soon placeholder */
+    .phase-placeholder {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 12px; padding: 32px;
+      text-align: center;
+    }
+
+    .phase-placeholder .icon {
+      font-size: 32px; opacity: 0.4;
+    }
+
+    .phase-placeholder p {
+      font-size: 13px; color: rgba(238,242,255,0.35); max-width: 200px;
+      line-height: 1.6;
+    }
+    /* Skeleton loading cards */
+    .skeleton-card .news-top { background: rgba(255,255,255,0.04) !important; }
+    .skel { background: rgba(255,255,255,0.06); border-radius: 6px; margin-bottom: 10px; height: 14px; }
+    .skel-title { height: 18px; width: 75%; }
+    .skel-line  { width: 90%; }
+    .skel-line.short { width: 55%; }
+    @keyframes shimmer { 0%,100%{opacity:.5} 50%{opacity:1} }
+    .skeleton-card .skel { animation: shimmer 1.4s ease-in-out infinite; }
+
+    /* Post creation form */
+    .create-post-section { margin-top: 28px; }
+    .create-post-section h2 { font-size:16px; font-weight:800; color:#eef2ff; margin-bottom:18px; }
+
+    /* Executives management */
+    .exec-list-group { margin-top: 18px; }
+    .exec-list-group h3 {
+      font-size: 12px; font-weight: 800; color: #3b82f6; text-transform: uppercase;
+      letter-spacing: .5px; margin: 18px 0 8px; padding-bottom: 6px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .exec-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 12px 14px; background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06); border-radius: 10px; margin-bottom: 8px;
+    }
+    .exec-row-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+    .exec-row-thumb {
+      width: 38px; height: 38px; border-radius: 50%; object-fit: cover; flex-shrink: 0;
+      background: linear-gradient(135deg, #1d4ed8, #102a6b); display: flex; align-items: center;
+      justify-content: center; font-size: 11px; font-weight: 800; color: white;
+    }
+    .exec-row-text { min-width: 0; }
+    .exec-row-name { font-size: 13px; font-weight: 700; color: #eef2ff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .exec-row-meta { font-size: 11px; color: rgba(238,242,255,.4); margin-top: 2px; }
+    .exec-category-select-wrap { margin-bottom: 16px; }
+    .exec-empty { text-align:center; padding: 24px; color: rgba(238,242,255,.3); font-size: 13px; }
+
+    .post-form { display:flex; flex-direction:column; gap:14px; }
+    .post-form label { font-size:11px; font-weight:700; color:#3b82f6;
+      text-transform:uppercase; letter-spacing:.5px; display:block; margin-bottom:5px; }
+    .post-form input, .post-form textarea, .post-form select {
+      width:100%; padding:11px 14px; background:rgba(255,255,255,0.04);
+      border:1.5px solid rgba(255,255,255,0.1); border-radius:10px;
+      color:#eef2ff; font-size:14px; font-family:inherit;
+      transition:border-color .2s ease;
+    }
+    .post-form input::placeholder, .post-form textarea::placeholder { color:rgba(238,242,255,0.3); }
+    .post-form input:focus, .post-form textarea:focus, .post-form select:focus {
+      outline:none; border-color:#3b82f6; }
+    .post-form select option { background:#0a1330; color:#eef2ff; }
+    .post-form textarea { resize:vertical; min-height:90px; }
+
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    @media(max-width:600px) { .form-row { grid-template-columns:1fr; } }
+
+    .char-hint { font-size:11px; color:rgba(238,242,255,.3); margin-top:4px; }
+    .char-hint span { color:#3b82f6; }
+
+    .publish-btn {
+      padding:12px 28px; border-radius:10px; border:none; cursor:pointer;
+      background:linear-gradient(135deg,#1d4ed8,#102a6b);
+      color:white; font-size:14px; font-weight:800; font-family:inherit;
+      transition:opacity .2s, transform .2s;
+      box-shadow:0 6px 18px rgba(29,78,216,.3);
+    }
+    .publish-btn:hover:not(:disabled) { opacity:.9; transform:translateY(-2px); }
+    .publish-btn:disabled { opacity:.5; cursor:not-allowed; }
+
+    .post-msg { display:none; margin-top:12px; padding:11px 14px; border-radius:10px;
+      font-size:13px; font-weight:700; text-align:center; }
+    .post-msg.success { display:block; background:rgba(16,185,129,.12);
+      border:1px solid rgba(16,185,129,.3); color:#34d399; }
+    .post-msg.error { display:block; background:rgba(220,38,38,.12);
+      border:1px solid rgba(220,38,38,.3); color:#fca5a5; }
+
+    /* Cover image uploader */
+    .image-drop {
+      border: 1.5px dashed rgba(255,255,255,0.15); border-radius: 12px;
+      padding: 18px; text-align: center; cursor: pointer;
+      background: rgba(255,255,255,0.02); transition: border-color .2s, background .2s;
+      position: relative;
+    }
+    .image-drop:hover, .image-drop.dragover { border-color: #3b82f6; background: rgba(59,130,246,0.05); }
+    .image-drop input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; }
+    .image-drop .hint { font-size: 12px; color: rgba(238,242,255,0.4); }
+    .image-drop .hint strong { color: #3b82f6; }
+
+    .image-preview-wrap { position: relative; display: inline-block; margin-top: 10px; }
+    .image-preview-wrap img {
+      max-width: 100%; max-height: 180px; border-radius: 10px; display: block;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .image-remove-btn {
+      position: absolute; top: -8px; right: -8px; width: 24px; height: 24px;
+      border-radius: 50%; background: #dc2626; color: white; border: 2px solid #060c1f;
+      cursor: pointer; font-size: 13px; font-weight: 800; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .image-upload-status { font-size: 12px; margin-top: 6px; color: rgba(238,242,255,0.5); }
+    .image-upload-status.error { color: #fca5a5; }
+    .image-upload-status.success { color: #34d399; }
+
+    .post-item-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+    .post-thumb {
+      width: 44px; height: 44px; border-radius: 8px; object-fit: cover; flex-shrink: 0;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+    }
+    .post-item-text { flex: 1; min-width: 0; }
+
+    /* Posts list */
+    .posts-list { display:flex; flex-direction:column; gap:10px; margin-top:20px; }
+    .post-item {
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding:13px 16px; background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.06); border-radius:10px;
+    }
+    .post-item-left { flex:1; min-width:0; }
+    .post-item .post-title { font-size:13px; font-weight:700; color:#eef2ff;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .post-item .post-meta { font-size:11px; color:rgba(238,242,255,.4); margin-top:3px; }
+    .cat-pill { display:inline-block; padding:2px 8px; border-radius:20px;
+      font-size:10px; font-weight:700; margin-right:6px;
+      background:rgba(59,130,246,.15); color:#3b82f6; border:1px solid rgba(59,130,246,.2); }
+    .view-btn {
+      padding:6px 12px; border-radius:7px; cursor:pointer; text-decoration:none;
+      background:rgba(59,130,246,.12); color:#93c5fd; font-size:12px; font-weight:700;
+      font-family:inherit; border:1px solid rgba(59,130,246,.2); transition:background .2s;
+    }
+    .view-btn:hover { background:rgba(59,130,246,.25); }
+    .inline-image-editor { padding:16px; border:1px solid rgba(147,197,253,.14); border-radius:12px; background:rgba(59,130,246,.05); }
+    .inline-image-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; align-items:stretch; }
+    .inline-image-drop { min-height:92px; display:flex; align-items:center; justify-content:center; text-align:center; padding:14px; border:1px dashed rgba(147,197,253,.32); border-radius:9px; color:rgba(238,242,255,.5); font-size:12px; cursor:pointer; transition:border-color .2s, background .2s; }
+    .inline-image-drop:hover, .inline-image-drop.dragover { border-color:#60a5fa; background:rgba(59,130,246,.1); }
+    .inline-image-drop input { display:none; }
+    .inline-image-drop strong { display:block; color:#93c5fd; margin-bottom:4px; }
+    .inline-image-fields { display:grid; gap:8px; }
+    .inline-image-fields input { width:100%; }
+    .inline-insert-btn { border:0; border-radius:7px; background:linear-gradient(135deg,#2563eb,#1d4ed8); color:white; font-family:inherit; font-size:12px; font-weight:700; cursor:pointer; padding:10px 12px; transition:transform .2s, opacity .2s; }
+    .inline-insert-btn:hover:not(:disabled) { transform:translateY(-1px); }
+    .inline-insert-btn:disabled { opacity:.4; cursor:not-allowed; }
+    .inline-image-note { margin-top:9px; color:rgba(238,242,255,.36); font-size:11px; line-height:1.5; }
+    .panel-help { margin:-8px 0 18px; color:rgba(238,242,255,.5); font-size:13px; line-height:1.6; }
+    .field-note { color:rgba(238,242,255,.38); font-weight:400; }
+    .resource-file-drop { min-height:96px; display:flex; align-items:center; justify-content:center; text-align:center; padding:16px; border:1px dashed rgba(147,197,253,.32); border-radius:10px; color:rgba(238,242,255,.5); font-size:12px; cursor:pointer; transition:border-color .2s, background .2s; }
+    .resource-file-drop:hover, .resource-file-drop.dragover { border-color:#60a5fa; background:rgba(59,130,246,.1); }
+    .resource-file-drop input { display:none; }
+    .resource-file-drop strong { display:block; color:#93c5fd; margin-bottom:5px; }
+    .resource-admin-list { display:grid; gap:8px; margin-top:22px; }
+    .resource-admin-item { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:12px 14px; border:1px solid rgba(255,255,255,.08); border-radius:10px; background:rgba(255,255,255,.03); }
+    .resource-admin-item strong { display:block; font-size:13px; color:#eef2ff; }
+    .resource-admin-item span { display:block; color:rgba(238,242,255,.42); font-size:11px; margin-top:4px; }
+    .resource-admin-actions { display:flex; gap:7px; flex-shrink:0; }
+    .resource-cancel-btn { margin-left:8px; padding:10px 14px; border:1px solid rgba(255,255,255,.14); border-radius:8px; background:transparent; color:rgba(238,242,255,.64); cursor:pointer; font:inherit; font-size:12px; font-weight:700; }
+    .admin-setting-card{margin-bottom:20px;padding:20px 22px;border:1px solid rgba(147,197,253,.16);border-radius:14px;background:linear-gradient(135deg,rgba(29,78,216,.11),rgba(220,38,38,.07));}
+    .admin-setting-card h3{font-size:14px;font-weight:800;color:#eef2ff;margin-bottom:6px;}
+    .admin-setting-card p{font-size:12px;line-height:1.6;color:rgba(238,242,255,.48);margin-bottom:14px;}
+    .admin-setting-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end;}
+    .admin-setting-row input{width:100%;}
+    .admin-setting-btn{padding:11px 16px;border:0;border-radius:8px;background:linear-gradient(135deg,#dc2626,#9f1414);color:#fff;font:700 12px 'Segoe UI',sans-serif;cursor:pointer;white-space:nowrap;}
+    .admin-setting-btn:disabled{opacity:.55;cursor:wait;}
+    .setting-msg{margin-top:9px;font-size:12px;font-weight:700;color:rgba(238,242,255,.5);}
+    .setting-msg.success{color:#34d399;}.setting-msg.error{color:#fca5a5;}
+    @media(max-width:700px){.admin-setting-row{grid-template-columns:1fr}.admin-setting-btn{width:100%}.admin-setting-card{padding:18px}}
+    @media (max-width:700px) { .inline-image-grid { grid-template-columns:1fr; } .resource-admin-item { align-items:flex-start; flex-direction:column; } .resource-admin-actions { width:100%; } }
+
+    .delete-btn {
+      padding:6px 12px; border-radius:7px; border:none; cursor:pointer;
+      background:rgba(220,38,38,.12); color:#fca5a5; font-size:12px; font-weight:700;
+      font-family:inherit; border:1px solid rgba(220,38,38,.2);
+      transition:background .2s; flex-shrink:0;
+    }
+    .delete-btn:hover { background:rgba(220,38,38,.25); }
+    .news-empty { grid-column:1/-1; text-align:center; padding:40px;
+      color:rgba(238,242,255,.35); font-size:14px; }
+    /* ── Phase 4: Messages log styles ─────────────────────────────────── */
+    .msg-filters {
+      display: flex; gap: 8px; margin-bottom: 16px; align-items: center;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
+      border: 1.5px solid rgba(255,255,255,0.1); background: transparent;
+      color: rgba(238,242,255,0.6); cursor: pointer; font-family: inherit;
+      transition: all .2s ease;
+    }
+    .filter-btn.active {
+      background: linear-gradient(135deg, #1d4ed8, #102a6b);
+      border-color: transparent; color: white;
+      box-shadow: 0 4px 12px rgba(29,78,216,0.3);
+    }
+    .unread-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 20px; height: 20px; border-radius: 10px; padding: 0 6px;
+      background: #dc2626; color: white; font-size: 11px; font-weight: 800;
+      margin-left: 6px;
+    }
+    .msg-item {
+      padding: 16px 18px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px; cursor: pointer;
+      transition: background .2s ease, border-color .2s ease;
+      position: relative;
+    }
+    .msg-item:hover { background: rgba(255,255,255,0.06); border-color: rgba(59,130,246,0.25); }
+    .msg-item.unread { border-left: 3px solid #3b82f6; }
+    .msg-item.unread .msg-name { color: #ffffff; }
+    .unread-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #3b82f6;
+      display: inline-block; margin-right: 8px; flex-shrink: 0;
+    }
+    .msg-item .msg-meta {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 4px;
+    }
+    .msg-name-row { display: flex; align-items: center; }
+    .msg-name   { font-size: 13px; font-weight: 700; color: #eef2ff; }
+    .msg-time   { font-size: 11px; color: rgba(238,242,255,0.35); }
+    .msg-subject { font-size: 12px; color: rgba(238,242,255,0.55); margin-bottom: 3px; }
+    .msg-preview {
+      font-size: 12px; color: rgba(238,242,255,0.35);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* Full message modal */
+    .msg-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px); z-index: 500;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px; animation: fadeIn .2s ease;
+    }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+    .msg-modal {
+      background: #0a1330; border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px; padding: 32px; max-width: 580px; width: 100%;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+      animation: slideUp .25s ease;
+      max-height: 85vh; overflow-y: auto;
+    }
+    @keyframes slideUp { from { transform: translateY(20px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 20px; gap: 12px;
+    }
+    .modal-header h3 { font-size: 17px; font-weight: 800; color: #eef2ff; line-height: 1.3; }
+    .modal-close {
+      width: 32px; height: 32px; border-radius: 50%; border: none;
+      background: rgba(255,255,255,0.08); color: rgba(238,242,255,0.7);
+      cursor: pointer; font-size: 16px; font-family: inherit; flex-shrink: 0;
+      transition: background .2s;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.15); }
+    .modal-meta {
+      display: grid; grid-template-columns: auto 1fr; gap: 6px 12px;
+      margin-bottom: 20px; font-size: 13px;
+    }
+    .modal-meta .label { color: rgba(238,242,255,0.4); font-weight: 600; }
+    .modal-meta .value { color: #eef2ff; }
+    .modal-divider { height:1px; background:rgba(255,255,255,0.08); margin-bottom:16px; }
+    .modal-message {
+      font-size: 14px; color: rgba(238,242,255,0.8); line-height: 1.8;
+      white-space: pre-wrap; margin-bottom: 24px;
+    }
+    .modal-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .modal-btn {
+      padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer;
+      font-size: 13px; font-weight: 700; font-family: inherit; transition: all .2s;
+    }
+    .modal-btn.reply {
+      background: linear-gradient(135deg, #1d4ed8, #102a6b); color: white;
+      box-shadow: 0 4px 14px rgba(29,78,216,0.3);
+    }
+    .modal-btn.reply:hover { opacity: .9; transform: translateY(-1px); }
+    .modal-btn.toggle-read {
+      background: rgba(255,255,255,0.06); color: rgba(238,242,255,0.7);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .modal-btn.toggle-read:hover { background: rgba(255,255,255,0.1); }
+    .modal-btn.close-modal {
+      background: rgba(220,38,38,0.1); color: #fca5a5;
+      border: 1px solid rgba(220,38,38,0.2);
+    }
+
+    /* Pagination */
+    .pagination {
+      display: flex; gap: 8px; justify-content: center;
+      align-items: center; margin-top: 16px; flex-wrap: wrap;
+    }
+    .page-btn {
+      padding: 7px 14px; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.1);
+      background: transparent; color: rgba(238,242,255,0.6);
+      cursor: pointer; font-size: 13px; font-weight: 700; font-family: inherit;
+      transition: all .2s;
+    }
+    .page-btn:hover:not(:disabled) { border-color: #3b82f6; color: #3b82f6; }
+    .page-btn.active { background: #1d4ed8; border-color: #1d4ed8; color: white; }
+    .page-btn:disabled { opacity: .3; cursor: not-allowed; }
+    .page-info { font-size: 12px; color: rgba(238,242,255,.4); }
+    /* Admin command bar */
+    .admin-commandbar { position:sticky; top:0; z-index:15; display:flex; align-items:center; gap:18px; margin:0 0 24px; padding:10px 12px; background:rgba(15,23,42,.9); border:1px solid rgba(147,197,253,.13); border-radius:12px; backdrop-filter:blur(16px); box-shadow:0 12px 30px rgba(2,6,23,.18); }
+    .commandbar-label { color:rgba(238,242,255,.36); font-size:10px; font-weight:900; letter-spacing:1.4px; text-transform:uppercase; flex-shrink:0; }
+    .commandbar-links { display:flex; align-items:center; gap:4px; min-width:0; overflow-x:auto; scrollbar-width:none; }
+    .commandbar-links::-webkit-scrollbar { display:none; }
+    .command-link { display:inline-flex; align-items:center; gap:5px; padding:8px 10px; color:rgba(238,242,255,.56); border-radius:8px; font-size:12px; font-weight:750; text-decoration:none; white-space:nowrap; transition:background .2s,color .2s; }
+    .command-link:hover { color:#fff; background:rgba(59,130,246,.12); }
+    .command-link.active { color:#fff; background:rgba(59,130,246,.2); box-shadow:inset 0 0 0 1px rgba(96,165,250,.14); }
+    .nav-count { display:none; min-width:16px; height:16px; align-items:center; justify-content:center; padding:0 4px; border-radius:99px; background:#dc2626; color:#fff; font-size:9px; font-weight:900; }
+    .nav-count.has-count { display:inline-flex; }
+    .quick-publish { margin-left:auto; flex-shrink:0; padding:9px 13px; border-radius:8px; background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; font-size:11px; font-weight:900; text-decoration:none; white-space:nowrap; box-shadow:0 5px 14px rgba(37,99,235,.22); transition:transform .2s,box-shadow .2s; }
+    .quick-publish:hover { transform:translateY(-1px); box-shadow:0 8px 18px rgba(37,99,235,.3); }
+    [id] { scroll-margin-top:92px; }
+    @media (max-width:700px) { .admin-commandbar { top:0; gap:10px; padding:8px; } .commandbar-label { display:none; } .command-link { padding:8px 9px; } .quick-publish { padding:8px 10px; } }
+  </style>
+</head>
+<body>
+
+<!-- Auth guard overlay — hides once session is verified -->
+<div class="auth-guard" id="authGuard">
+  <div class="spinner"></div>
+  <p>Verifying session…</p>
+</div>
+
+<!-- Dashboard (hidden until auth confirmed) -->
+<div id="dashContent" style="display:none;">
+
+  <nav class="admin-nav">
+    <div class="brand">
+      <div class="badge"><img src="ar.png"
+         alt="ARSRC Logo"
+         style="width:100%;height:100%;object-fit:contain;"></div>
+      <div>
+        <span>ARSRC Admin</span>
+        <small>Council Management Dashboard</small>
+      </div>
+    </div>
+    <div class="nav-right">
+      <a href="/" class="site-link">← View website</a>
+      <button class="logout-btn" id="logoutBtn">Sign Out</button>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="welcome">
+      <h1>Welcome back</h1>
+      <p id="welcomeSub">Loading dashboard…</p>
+    </div>
+
+    <nav class="admin-commandbar" id="adminCommandbar" aria-label="Dashboard sections">
+      <span class="commandbar-label">Workspace</span>
+      <div class="commandbar-links">
+        <a class="command-link active" href="#overview" data-section="overview">Overview</a>
+        <a class="command-link" href="#messagesPanel" data-section="messagesPanel">Messages <span class="nav-count" id="navUnreadCount"></span></a>
+        <a class="command-link" href="#postsPanel" data-section="postsPanel">Posts</a>
+        <a class="command-link" href="#editorPanel" data-section="editorPanel">Publish</a>
+        <a class="command-link" href="#executivesPanel" data-section="executivesPanel">Executives</a>
+        <a class="command-link" href="#archivePanel" data-section="archivePanel">Archive</a>
+        <a class="command-link" href="#pastExecutivesPanel" data-section="pastExecutivesPanel">Past terms</a>
+        <a class="command-link" href="#resourcesPanel" data-section="resourcesPanel">Resources</a>
+        <a class="command-link" href="#engagementPanel" data-section="engagementPanel">Engagement</a>
+      </div>
+      <a class="quick-publish" href="#editorPanel">+ New post</a>
+    </nav>
+
+    <div id="overview"></div>
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="label">Contact Messages</div>
+        <div class="value" id="msgCount">—</div>
+        <div class="sub" id="msgCountSub">Total received</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Published Posts</div>
+        <div class="value" style="color:#a78bfa;" id="postCount">—</div>
+        <div class="sub">Published</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Schools Registered</div>
+        <div class="value" style="color:#34d399;">146</div>
+        <div class="sub">Across Ashanti Region</div>
+      </div>
+    </div>
+
+    <div class="panels">
+
+      <!-- Full messages log (Phase 4) -->
+      <div class="panel" id="messagesPanel">
+        <div class="panel-head">
+          <h2>Contact Messages <span class="unread-badge" id="unreadBadge" style="display:none;"></span></h2>
+          <span class="badge-pill" id="msgBadge">Loading…</span>
+        </div>
+        <div class="msg-filters">
+          <button class="filter-btn active" data-filter="all"  id="filterAll">All</button>
+          <button class="filter-btn"        data-filter="unread" id="filterUnread">Unread</button>
+        </div>
+        <div id="msgList" class="msg-list">
+          <div class="empty-state">Loading messages…</div>
+        </div>
+        <div class="pagination" id="msgPagination" style="display:none;"></div>
+      </div>
+
+      <!-- Blog posts panel (Phase 3 — live) -->
+      <div class="panel" id="postsPanel">
+        <div class="panel-head">
+          <h2>News, Magazines &amp; Stories</h2>
+          <span class="badge-pill" id="postBadge">Loading…</span>
+        </div>
+        <div id="postsList" class="posts-list">
+          <div class="empty-state">Loading posts…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create New Post -->
+    <div class="panel create-post-section" id="editorPanel">
+      <div class="panel-head">
+        <h2>✍️ Publish News, Magazine or Story</h2>
+      </div>
+
+      <div id="postEditBanner" style="display:none; margin-bottom:14px; padding:10px 14px; background:rgba(59,130,246,.12); border:1px solid rgba(59,130,246,.3); border-radius:10px; font-size:13px; color:#93c5fd; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+        <span id="postEditBannerText">Editing post…</span>
+        <button type="button" id="postCancelEditBtn" style="background:none; border:1px solid rgba(147,197,253,.4); color:#93c5fd; border-radius:6px; padding:4px 10px; font-size:12px; font-weight:700; cursor:pointer; font-family:inherit;">Cancel</button>
+      </div>
+
+      <div class="post-form" id="postForm">
+        <div class="form-row">
+          <div>
+            <label for="postTitle">Title</label>
+            <input type="text" id="postTitle" placeholder="e.g. ARSRC holds inter-school summit">
+          </div>
+          <div>
+            <label for="postCategory">Category</label>
+            <select id="postCategory">
+              <option value="News">News</option>
+              <option value="Magazine">Magazine</option>
+              <option value="Story">Story</option>
+              <option value="Announcement">Announcement</option>
+              <option value="Achievement">Achievement</option>
+              <option value="Event">Event</option>
+              <option value="Press Release">Press Release</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="postImageInput">Cover Image <span style="color:rgba(238,242,255,.4);font-weight:400;">(shown on the homepage card and article page)</span></label>
+          <div class="image-drop" id="imageDrop">
+            <input type="file" id="postImageInput" accept="image/png,image/jpeg,image/webp">
+            <div class="hint" id="imageDropHint"><strong>Click to upload</strong> or drag an image here — JPG, PNG or WEBP, max 5MB</div>
+          </div>
+          <div id="imagePreviewWrap" style="display:none;" class="image-preview-wrap">
+            <img id="imagePreviewImg" src="" alt="Cover preview">
+            <button type="button" class="image-remove-btn" id="imageRemoveBtn">×</button>
+          </div>
+          <div class="image-upload-status" id="imageUploadStatus"></div>
+          <input type="hidden" id="postCoverImageUrl" value="">
+        </div>
+
+        <div>
+          <label for="postExcerpt">Excerpt <span style="color:rgba(238,242,255,.4);font-weight:400;">(shown on homepage card — max 280 chars)</span></label>
+          <textarea id="postExcerpt" rows="2" placeholder="Short summary of the post…" maxlength="280"></textarea>
+          <div class="char-hint">Characters: <span id="excerptCount">0</span> / 280</div>
+        </div>
+
+        <div>
+          <label for="postContent">Full Content <span style="color:rgba(238,242,255,.4);font-weight:400;">(paragraphs separated by a blank line)</span></label>
+          <textarea id="postContent" rows="5" placeholder="Write the full post content here…"></textarea>
+        </div>
+
+        <div class="inline-image-editor">
+          <label>In-article image <span style="color:rgba(238,242,255,.4);font-weight:400;">(place your cursor in Full Content first)</span></label>
+          <div class="inline-image-grid">
+            <div class="inline-image-drop" id="inlineImageDrop">
+              <input type="file" id="inlineImageInput" accept="image/png,image/jpeg,image/webp">
+              <span id="inlineImageHint"><strong>Choose an image</strong> to insert at the cursor</span>
+            </div>
+            <div class="inline-image-fields">
+              <input type="text" id="inlineImageAlt" placeholder="Image description (alt text)">
+              <input type="text" id="inlineImageCaption" placeholder="Caption (optional)">
+              <button type="button" class="inline-insert-btn" id="insertInlineImageBtn" disabled>Upload &amp; insert image</button>
+            </div>
+          </div>
+          <div class="image-upload-status" id="inlineImageStatus"></div>
+          <div class="inline-image-note">Images are inserted as a formatted block and will appear between your paragraphs on the article page.</div>
+        </div>
+
+        <div>
+          <label for="postAuthor">Author</label>
+          <input type="text" id="postAuthor" value="ARSRC Council" placeholder="Author name">
+        </div>
+
+        <div>
+          <button class="publish-btn" id="publishBtn">Publish Post</button>
+          <div class="post-msg" id="postMsg"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Manage Resources -->
+    <div class="panel create-post-section" id="resourcesPanel">
+      <div class="panel-head">
+        <h2>📚 Manage Resources</h2>
+        <span class="badge-pill" id="resourceBadge">Loading…</span>
+      </div>
+      <p class="panel-help">Upload official documents, forms, guides, and templates. Published resources appear on the public Resources section immediately.</p>
+      <div class="resource-admin-form">
+        <div class="form-row">
+          <div><label for="resourceTitle">Resource title</label><input type="text" id="resourceTitle" placeholder="e.g. ARSRC Constitution"></div>
+          <div><label for="resourceCategory">Type</label><select id="resourceCategory"><option>Policy</option><option>Form</option><option>Guide</option><option>Template</option><option>Other</option></select></div>
+        </div>
+        <div><label for="resourceDescription">Description <span class="field-note">(optional)</span></label><textarea id="resourceDescription" rows="2" placeholder="Short description shown on the website…"></textarea></div>
+        <div><label for="resourceFileInput">File <span class="field-note">(PDF, DOCX, XLSX, PPTX, ZIP — max 20MB)</span></label>
+          <div class="resource-file-drop" id="resourceFileDrop"><input type="file" id="resourceFileInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.txt"><span id="resourceFileHint"><strong>Choose a file</strong> or drag it here</span></div>
+        </div>
+        <div><button class="publish-btn" id="resourceSaveBtn" disabled>Upload &amp; publish resource</button><button type="button" class="resource-cancel-btn" id="resourceCancelBtn" style="display:none">Cancel edit</button><div class="post-msg" id="resourceMsg"></div></div>
+      </div>
+      <div id="resourceAdminList" class="resource-admin-list"><div class="empty-state">Loading resources…</div></div>
+    </div>
+
+    <!-- Manage Executives -->
+    <div class="panel create-post-section" id="executivesPanel">
+      <div class="panel-head">
+        <h2>👥 Manage Executives</h2>
+      </div>
+      <div class="admin-setting-card" id="administrationSetting">
+        <h3>Current administration</h3>
+        <p>This label appears above the public Executives section. Update it here when a new executive batch takes office.</p>
+        <div class="admin-setting-row">
+          <div><label for="administrationInput">Administration label</label><input type="text" id="administrationInput" value="29th Administration" maxlength="80" placeholder="e.g. 30th Administration"></div>
+          <button type="button" class="admin-setting-btn" id="saveAdministrationBtn">Save administration</button>
+        </div>
+        <div class="setting-msg" id="administrationMsg" role="status"></div>
+      </div>
+
+      <div id="execEditBanner" style="display:none; margin-bottom:14px; padding:10px 14px; background:rgba(59,130,246,.12); border:1px solid rgba(59,130,246,.3); border-radius:10px; font-size:13px; color:#93c5fd; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+        <span id="execEditBannerText">Editing executive…</span>
+        <button type="button" id="execCancelEditBtn" style="background:none; border:1px solid rgba(147,197,253,.4); color:#93c5fd; border-radius:6px; padding:4px 10px; font-size:12px; font-weight:700; cursor:pointer; font-family:inherit;">Cancel</button>
+      </div>
+
+      <div class="post-form" id="execForm">
+        <div class="form-row">
+          <div>
+            <label for="execCategory">Committee / Body</label>
+            <select id="execCategory">
+              <option value="rec">Regional Executive Committee (REC)</option>
+              <option value="zec">Zonal Executive Committee (ZEC)</option>
+              <option value="ligec">Literary Group Executive Committee (LiGEC)</option>
+              <option value="wds">Writers &amp; Debaters Society (WDS)</option>
+              <option value="edicom">Editorial Committee (EDICOM)</option>
+              <option value="sec">Secretariat</option>
+              <option value="adhoc">Adhoc</option>
+            </select>
+          </div>
+          <div id="execSubgroupWrap">
+            <label for="execSubgroup">Sub-group / Committee Name <span style="color:rgba(238,242,255,.4);font-weight:400;">(e.g. "Zone 1" or "Editorial Committee (EDICOM)")</span></label>
+            <input type="text" id="execSubgroup" list="execSubgroupList" placeholder="e.g. Zone 1">
+            <datalist id="execSubgroupList"></datalist>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label for="execName">Full Name</label>
+            <input type="text" id="execName" placeholder="e.g. James Hope Arthur">
+          </div>
+          <div>
+            <label for="execRole">Role / Position</label>
+            <input type="text" id="execRole" placeholder="e.g. Regional President">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label for="execSchool">School <span style="color:rgba(238,242,255,.4);font-weight:400;">(optional)</span></label>
+            <input type="text" id="execSchool" placeholder="e.g. Prempeh College">
+          </div>
+          <div>
+            <label for="execInitials">Avatar Initials <span style="color:rgba(238,242,255,.4);font-weight:400;">(optional — auto-generated if blank)</span></label>
+            <input type="text" id="execInitials" maxlength="4" placeholder="e.g. PR">
+          </div>
+        </div>
+
+        <div>
+          <label for="execImageInput">Photo <span style="color:rgba(238,242,255,.4);font-weight:400;">(optional — falls back to initials avatar)</span></label>
+          <div class="image-drop" id="execImageDrop">
+            <input type="file" id="execImageInput" accept="image/png,image/jpeg,image/webp">
+            <div class="hint"><strong>Click to upload</strong> or drag a photo here — JPG, PNG or WEBP, max 5MB</div>
+          </div>
+          <div id="execImagePreviewWrap" style="display:none;" class="image-preview-wrap">
+            <img id="execImagePreviewImg" src="" alt="Executive photo preview">
+            <button type="button" class="image-remove-btn" id="execImageRemoveBtn">×</button>
+          </div>
+          <div class="image-upload-status" id="execImageUploadStatus"></div>
+          <input type="hidden" id="execPhotoUrl" value="">
+        </div>
+
+        <div>
+          <button class="publish-btn" id="execAddBtn">Add Executive</button>
+          <div class="post-msg" id="execMsg"></div>
+        </div>
+      </div>
+
+      <div id="execListContainer">
+        <div class="exec-empty">Loading executives…</div>
+      </div>
+    </div>
+
+    <!-- Archive Current Executives -->
+    <div class="panel create-post-section" id="archivePanel">
+      <div class="panel-head">
+        <h2>🗄️ Archive Current Executives</h2>
+      </div>
+      <p style="font-size:13px; color:rgba(238,242,255,.5); margin-bottom:16px; line-height:1.6;">
+        Snapshots everyone currently listed in "Manage Executives" above into the Past Executives archive under a year label.
+        This does <strong>not</strong> touch or clear the current list — you'll still edit those names in place when the new term starts.
+      </p>
+      <div class="form-row">
+        <div>
+          <label for="archiveYear">Year Label</label>
+          <input type="text" id="archiveYear" placeholder="e.g. 2024/2025">
+        </div>
+      </div>
+      <div style="margin-top:14px;">
+        <button class="publish-btn" id="archiveBtn" style="background:linear-gradient(135deg,#7c3aed,#4c1d95);">Archive Current Executives</button>
+        <div class="post-msg" id="archiveMsg"></div>
+      </div>
+    </div>
+
+    <!-- Manage Past Executives -->
+    <div class="panel create-post-section" id="pastExecutivesPanel">
+      <div class="panel-head">
+        <h2>📜 Manage Past Executives</h2>
+      </div>
+
+      <div class="post-form" id="pastExecForm">
+        <div class="form-row">
+          <div>
+            <label for="pastExecYear">Year</label>
+            <input type="text" id="pastExecYear" list="pastExecYearList" placeholder="e.g. 2021/2022">
+            <datalist id="pastExecYearList"></datalist>
+          </div>
+          <div>
+            <label for="pastExecCategory">Committee / Body</label>
+            <select id="pastExecCategory">
+              <option value="rec">Regional Executive Committee (REC)</option>
+              <option value="zec">Zonal Executive Committee (ZEC)</option>
+              <option value="ligec">Literary Group Executive Committee (LiGEC)</option>
+              <option value="wds">Writers &amp; Debaters Society (WDS)</option>
+              <option value="edicom">Editorial Committee (EDICOM)</option>
+              <option value="sec">Secretariat</option>
+              <option value="adhoc">Adhoc</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div id="pastExecSubgroupWrap">
+            <label for="pastExecSubgroup">Sub-group / Committee Name</label>
+            <input type="text" id="pastExecSubgroup" list="pastExecSubgroupList" placeholder="e.g. Zone 1">
+            <datalist id="pastExecSubgroupList"></datalist>
+          </div>
+          <div>
+            <label for="pastExecName">Full Name</label>
+            <input type="text" id="pastExecName" placeholder="e.g. James Hope Arthur">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label for="pastExecRole">Role / Position</label>
+            <input type="text" id="pastExecRole" placeholder="e.g. Regional President">
+          </div>
+          <div>
+            <label for="pastExecSchool">School <span style="color:rgba(238,242,255,.4);font-weight:400;">(optional)</span></label>
+            <input type="text" id="pastExecSchool" placeholder="e.g. Prempeh College">
+          </div>
+        </div>
+
+        <div>
+          <label for="pastExecInitials">Avatar Initials <span style="color:rgba(238,242,255,.4);font-weight:400;">(optional — auto-generated if blank)</span></label>
+          <input type="text" id="pastExecInitials" maxlength="4" placeholder="e.g. PR">
+        </div>
+
+        <div>
+          <label for="pastExecImageInput">Photo <span style="color:rgba(238,242,255,.4);font-weight:400;">(optional)</span></label>
+          <div class="image-drop" id="pastExecImageDrop">
+            <input type="file" id="pastExecImageInput" accept="image/png,image/jpeg,image/webp">
+            <div class="hint"><strong>Click to upload</strong> or drag a photo here — JPG, PNG or WEBP, max 5MB</div>
+          </div>
+          <div id="pastExecImagePreviewWrap" style="display:none;" class="image-preview-wrap">
+            <img id="pastExecImagePreviewImg" src="" alt="Past executive photo preview">
+            <button type="button" class="image-remove-btn" id="pastExecImageRemoveBtn">×</button>
+          </div>
+          <div class="image-upload-status" id="pastExecImageUploadStatus"></div>
+          <input type="hidden" id="pastExecPhotoUrl" value="">
+        </div>
+
+        <div id="pastExecEditBanner" style="display:none; margin-bottom:4px; padding:10px 14px; background:rgba(124,58,237,.12); border:1px solid rgba(124,58,237,.3); border-radius:10px; font-size:13px; color:#c4b5fd; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+          <span id="pastExecEditBannerText">Editing…</span>
+          <button type="button" id="pastExecCancelEditBtn" style="background:none; border:1px solid rgba(196,181,253,.4); color:#c4b5fd; border-radius:6px; padding:4px 10px; font-size:12px; font-weight:700; cursor:pointer; font-family:inherit;">Cancel</button>
+        </div>
+
+        <div>
+          <button class="publish-btn" id="pastExecAddBtn">Add Past Executive</button>
+          <div class="post-msg" id="pastExecMsg"></div>
+        </div>
+      </div>
+
+      <div class="form-row" style="margin-top:22px;">
+        <div>
+          <label for="pastExecYearFilter">Filter by Year</label>
+          <select id="pastExecYearFilter">
+            <option value="">All years</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="pastExecListContainer">
+        <div class="exec-empty">Loading past executives…</div>
+      </div>
+    </div>
+
+    <!-- Student Engagement -->
+    <div class="panel create-post-section" id="engagementPanel">
+      <div class="panel-head">
+        <h2>🌍 Student Engagement Page</h2>
+      </div>
+      <p style="font-size:13px; color:rgba(238,242,255,.5); margin-bottom:20px; line-height:1.6;">
+        Manage the zone slogans/logos, schools, student photos, and WDS/LG events shown on the
+        <a href="/student-engagement.html" target="_blank" style="color:#3b82f6;">Student Engagement page</a>.
+        Anything you add here goes live immediately — the page falls back to its built-in placeholder content
+        for anything you haven't added yet, so nothing goes blank in the meantime.
+      </p>
+
+      <h3 style="font-size:12px; font-weight:800; color:#3b82f6; text-transform:uppercase; letter-spacing:.5px; margin-bottom:12px;">Zone Content</h3>
+      <div id="engZonesContainer" style="display:flex; flex-direction:column; gap:14px; margin-bottom:32px;"></div>
+
+      <h3 style="font-size:12px; font-weight:800; color:#3b82f6; text-transform:uppercase; letter-spacing:.5px; margin-bottom:12px;">Schools</h3>
+      <div class="form-row">
+        <div>
+          <label for="engSchoolZone">Zone</label>
+          <select id="engSchoolZone">
+            <option value="z1">Zone 1</option>
+            <option value="z2">Zone 2</option>
+            <option value="z3">Zone 3</option>
+            <option value="z4">Zone 4</option>
+          </select>
+        </div>
+        <div>
+          <label for="engSchoolType">Type</label>
+          <select id="engSchoolType">
+            <option value="shs">SHS / SHTS</option>
+            <option value="tech">Technical Institute</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <label for="engSchoolName">School name</label>
+        <input type="text" id="engSchoolName" placeholder="e.g. Prempeh College">
+      </div>
+      <div style="margin-top:12px;">
+        <button class="publish-btn" id="engSchoolAddBtn">Add School</button>
+        <div class="post-msg" id="engSchoolMsg"></div>
+      </div>
+      <div id="engSchoolsListContainer" style="margin-top:16px;"><div class="exec-empty">Loading schools…</div></div>
+
+      <h3 style="font-size:12px; font-weight:800; color:#3b82f6; text-transform:uppercase; letter-spacing:.5px; margin:30px 0 12px;">Student Photos</h3>
+      <div class="form-row">
+        <div>
+          <label for="engStudentZone">Zone</label>
+          <select id="engStudentZone">
+            <option value="z1">Zone 1</option>
+            <option value="z2">Zone 2</option>
+            <option value="z3">Zone 3</option>
+            <option value="z4">Zone 4</option>
+          </select>
+        </div>
+        <div>
+          <label for="engStudentName">Name <span style="color:rgba(238,242,255,.4);font-weight:400;">(optional)</span></label>
+          <input type="text" id="engStudentName" placeholder="e.g. Ama Serwaa">
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <label for="engStudentImageInput">Photo</label>
+        <div class="image-drop" id="engStudentImageDrop">
+          <input type="file" id="engStudentImageInput" accept="image/png,image/jpeg,image/webp">
+          <div class="hint"><strong>Click to upload</strong> or drag a photo here — JPG, PNG or WEBP, max 5MB</div>
+        </div>
+        <div id="engStudentImagePreviewWrap" style="display:none;" class="image-preview-wrap">
+          <img id="engStudentImagePreviewImg" src="" alt="Student photo preview">
+          <button type="button" class="image-remove-btn" id="engStudentImageRemoveBtn">×</button>
+        </div>
+        <div class="image-upload-status" id="engStudentImageUploadStatus"></div>
+        <input type="hidden" id="engStudentPhotoUrl" value="">
+      </div>
+      <div style="margin-top:12px;">
+        <button class="publish-btn" id="engStudentAddBtn">Add Student Photo</button>
+        <div class="post-msg" id="engStudentMsg"></div>
+      </div>
+      <div id="engStudentsListContainer" style="margin-top:16px;"><div class="exec-empty">Loading student photos…</div></div>
+
+      <h3 style="font-size:12px; font-weight:800; color:#3b82f6; text-transform:uppercase; letter-spacing:.5px; margin:30px 0 12px;">WDS / LG Events</h3>
+      <div id="engEventEditBanner" style="display:none; margin-bottom:14px; padding:10px 14px; background:rgba(59,130,246,.12); border:1px solid rgba(59,130,246,.3); border-radius:10px; font-size:13px; color:#93c5fd; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+        <span id="engEventEditBannerText">Editing event…</span>
+        <button type="button" id="engEventCancelEditBtn" style="background:none; border:1px solid rgba(147,197,253,.4); color:#93c5fd; border-radius:6px; padding:4px 10px; font-size:12px; font-weight:700; cursor:pointer; font-family:inherit;">Cancel</button>
+      </div>
+      <div class="form-row">
+        <div>
+          <label for="engEventWing">Wing</label>
+          <select id="engEventWing">
+            <option value="wds">Writers &amp; Debaters Society (WDS)</option>
+            <option value="lg">Literary Group (LG)</option>
+          </select>
+        </div>
+        <div>
+          <label for="engEventTitle">Title</label>
+          <input type="text" id="engEventTitle" placeholder="e.g. Talefest 2026">
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <label for="engEventDescription">Description</label>
+        <textarea id="engEventDescription" rows="3" placeholder="What happened, who took part, where…"></textarea>
+      </div>
+      <div style="margin-top:10px;">
+        <label for="engEventImageInput">Photos <span style="color:rgba(238,242,255,.4);font-weight:400;">(add one at a time, up to 6)</span></label>
+        <div class="image-drop" id="engEventImageDrop">
+          <input type="file" id="engEventImageInput" accept="image/png,image/jpeg,image/webp">
+          <div class="hint"><strong>Click to upload</strong> or drag a photo here — JPG, PNG or WEBP, max 5MB</div>
+        </div>
+        <div class="image-upload-status" id="engEventImageUploadStatus"></div>
+        <div id="engEventPhotoThumbs" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;"></div>
+      </div>
+      <div style="margin-top:12px;">
+        <button class="publish-btn" id="engEventAddBtn">Add Event</button>
+        <div class="post-msg" id="engEventMsg"></div>
+      </div>
+      <div id="engEventsListContainer" style="margin-top:16px;"><div class="exec-empty">Loading events…</div></div>
+    </div>
+  </main>
+
+</div>
+
+<script>
+  // ── Auth guard ──────────────────────────────────────────────────────────────
+  (async function checkAuth() {
+    try {
+      const res = await fetch('/api/admin/auth', { credentials: 'same-origin' });
+      if (!res.ok) {
+        window.location.href = '/admin/';
+        return;
+      }
+      // Auth confirmed — show dashboard
+      document.getElementById('authGuard').classList.add('hidden');
+      document.getElementById('dashContent').style.display = 'block';
+      loadDashboard();
+    } catch {
+      window.location.href = '/admin/';
+    }
+  })();
+
+  // ── Logout ──────────────────────────────────────────────────────────────────
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await fetch('/api/admin/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'logout' }),
+      credentials: 'same-origin',
+    });
+    window.location.href = '/admin/';
+  });
+
+  // ── Load dashboard data ─────────────────────────────────────────────────────
+  async function loadDashboard() {
+    const now = new Date();
+    document.getElementById('welcomeSub').textContent =
+      `${now.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' })} · Ashanti Region`;
+
+    // Load posts, messages, executives, and past executives in parallel
+    loadPosts();
+    loadMessages();
+    loadExecutives();
+    loadPastExecutives();
+  }
+
+  // ── Phase 4: Full messages log ──────────────────────────────────────────────
+  let currentPage   = 1;
+  let currentFilter = 'all';
+  let activeModal   = null;
+
+  // Filter buttons
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      currentFilter = this.dataset.filter;
+      currentPage   = 1;
+      loadMessages();
+    });
+  });
+
+  async function loadMessages() {
+    const list = document.getElementById('msgList');
+    list.innerHTML = '<div class="empty-state">Loading…</div>';
+
+    try {
+      const url = `/api/admin/messages?page=${currentPage}&limit=10&filter=${currentFilter}`;
+      const res  = await fetch(url, { credentials: 'same-origin' });
+      if (res.status === 401) { window.location.href = '/admin/'; return; }
+      const data = await res.json();
+
+      if (res.ok) {
+        renderMessages(data);
+      } else {
+        list.innerHTML = '<div class="empty-state">Could not load messages.</div>';
+      }
+    } catch {
+      document.getElementById('msgList').innerHTML =
+        '<div class="empty-state">Could not load messages.</div>';
+    }
+  }
+
+  function renderMessages(data) {
+    const { messages, total, unread, page, totalPages } = data;
+
+    // Update stat card
+    document.getElementById('msgCount').textContent = total;
+    document.getElementById('msgCountSub').textContent =
+      unread > 0 ? `${unread} unread` : 'All read';
+    const navUnreadCount = document.getElementById('navUnreadCount');
+    if (navUnreadCount) {
+      navUnreadCount.textContent = unread > 99 ? '99+' : unread;
+      navUnreadCount.classList.toggle('has-count', unread > 0);
+    }
+
+    // Unread badge in panel header
+    const badge = document.getElementById('unreadBadge');
+    if (unread > 0) {
+      badge.textContent = unread;
+      badge.style.display = 'inline-flex';
+    } else {
+      badge.style.display = 'none';
+    }
+
+    document.getElementById('msgBadge').textContent = `${total} total`;
+
+    const list = document.getElementById('msgList');
+
+    if (!messages || messages.length === 0) {
+      list.innerHTML = `<div class="empty-state">${
+        currentFilter === 'unread' ? 'No unread messages.' : 'No messages yet.'
+      }</div>`;
+      document.getElementById('msgPagination').style.display = 'none';
+      return;
+    }
+
+    list.innerHTML = messages.map(m => `
+      <div class="msg-item ${!m.read ? 'unread' : ''}" data-id="${esc(m.id)}"
+           data-name="${esc(m.name)}" data-email="${esc(m.email)}"
+           data-subject="${esc(m.subject)}" data-message="${esc(m.message)}"
+           data-time="${esc(m.created_at)}" data-read="${m.read}">
+        <div class="msg-meta">
+          <div class="msg-name-row">
+            ${!m.read ? '<span class="unread-dot"></span>' : ''}
+            <span class="msg-name">${esc(m.name)}</span>
+          </div>
+          <span class="msg-time">${timeAgo(m.created_at)}</span>
+        </div>
+        <div class="msg-subject">${esc(m.subject)}</div>
+        <div class="msg-preview">${esc(m.email)} · ${esc(m.message)}</div>
+      </div>
+    `).join('');
+
+    // Click to open full message modal
+    list.querySelectorAll('.msg-item').forEach(item => {
+      item.addEventListener('click', function () {
+        openMessageModal({
+          id:      this.dataset.id,
+          name:    this.dataset.name,
+          email:   this.dataset.email,
+          subject: this.dataset.subject,
+          message: this.dataset.message,
+          time:    this.dataset.time,
+          read:    this.dataset.read === 'true',
+        });
+      });
+    });
+
+    // Pagination
+    renderPagination(page, totalPages);
+  }
+
+  function renderPagination(page, totalPages) {
+    const pag = document.getElementById('msgPagination');
+    if (totalPages <= 1) { pag.style.display = 'none'; return; }
+
+    pag.style.display = 'flex';
+    pag.innerHTML = `
+      <button class="page-btn" id="prevPage" ${page <= 1 ? 'disabled' : ''}>← Prev</button>
+      <span class="page-info">Page ${page} of ${totalPages}</span>
+      <button class="page-btn" id="nextPage" ${page >= totalPages ? 'disabled' : ''}>Next →</button>
+    `;
+
+    document.getElementById('prevPage')?.addEventListener('click', () => {
+      if (currentPage > 1) { currentPage--; loadMessages(); }
+    });
+    document.getElementById('nextPage')?.addEventListener('click', () => {
+      if (currentPage < totalPages) { currentPage++; loadMessages(); }
+    });
+  }
+
+  // ── Workspace navigation ────────────────────────────────────────────────────
+  (function initWorkspaceNavigation() {
+    const links = [...document.querySelectorAll('.command-link[data-section]')];
+    const sections = links.map(link => document.getElementById(link.dataset.section)).filter(Boolean);
+    const setActive = id => links.forEach(link => link.classList.toggle('active', link.dataset.section === id));
+
+    links.forEach(link => link.addEventListener('click', () => setActive(link.dataset.section)));
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        const visible = entries.filter(entry => entry.isIntersecting).sort((a,b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible) setActive(visible.target.id);
+      }, { rootMargin: '-96px 0px -62% 0px', threshold: [0, .25, .6] });
+      sections.forEach(section => observer.observe(section));
+    }
+
+    document.querySelector('.quick-publish')?.addEventListener('click', () => {
+      window.setTimeout(() => document.getElementById('postTitle')?.focus(), 350);
+    });
+  })();
+
+  // ── Message modal ───────────────────────────────────────────────────────────
+  function openMessageModal(msg) {
+    // Auto-mark as read when opened
+    if (!msg.read) markReadState(msg.id, true);
+
+    const overlay = document.createElement('div');
+    overlay.className = 'msg-modal-overlay';
+    overlay.id = 'msgModalOverlay';
+    overlay.innerHTML = `
+      <div class="msg-modal">
+        <div class="modal-header">
+          <h3>${esc(msg.subject)}</h3>
+          <button class="modal-close" id="modalClose">✕</button>
+        </div>
+        <div class="modal-meta">
+          <span class="label">From</span>   <span class="value">${esc(msg.name)}</span>
+          <span class="label">Email</span>  <span class="value">${esc(msg.email)}</span>
+          <span class="label">Received</span><span class="value">${new Date(msg.time).toLocaleString('en-GB')}</span>
+        </div>
+        <div class="modal-divider"></div>
+        <div class="modal-message">${esc(msg.message)}</div>
+        <div class="modal-actions">
+          <button class="modal-btn reply" id="modalReply">↩ Reply to ${esc(msg.name)}</button>
+          <button class="modal-btn toggle-read" id="modalToggleRead">
+            ${msg.read ? 'Mark as Unread' : 'Mark as Read'}
+          </button>
+          <button class="modal-btn close-modal" id="modalCloseBtn">Close</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+    activeModal = { id: msg.id, read: msg.read };
+
+    // Reply — opens Gmail compose directly in a new tab
+    document.getElementById('modalReply').addEventListener('click', () => {
+      const to      = encodeURIComponent(msg.email);
+      const subject = encodeURIComponent(`Re: ${msg.subject}`);
+      const body    = encodeURIComponent(
+        `\n\n---\nOriginal message from ${msg.name} (${msg.email}):\n${msg.message}`
+      );
+      window.open(
+        `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${subject}&body=${body}`,
+        '_blank'
+      );
+    });
+
+    // Toggle read
+    document.getElementById('modalToggleRead').addEventListener('click', async function () {
+      const nowRead = !activeModal.read;
+      await markReadState(msg.id, nowRead);
+      activeModal.read = nowRead;
+      this.textContent = nowRead ? 'Mark as Unread' : 'Mark as Read';
+    });
+
+    // Close
+    const closeModal = () => {
+      overlay.remove();
+      activeModal = null;
+      loadMessages(); // refresh list to update read state
+    };
+    document.getElementById('modalClose').addEventListener('click', closeModal);
+    document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+  }
+
+  async function markReadState(id, read) {
+    try {
+      await fetch('/api/admin/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: read ? 'mark_read' : 'mark_unread', id }),
+        credentials: 'same-origin',
+      });
+    } catch { /* non-fatal — UI still works */ }
+  }
+
+  function esc(str) {
+    return String(str || '')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function timeAgo(iso) {
+    const diff = Date.now() - new Date(iso).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1)  return 'Just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24)  return `${hrs}h ago`;
+    return Math.floor(hrs / 24) + 'd ago';
+  }
+
+  // ── Phase 3: Posts management ───────────────────────────────────────────────
+
+  // Load posts list
+  async function loadPosts() {
+    try {
+      // Admin listing — full set (incl. unpublished), unlike the public
+      // /api/posts endpoint which caps at the latest 6 published posts.
+      const res  = await fetch('/api/admin/posts-create?_=' + Date.now(), { credentials: 'same-origin' });
+      if (res.status === 401) { window.location.href = '/admin/'; return; }
+      const data = await res.json();
+      renderPosts(data.posts || [], data.total || 0);
+    } catch {
+      document.getElementById('postsList').innerHTML =
+        '<div class="empty-state">Could not load posts.</div>';
+    }
+  }
+
+  function renderPosts(posts, total) {
+    document.getElementById('postCount').textContent = total;
+    document.getElementById('postBadge').textContent = `${total} total`;
+
+    const list = document.getElementById('postsList');
+    if (!posts.length) {
+      list.innerHTML = '<div class="empty-state">No posts yet. Publish your first one below.</div>';
+      return;
+    }
+
+    list.innerHTML = posts.map(p => `
+      <div class="post-item" data-id="${esc(p.id)}">
+        <div class="post-item-left">
+          ${p.image_url
+            ? `<img class="post-thumb" src="${esc(p.image_url)}" alt="">`
+            : `<div class="post-thumb"></div>`}
+          <div class="post-item-text">
+            <div class="post-title">${esc(p.title)}</div>
+            <div class="post-meta">
+              <span class="cat-pill">${esc(p.category)}</span>
+              ${timeAgo(p.created_at)}
+            </div>
+          </div>
+        </div>
+        <div class="post-item-actions" style="display:flex; gap:8px;">
+          ${p.slug ? `<a class="view-btn" href="/post.html?slug=${encodeURIComponent(p.slug)}" target="_blank" rel="noopener">View</a>` : ''}
+          <button class="edit-btn" data-id="${esc(p.id)}">Edit</button>
+          <button class="delete-btn" data-id="${esc(p.id)}">Delete</button>
+        </div>
+      </div>
+    `).join('');
+
+    // Wire edit buttons
+    list.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const post = posts.find(p => p.id === this.dataset.id);
+        if (post) startEditPost(post);
+      });
+    });
+
+    // Wire delete buttons
+    list.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', async function () {
+        const id = this.dataset.id;
+        if (!confirm('Delete this post? This cannot be undone.')) return;
+        this.disabled = true;
+        this.textContent = 'Deleting…';
+        try {
+          const res = await fetch(`/api/admin/posts-create`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id }),
+            credentials: 'same-origin',
+          });
+          if (res.ok) {
+            this.closest('.post-item').remove();
+            const remaining = document.querySelectorAll('.post-item').length;
+            document.getElementById('postCount').textContent = remaining;
+            document.getElementById('postBadge').textContent = `${remaining} total`;
+            if (remaining === 0) {
+              document.getElementById('postsList').innerHTML =
+                '<div class="empty-state">No posts yet. Publish your first one below.</div>';
+            }
+          } else {
+            alert('Could not delete post. Try again.');
+            this.disabled = false;
+            this.textContent = 'Delete';
+          }
+        } catch {
+          alert('Network error. Try again.');
+          this.disabled = false;
+          this.textContent = 'Delete';
+        }
+      });
+    });
+  }
+
+  // ── Post edit mode ──────────────────────────────────────────────────────────
+  let editingPostId = null;
+
+  function startEditPost(post) {
+    editingPostId = post.id;
+
+    document.getElementById('postTitle').value    = post.title || '';
+    document.getElementById('postCategory').value  = post.category || 'News';
+    document.getElementById('postExcerpt').value   = post.excerpt || '';
+    document.getElementById('postContent').value   = post.content || '';
+    document.getElementById('postAuthor').value    = post.author || 'ARSRC Council';
+    excerptCount.textContent = (post.excerpt || '').length;
+
+    if (post.image_url) {
+      postCoverImageUrl.value = post.image_url;
+      imagePreviewImg.src = post.image_url;
+      imagePreviewWrap.style.display = 'inline-block';
+      imageDrop.style.display = 'none';
+    } else {
+      resetImageField();
+    }
+
+    document.getElementById('postEditBannerText').textContent = `Editing: ${post.title}`;
+    document.getElementById('postEditBanner').style.display = 'flex';
+    publishBtn.textContent = 'Save Changes';
+
+    document.getElementById('postForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function exitPostEditMode() {
+    editingPostId = null;
+    document.getElementById('postEditBanner').style.display = 'none';
+    publishBtn.textContent = 'Publish Post';
+
+    document.getElementById('postTitle').value   = '';
+    document.getElementById('postExcerpt').value = '';
+    document.getElementById('postContent').value = '';
+    document.getElementById('postAuthor').value  = 'ARSRC Council';
+    excerptCount.textContent = '0';
+    resetImageField();
+  }
+
+  document.getElementById('postCancelEditBtn').addEventListener('click', exitPostEditMode);
+
+  // Excerpt character counter
+  const excerptField = document.getElementById('postExcerpt');
+  const excerptCount = document.getElementById('excerptCount');
+  if (excerptField) {
+    excerptField.addEventListener('input', () => {
+      excerptCount.textContent = excerptField.value.length;
+    });
+  }
+
+  // ── Cover image upload ──────────────────────────────────────────────────────
+  const imageInput      = document.getElementById('postImageInput');
+  const imageDrop        = document.getElementById('imageDrop');
+  const imageDropHint     = document.getElementById('imageDropHint');
+  const imagePreviewWrap  = document.getElementById('imagePreviewWrap');
+  const imagePreviewImg   = document.getElementById('imagePreviewImg');
+  const imageRemoveBtn    = document.getElementById('imageRemoveBtn');
+  const imageUploadStatus = document.getElementById('imageUploadStatus');
+  const postCoverImageUrl = document.getElementById('postCoverImageUrl');
+
+  const MAX_IMAGE_BYTES = 12 * 1024 * 1024; // 12MB
+  const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
+
+  function resetImageField() {
+    postCoverImageUrl.value = '';
+    imagePreviewWrap.style.display = 'none';
+    imagePreviewImg.src = '';
+    imageDrop.style.display = 'block';
+    imageInput.value = '';
+    imageUploadStatus.textContent = '';
+    imageUploadStatus.className = 'image-upload-status';
+  }
+
+  // Canvas-based image compression — no library needed
+  // Outputs JPEG at max 1200x800px, quality 0.82, always under ~400KB
+  function compressImage(file) {
+    return new Promise((resolve, reject) => {
+      const MAX_W = 1200, MAX_H = 800, QUALITY = 0.82;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          let { width: w, height: h } = img;
+          if (w > MAX_W) { h = Math.round(h * MAX_W / w); w = MAX_W; }
+          if (h > MAX_H) { w = Math.round(w * MAX_H / h); h = MAX_H; }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          canvas.toBlob(
+            blob => blob ? resolve(blob) : reject(new Error('Compression failed')),
+            'image/jpeg', QUALITY
+          );
+        };
+        img.onerror = () => reject(new Error('Could not load image'));
+        img.src = e.target.result;
+      };
+      reader.onerror = () => reject(new Error('Could not read file'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+    async function handleImageFile(file) {
+    if (!file) return;
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      imageUploadStatus.textContent = '✗ Only JPG, PNG or WEBP images are allowed.';
+      imageUploadStatus.className = 'image-upload-status error';
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      imageUploadStatus.textContent = '✗ Image is too large — max 5MB.';
+      imageUploadStatus.className = 'image-upload-status error';
+      return;
+    }
+
+    // Local preview while the upload runs
+    const localUrl = URL.createObjectURL(file);
+    imagePreviewImg.src = localUrl;
+    imagePreviewWrap.style.display = 'inline-block';
+    imageDrop.style.display = 'none';
+    imageUploadStatus.textContent = 'Uploading…';
+    imageUploadStatus.className = 'image-upload-status';
+
+    try {
+      // Step 1: Compress image using Canvas API (targets <400KB, max 1200x800px)
+      imageUploadStatus.textContent = 'Compressing…';
+      imageUploadStatus.className = 'image-upload-status';
+      const compressed = await compressImage(file);
+
+      // Step 2: Get a signed Supabase Storage upload URL from our admin endpoint
+      imageUploadStatus.textContent = 'Uploading…';
+      const urlRes  = await fetch('/api/admin/upload-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name }),
+        credentials: 'same-origin',
+      });
+      const urlData = await urlRes.json();
+      if (!urlRes.ok) {
+        imageUploadStatus.textContent = '✗ ' + (urlData.error || 'Could not get upload URL.');
+        imageUploadStatus.className = 'image-upload-status error';
+        return;
+      }
+
+      // Step 3: PUT compressed image directly to Supabase Storage
+      // (never passes through Vercel — avoids 4.5MB function body limit)
+      const uploadRes = await fetch(urlData.signedUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'image/jpeg' },
+        body: compressed,
+      });
+      if (!uploadRes.ok) {
+        imageUploadStatus.textContent = '✗ Upload to storage failed. Check bucket policy.';
+        imageUploadStatus.className = 'image-upload-status error';
+        return;
+      }
+
+      // Step 4: Store the public URL for use when publishing
+      postCoverImageUrl.value = urlData.publicUrl;
+      imageUploadStatus.textContent = '✓ Image uploaded and ready.';
+      imageUploadStatus.className = 'image-upload-status success';
+
+    } catch (err) {
+      imageUploadStatus.textContent = '✗ ' + (err.message || 'Network error uploading image.');
+      imageUploadStatus.className = 'image-upload-status error';
+    }
+  }
+
+  if (imageInput) {
+    imageInput.addEventListener('change', e => handleImageFile(e.target.files[0]));
+
+    ['dragenter', 'dragover'].forEach(evt =>
+      imageDrop.addEventListener(evt, e => { e.preventDefault(); imageDrop.classList.add('dragover'); })
+    );
+    ['dragleave', 'drop'].forEach(evt =>
+      imageDrop.addEventListener(evt, e => { e.preventDefault(); imageDrop.classList.remove('dragover'); })
+    );
+    imageDrop.addEventListener('drop', e => {
+      const file = e.dataTransfer.files[0];
+      if (file) handleImageFile(file);
+    });
+
+    imageRemoveBtn.addEventListener('click', resetImageField);
+  }
+
+  // ── Inline article images ────────────────────────────────────────────────────
+  // Images are stored in the same bucket as cover images. The article body keeps
+  // a compact token so admins can place an image between paragraphs without
+  // requiring a separate body-block table.
+  const inlineImageInput = document.getElementById('inlineImageInput');
+  const inlineImageDrop = document.getElementById('inlineImageDrop');
+  const inlineImageAlt = document.getElementById('inlineImageAlt');
+  const inlineImageCaption = document.getElementById('inlineImageCaption');
+  const insertInlineImageBtn = document.getElementById('insertInlineImageBtn');
+  const inlineImageStatus = document.getElementById('inlineImageStatus');
+  const inlineImageHint = document.getElementById('inlineImageHint');
+  let inlineImageFile = null;
+
+  function cleanInlineValue(value, fallback) {
+    return String(value || fallback).replace(/[|\n\r]/g, ' ').trim().slice(0, 240);
+  }
+
+  function setInlineImageFile(file) {
+    if (!file) return;
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      inlineImageStatus.textContent = '✗ Only JPG, PNG or WEBP images are allowed.';
+      inlineImageStatus.className = 'image-upload-status error';
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      inlineImageStatus.textContent = '✗ Image is too large — max 5MB.';
+      inlineImageStatus.className = 'image-upload-status error';
+      return;
+    }
+    inlineImageFile = file;
+    insertInlineImageBtn.disabled = false;
+    inlineImageStatus.textContent = `${file.name} ready — place your cursor in Full Content, then insert.`;
+    inlineImageStatus.className = 'image-upload-status success';
+  }
+
+  async function insertInlineImage() {
+    if (!inlineImageFile) return;
+    const editor = document.getElementById('postContent');
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    const alt = cleanInlineValue(inlineImageAlt.value, 'Article image');
+    const caption = cleanInlineValue(inlineImageCaption.value, '');
+    insertInlineImageBtn.disabled = true;
+    inlineImageStatus.textContent = 'Compressing and uploading…';
+    inlineImageStatus.className = 'image-upload-status';
+
+    try {
+      const compressed = await compressImage(inlineImageFile);
+      const urlRes = await fetch('/api/admin/upload-image', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: inlineImageFile.name, folder: 'article-images' }),
+        credentials: 'same-origin',
+      });
+      const urlData = await urlRes.json();
+      if (!urlRes.ok) throw new Error(urlData.error || 'Could not get upload URL.');
+      const uploadRes = await fetch(urlData.signedUrl, {
+        method: 'PUT', headers: { 'Content-Type': 'image/jpeg' }, body: compressed,
+      });
+      if (!uploadRes.ok) throw new Error('Upload to storage failed.');
+
+      const token = `\n\n[[IMAGE|${urlData.publicUrl}|${alt}|${caption}]]\n\n`;
+      editor.value = editor.value.slice(0, start) + token + editor.value.slice(end);
+      const nextCursor = start + token.length;
+      editor.focus();
+      editor.setSelectionRange(nextCursor, nextCursor);
+      inlineImageStatus.textContent = '✓ Image inserted at the cursor position.';
+      inlineImageStatus.className = 'image-upload-status success';
+      inlineImageFile = null;
+      inlineImageInput.value = '';
+      inlineImageAlt.value = '';
+      inlineImageCaption.value = '';
+      inlineImageHint.innerHTML = '<strong>Choose an image</strong> to insert at the cursor';
+    } catch (err) {
+      inlineImageStatus.textContent = '✗ ' + (err.message || 'Could not insert image.');
+      inlineImageStatus.className = 'image-upload-status error';
+    } finally {
+      insertInlineImageBtn.disabled = !inlineImageFile;
+    }
+  }
+
+  if (inlineImageInput && inlineImageDrop) {
+    inlineImageDrop.addEventListener('click', () => inlineImageInput.click());
+    inlineImageInput.addEventListener('change', e => setInlineImageFile(e.target.files[0]));
+    ['dragenter', 'dragover'].forEach(evt => inlineImageDrop.addEventListener(evt, e => {
+      e.preventDefault(); inlineImageDrop.classList.add('dragover');
+    }));
+    ['dragleave', 'drop'].forEach(evt => inlineImageDrop.addEventListener(evt, e => {
+      e.preventDefault(); inlineImageDrop.classList.remove('dragover');
+    }));
+    inlineImageDrop.addEventListener('drop', e => setInlineImageFile(e.dataTransfer.files[0]));
+    insertInlineImageBtn.addEventListener('click', insertInlineImage);
+  }
+
+  // Publish post
+  const publishBtn = document.getElementById('publishBtn');
+  const postMsg    = document.getElementById('postMsg');
+
+  if (publishBtn) {
+    publishBtn.addEventListener('click', async function () {
+      const title    = document.getElementById('postTitle').value;
+      const category = document.getElementById('postCategory').value;
+      const excerpt  = document.getElementById('postExcerpt').value;
+      const content  = document.getElementById('postContent').value;
+      const author   = document.getElementById('postAuthor').value;
+      const coverImageUrl = postCoverImageUrl.value;
+
+      postMsg.className = 'post-msg';
+
+      if (!title.trim() || !excerpt.trim() || !content.trim()) {
+        postMsg.textContent = '✗ Title, excerpt and content are all required.';
+        postMsg.classList.add('error');
+        return;
+      }
+
+      const isEdit = !!editingPostId;
+
+      publishBtn.disabled    = true;
+      publishBtn.textContent = isEdit ? 'Saving…' : 'Publishing…';
+
+      try {
+        const res  = await fetch('/api/admin/posts-create', {
+          method: isEdit ? 'PATCH' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...(isEdit ? { id: editingPostId } : {}),
+            title, category, excerpt, content, author,
+            image_url: postCoverImageUrl.value,
+          }),
+          credentials: 'same-origin',
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          postMsg.textContent = '✗ ' + (data.error || (isEdit ? 'Could not save changes.' : 'Could not publish post.'));
+          postMsg.classList.add('error');
+          return;
+        }
+
+        postMsg.textContent = isEdit
+          ? '✓ Changes saved and now live on the website.'
+          : '✓ Post published successfully. It is now live on the website.';
+        postMsg.classList.add('success');
+
+        if (isEdit) {
+          exitPostEditMode();
+        } else {
+          // Clear form
+          document.getElementById('postTitle').value   = '';
+          document.getElementById('postExcerpt').value = '';
+          document.getElementById('postContent').value = '';
+          document.getElementById('postAuthor').value  = 'ARSRC Council';
+          excerptCount.textContent = '0';
+          resetImageField();
+        }
+
+        // Reload posts list to show new/updated post
+        loadPosts();
+
+        setTimeout(() => { postMsg.className = 'post-msg'; }, 5000);
+
+      } catch {
+        postMsg.textContent = '✗ Network error. Check your connection and try again.';
+        postMsg.classList.add('error');
+      } finally {
+        publishBtn.disabled    = false;
+        publishBtn.textContent = editingPostId ? 'Save Changes' : 'Publish Post';
+      }
+    });
+
+  }
+
+  // ── Resources management ────────────────────────────────────────────────────
+  (function initResourcesAdmin() {
+    const fileInput = document.getElementById('resourceFileInput');
+    const fileDrop = document.getElementById('resourceFileDrop');
+    const fileHint = document.getElementById('resourceFileHint');
+    const saveBtn = document.getElementById('resourceSaveBtn');
+    const cancelBtn = document.getElementById('resourceCancelBtn');
+    const msg = document.getElementById('resourceMsg');
+    const list = document.getElementById('resourceAdminList');
+    const badge = document.getElementById('resourceBadge');
+    let selectedFile = null;
+    let editingId = null;
+    let editingUrl = '';
+
+    const allowed = ['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/vnd.ms-powerpoint','application/vnd.openxmlformats-officedocument.presentationml.presentation','application/zip','text/plain'];
+    const maxBytes = 20 * 1024 * 1024;
+
+    function setMessage(text, state) { msg.textContent = text || ''; msg.className = 'post-msg' + (state ? ' ' + state : ''); }
+    async function readApiResponse(response, fallbackMessage) {
+      const raw = await response.text();
+      let data = null;
+      try { data = raw ? JSON.parse(raw) : {}; } catch { throw new Error(response.status === 404 ? 'Resource API route not found. Deploy /api/admin/resources and /api/admin/upload-image.' : 'The resource API returned HTML instead of JSON. Check the server route or authentication redirect.'); }
+      if (!response.ok) throw new Error(data?.error || fallbackMessage);
+      return data;
+    }
+    function resetResourceForm() { editingId = null; editingUrl = ''; selectedFile = null; fileInput.value = ''; document.getElementById('resourceTitle').value = ''; document.getElementById('resourceDescription').value = ''; document.getElementById('resourceCategory').value = 'Policy'; fileHint.innerHTML = '<strong>Choose a file</strong> or drag it here'; saveBtn.textContent = 'Upload & publish resource'; saveBtn.disabled = true; cancelBtn.style.display = 'none'; setMessage(''); }
+    function chooseFile(file) {
+      if (!file) return;
+      if (!allowed.includes(file.type) && !/\.(pdf|docx?|xlsx?|pptx?|zip|txt)$/i.test(file.name)) return setMessage('✗ Unsupported file type.', 'error');
+      if (file.size > maxBytes) return setMessage('✗ File is too large — maximum 20MB.', 'error');
+      selectedFile = file; fileHint.textContent = file.name; saveBtn.disabled = false; setMessage('File ready to upload.', 'success');
+    }
+    async function uploadResourceFile(file) {
+      const urlRes = await fetch('/api/admin/upload-image', { method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'}, body:JSON.stringify({ filename:file.name, folder:'resources' }), credentials:'same-origin' });
+      const urlData = await readApiResponse(urlRes, 'Could not get upload URL.');
+      const uploaded = await fetch(urlData.signedUrl, { method:'PUT', headers:{'Content-Type':file.type || 'application/octet-stream'}, body:file });
+      if (!uploaded.ok) throw new Error('Resource upload failed.');
+      return urlData.publicUrl;
+    }
+    async function loadResources() {
+      try { const res = await fetch('/api/admin/resources?_=' + Date.now(), { credentials:'same-origin', headers:{'Accept':'application/json'} }); const data = await readApiResponse(res, 'Could not load resources.'); renderResources(data.resources || []); }
+      catch (err) { list.innerHTML = '<div class="empty-state">' + esc(err.message || 'Resource management API is not connected yet.') + '</div>'; badge.textContent = 'Unavailable'; }
+    }
+    function renderResources(resources) {
+      badge.textContent = `${resources.length} total`;
+      if (!resources.length) { list.innerHTML = '<div class="empty-state">No resources yet. Upload your first document above.</div>'; return; }
+      list.innerHTML = resources.map(resource => `<div class="resource-admin-item"><div><strong>${esc(resource.title)}</strong><span>${esc(resource.category || 'Document')} · ${esc(resource.file_name || 'Download')}</span></div><div class="resource-admin-actions"><a class="view-btn" href="${esc(resource.file_url)}" target="_blank" rel="noopener">View</a><button class="edit-btn" data-resource-edit="${esc(resource.id)}">Edit</button><button class="delete-btn" data-resource-delete="${esc(resource.id)}">Delete</button></div></div>`).join('');
+      list.querySelectorAll('[data-resource-edit]').forEach(btn => btn.addEventListener('click', () => startEdit(resources.find(item => item.id === btn.dataset.resourceEdit))));
+      list.querySelectorAll('[data-resource-delete]').forEach(btn => btn.addEventListener('click', () => deleteResource(btn.dataset.resourceDelete)));
+    }
+    function startEdit(resource) { if (!resource) return; editingId=resource.id; editingUrl=resource.file_url; document.getElementById('resourceTitle').value=resource.title||''; document.getElementById('resourceCategory').value=resource.category||'Policy'; document.getElementById('resourceDescription').value=resource.description||''; fileHint.textContent=resource.file_name||'Existing file retained'; saveBtn.textContent='Save resource changes'; saveBtn.disabled=false; cancelBtn.style.display='inline-block'; document.getElementById('resourcesPanel').scrollIntoView({behavior:'smooth',block:'start'}); }
+    async function deleteResource(id) { if (!confirm('Delete this resource?')) return; try { const res=await fetch('/api/admin/resources',{method:'DELETE',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({id}),credentials:'same-origin'}); await readApiResponse(res, 'Could not delete resource.'); loadResources(); } catch (err) { setMessage(err.message || 'Could not delete resource.', 'error'); } }
+    fileDrop?.addEventListener('click', () => fileInput.click()); fileInput?.addEventListener('change', e => chooseFile(e.target.files[0]));
+    ['dragenter','dragover'].forEach(type => fileDrop?.addEventListener(type, e => { e.preventDefault(); fileDrop.classList.add('dragover'); }));
+    ['dragleave','drop'].forEach(type => fileDrop?.addEventListener(type, e => { e.preventDefault(); fileDrop.classList.remove('dragover'); }));
+    fileDrop?.addEventListener('drop', e => chooseFile(e.dataTransfer.files[0]));
+    cancelBtn?.addEventListener('click', resetResourceForm);
+    saveBtn?.addEventListener('click', async () => {
+      const title=document.getElementById('resourceTitle').value.trim(); const description=document.getElementById('resourceDescription').value.trim(); const category=document.getElementById('resourceCategory').value;
+      if(!title || (!selectedFile && !editingUrl)) return setMessage('Add a title and choose a file.', 'error');
+      saveBtn.disabled=true; saveBtn.textContent=editingId?'Saving…':'Uploading…';
+      try { const fileUrl=selectedFile?await uploadResourceFile(selectedFile):editingUrl; const payload={title,description,category,file_url:fileUrl,file_name:selectedFile?.name||fileHint.textContent,file_type:selectedFile?.type||null,file_size:selectedFile?.size||null}; const res=await fetch('/api/admin/resources',{method:editingId?'PATCH':'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(editingId?{...payload,id:editingId}:payload),credentials:'same-origin'}); await readApiResponse(res, 'Could not save resource.'); setMessage(editingId?'✓ Resource updated.':'✓ Resource published.', 'success'); resetResourceForm(); loadResources(); } catch(err) { setMessage('✗ '+(err.message||'Could not save resource.'),'error'); saveBtn.disabled=false; saveBtn.textContent=editingId?'Save resource changes':'Upload & publish resource'; }
+    });
+    loadResources();
+  })();
+
+  // ── Executives management ───────────────────────────────────────────────────
+  const EXEC_CATEGORY_LABELS = {
+    rec: 'Regional Executive Committee (REC)',
+    zec: 'Zonal Executive Committee (ZEC)',
+    ligec: 'Literary Group Executive Committee (LiGEC)',
+    wds: 'Writers & Debaters Society (WDS)',
+    edicom: 'Editorial Committee (EDICOM)',
+    sec: 'Secretariat',
+    adhoc: 'Adhoc',
+  };
+  const EXEC_CATEGORY_ORDER = ['rec', 'zec', 'ligec', 'wds', 'edicom', 'sec', 'adhoc'];
+  // Keep old combined Literary & Editorial records visible while they are
+  // being reclassified; new records should use ligec or edicom explicitly.
+  function belongsToExecCategory(ex, cat) {
+    if (cat === 'edicom') {
+      return ex.category === 'edicom' || (ex.category === 'lit' && /editorial|edicom/i.test(ex.subgroup || ''));
+    }
+    if (cat === 'ligec') {
+      return ex.category === 'ligec' || (ex.category === 'lit' && !/editorial|edicom/i.test(ex.subgroup || ''));
+    }
+    return ex.category === cat;
+  }
+
+  let execCache = [];
+
+  async function loadExecutives() {
+    const container = document.getElementById('execListContainer');
+    try {
+      // Cache-bust: /api/executives is CDN-cached for the public site's benefit,
+      // but the admin dashboard needs to see writes (reorders, edits, deletes)
+      // immediately, not up to 60s stale.
+      const res = await fetch('/api/executives?_=' + Date.now(), { credentials: 'same-origin' });
+      const data = await res.json();
+      if (!res.ok) {
+        container.innerHTML = '<div class="exec-empty">Could not load executives.</div>';
+        return;
+      }
+      execCache = data.executives || [];
+      renderExecList();
+      updateExecSubgroupOptions();
+    } catch {
+      container.innerHTML = '<div class="exec-empty">Could not load executives.</div>';
+    }
+  }
+
+  function renderExecList() {
+    const container = document.getElementById('execListContainer');
+    if (!execCache.length) {
+      container.innerHTML = '<div class="exec-empty">No executives added yet.</div>';
+      return;
+    }
+
+    let html = '';
+    EXEC_CATEGORY_ORDER.forEach(cat => {
+      const inCat = execCache.filter(e => belongsToExecCategory(e, cat));
+      if (!inCat.length) return;
+
+      html += `<div class="exec-list-group"><h3>${esc(EXEC_CATEGORY_LABELS[cat])}</h3>`;
+
+      // Group by subgroup within this category (REC has no subgroup)
+      const subgroups = [...new Set(inCat.map(e => e.subgroup || ''))];
+      subgroups.forEach(sg => {
+        if (sg) html += `<div style="font-size:11px;font-weight:700;color:rgba(238,242,255,.5);margin:10px 0 6px;">${esc(sg)}</div>`;
+        const groupItems = inCat.filter(e => (e.subgroup || '') === sg);
+        groupItems.forEach((ex, i) => {
+          const isFirst = i === 0;
+          const isLast  = i === groupItems.length - 1;
+          html += `
+            <div class="exec-row" data-id="${esc(ex.id)}">
+              <div class="exec-row-left">
+                ${ex.photo_url
+                  ? `<img class="exec-row-thumb" src="${esc(ex.photo_url)}" alt="">`
+                  : `<div class="exec-row-thumb">${esc(ex.initials || '')}</div>`}
+                <div class="exec-row-text">
+                  <div class="exec-row-name">${esc(ex.name)}</div>
+                  <div class="exec-row-meta">${esc(ex.role)}${ex.school ? ' · ' + esc(ex.school) : ''}</div>
+                </div>
+              </div>
+              <div style="display:flex; gap:6px; flex-shrink:0; align-items:center;">
+                <button class="delete-btn exec-move-btn" data-id="${esc(ex.id)}" data-dir="up" ${isFirst ? 'disabled' : ''}
+                  style="background:rgba(255,255,255,.05); color:rgba(238,242,255,.6); border-color:rgba(255,255,255,.1); padding:6px 9px;" title="Move up">▲</button>
+                <button class="delete-btn exec-move-btn" data-id="${esc(ex.id)}" data-dir="down" ${isLast ? 'disabled' : ''}
+                  style="background:rgba(255,255,255,.05); color:rgba(238,242,255,.6); border-color:rgba(255,255,255,.1); padding:6px 9px;" title="Move down">▼</button>
+                <button class="delete-btn exec-edit-btn" data-id="${esc(ex.id)}" style="background:rgba(59,130,246,.12); color:#93c5fd; border-color:rgba(59,130,246,.25);">Edit</button>
+                <button class="delete-btn exec-delete-btn" data-id="${esc(ex.id)}">Delete</button>
+              </div>
+            </div>`;
+        });
+      });
+
+      html += `</div>`;
+    });
+
+    container.innerHTML = html || '<div class="exec-empty">No executives added yet.</div>';
+
+
+    container.querySelectorAll('.exec-move-btn').forEach(btn => {
+      btn.addEventListener('click', async function () {
+        if (this.disabled) return;
+        const id  = this.dataset.id;
+        const dir = this.dataset.dir;
+        this.disabled = true;
+        try {
+          const res = await fetch('/api/admin/executives-create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'reorder', id, direction: dir }),
+            credentials: 'same-origin',
+          });
+          if (res.ok) {
+            loadExecutives();
+          } else {
+            alert('Could not reorder. Try again.');
+            this.disabled = false;
+          }
+        } catch {
+          alert('Network error. Try again.');
+          this.disabled = false;
+        }
+      });
+    });
+
+    container.querySelectorAll('.exec-edit-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const ex = execCache.find(e => e.id === this.dataset.id);
+        if (ex) enterEditMode(ex);
+      });
+    });
+
+    container.querySelectorAll('.exec-delete-btn').forEach(btn => {
+      btn.addEventListener('click', async function () {
+        const id = this.dataset.id;
+        if (!confirm('Remove this executive? This cannot be undone.')) return;
+        this.disabled = true;
+        this.textContent = 'Removing…';
+        try {
+          const res = await fetch('/api/admin/executives-create', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id }),
+            credentials: 'same-origin',
+          });
+          if (res.ok) {
+            execCache = execCache.filter(e => e.id !== id);
+            renderExecList();
+            updateExecSubgroupOptions();
+          } else {
+            alert('Could not remove executive. Try again.');
+            this.disabled = false;
+            this.textContent = 'Delete';
+          }
+        } catch {
+          alert('Network error. Try again.');
+          this.disabled = false;
+          this.textContent = 'Delete';
+        }
+      });
+    });
+  }
+
+  // ── Edit mode ────────────────────────────────────────────────────────────
+  let editingExecId = null;
+
+    function enterEditMode(ex) {
+    editingExecId = ex.id;
+    // Records created before LiGEC and EDICOM were separated may still have
+    // category "lit". Map them to a valid current option before PATCHing;
+    // otherwise the select becomes blank and the API rejects the update.
+    const editCategory = ex.category === 'lit'
+      ? (/editorial|edicom/i.test(ex.subgroup || '') ? 'edicom' : 'ligec')
+      : ex.category;
+    document.getElementById('execCategory').value = editCategory;
+    updateExecSubgroupOptions();
+    document.getElementById('execSubgroup').value = ex.subgroup || '';
+    document.getElementById('execName').value = ex.name || '';
+    document.getElementById('execRole').value = ex.role || '';
+    document.getElementById('execSchool').value = ex.school || '';
+    document.getElementById('execInitials').value = ex.initials || '';
+
+    if (ex.photo_url) {
+      execPhotoUrl.value = ex.photo_url;
+      execImagePreviewImg.src = ex.photo_url;
+      execImagePreviewWrap.style.display = 'inline-block';
+      execImageDrop.style.display = 'none';
+    } else {
+      resetExecImageField();
+    }
+
+    document.getElementById('execEditBannerText').textContent = `Editing: ${ex.name}`;
+    document.getElementById('execEditBanner').style.display = 'flex';
+    execAddBtn.textContent = 'Save Changes';
+
+    document.getElementById('execForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function exitEditMode() {
+    editingExecId = null;
+    document.getElementById('execEditBanner').style.display = 'none';
+    execAddBtn.textContent = 'Add Executive';
+
+    document.getElementById('execName').value = '';
+    document.getElementById('execRole').value = '';
+    document.getElementById('execSchool').value = '';
+    document.getElementById('execInitials').value = '';
+    execSubgroupInput.value = '';
+    resetExecImageField();
+  }
+
+  document.getElementById('execCancelEditBtn').addEventListener('click', exitEditMode);
+
+
+  const execCategorySelect = document.getElementById('execCategory');
+  const execSubgroupWrap   = document.getElementById('execSubgroupWrap');
+  const execSubgroupInput  = document.getElementById('execSubgroup');
+  const execSubgroupList   = document.getElementById('execSubgroupList');
+
+  function updateExecSubgroupOptions() {
+    const cat = execCategorySelect.value;
+    const isRec = cat === 'rec' || cat === 'sec';
+    execSubgroupWrap.style.opacity = isRec ? '0.4' : '1';
+    execSubgroupInput.placeholder = isRec ? 'Not used for REC' : 'e.g. Zone 1';
+    execSubgroupInput.disabled = isRec;
+
+      const options = [...new Set(execCache.filter(e => belongsToExecCategory(e, cat) && e.subgroup).map(e => e.subgroup))];
+    execSubgroupList.innerHTML = options.map(o => `<option value="${esc(o)}"></option>`).join('');
+  }
+  execCategorySelect.addEventListener('change', updateExecSubgroupOptions);
+
+  // Photo upload — reuses the same compressImage() helper defined above for post covers
+  const execImageInput      = document.getElementById('execImageInput');
+  const execImageDrop       = document.getElementById('execImageDrop');
+  const execImagePreviewWrap= document.getElementById('execImagePreviewWrap');
+  const execImagePreviewImg = document.getElementById('execImagePreviewImg');
+  const execImageRemoveBtn  = document.getElementById('execImageRemoveBtn');
+  const execImageUploadStatus = document.getElementById('execImageUploadStatus');
+  const execPhotoUrl        = document.getElementById('execPhotoUrl');
+
+  function resetExecImageField() {
+    execPhotoUrl.value = '';
+    execImagePreviewWrap.style.display = 'none';
+    execImagePreviewImg.src = '';
+    execImageDrop.style.display = 'block';
+    execImageInput.value = '';
+    execImageUploadStatus.textContent = '';
+    execImageUploadStatus.className = 'image-upload-status';
+  }
+
+  async function handleExecImageFile(file) {
+    if (!file) return;
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      execImageUploadStatus.textContent = '✗ Only JPG, PNG or WEBP images are allowed.';
+      execImageUploadStatus.className = 'image-upload-status error';
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      execImageUploadStatus.textContent = '✗ Image is too large — max 5MB.';
+      execImageUploadStatus.className = 'image-upload-status error';
+      return;
+    }
+
+    const localUrl = URL.createObjectURL(file);
+    execImagePreviewImg.src = localUrl;
+    execImagePreviewWrap.style.display = 'inline-block';
+    execImageDrop.style.display = 'none';
+    execImageUploadStatus.textContent = 'Compressing…';
+    execImageUploadStatus.className = 'image-upload-status';
+
+    try {
+      const compressed = await compressImage(file);
+
+      execImageUploadStatus.textContent = 'Uploading…';
+      const urlRes = await fetch('/api/admin/upload-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name, folder: 'executives' }),
+        credentials: 'same-origin',
+      });
+      const urlData = await urlRes.json();
+      if (!urlRes.ok) {
+        execImageUploadStatus.textContent = '✗ ' + (urlData.error || 'Could not get upload URL.');
+        execImageUploadStatus.className = 'image-upload-status error';
+        return;
+      }
+
+      const uploadRes = await fetch(urlData.signedUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'image/jpeg' },
+        body: compressed,
+      });
+      if (!uploadRes.ok) {
+        execImageUploadStatus.textContent = '✗ Upload to storage failed. Check bucket policy.';
+        execImageUploadStatus.className = 'image-upload-status error';
+        return;
+      }
+
+      execPhotoUrl.value = urlData.publicUrl;
+      execImageUploadStatus.textContent = '✓ Photo uploaded and ready.';
+      execImageUploadStatus.className = 'image-upload-status success';
+    } catch (err) {
+      execImageUploadStatus.textContent = '✗ ' + (err.message || 'Network error uploading photo.');
+      execImageUploadStatus.className = 'image-upload-status error';
+    }
+  }
+
+  if (execImageInput) {
+    execImageInput.addEventListener('change', e => handleExecImageFile(e.target.files[0]));
+    ['dragenter', 'dragover'].forEach(evt =>
+      execImageDrop.addEventListener(evt, e => { e.preventDefault(); execImageDrop.classList.add('dragover'); })
+    );
+    ['dragleave', 'drop'].forEach(evt =>
+      execImageDrop.addEventListener(evt, e => { e.preventDefault(); execImageDrop.classList.remove('dragover'); })
+    );
+    execImageDrop.addEventListener('drop', e => {
+      const file = e.dataTransfer.files[0];
+      if (file) handleExecImageFile(file);
+    });
+    execImageRemoveBtn.addEventListener('click', resetExecImageField);
+  }
+
+  // Add executive
+  const execAddBtn = document.getElementById('execAddBtn');
+  const execMsg    = document.getElementById('execMsg');
+
+  execAddBtn.addEventListener('click', async function () {
+    const category = execCategorySelect.value;
+    const subgroup = execSubgroupInput.value.trim();
+    const name     = document.getElementById('execName').value.trim();
+    const role     = document.getElementById('execRole').value.trim();
+    const school   = document.getElementById('execSchool').value.trim();
+    const initials = document.getElementById('execInitials').value.trim();
+
+    execMsg.className = 'post-msg';
+
+    if (!name || !role) {
+      execMsg.textContent = '✗ Name and role are required.';
+      execMsg.classList.add('error');
+      return;
+    }
+    if (category !== 'rec' && category !== 'sec' && !subgroup) {
+      execMsg.textContent = '✗ Sub-group / committee name is required for this category.';
+      execMsg.classList.add('error');
+      return;
+    }
+
+    execAddBtn.disabled = true;
+    execAddBtn.textContent = editingExecId ? 'Saving…' : 'Adding…';
+
+    const isEdit = !!editingExecId;
+
+    try {
+      const res = await fetch('/api/admin/executives-create', {
+        method: isEdit ? 'PATCH' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...(isEdit ? { id: editingExecId } : {}),
+          category, subgroup, name, role, school, initials,
+          photo_url: execPhotoUrl.value,
+        }),
+        credentials: 'same-origin',
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        execMsg.textContent = '✗ ' + (data.error || (isEdit ? 'Could not save changes.' : 'Could not add executive.'));
+        execMsg.classList.add('error');
+        return;
+      }
+
+      execMsg.textContent = isEdit
+        ? '✓ Changes saved and now live on the website.'
+        : '✓ Executive added and now live on the website.';
+      execMsg.classList.add('success');
+
+      if (isEdit) {
+        exitEditMode();
+      } else {
+        document.getElementById('execName').value = '';
+        document.getElementById('execRole').value = '';
+        document.getElementById('execSchool').value = '';
+        document.getElementById('execInitials').value = '';
+        execSubgroupInput.value = '';
+        resetExecImageField();
+      }
+
+      loadExecutives();
+
+      setTimeout(() => { execMsg.className = 'post-msg'; }, 5000);
+    } catch {
+      execMsg.textContent = '✗ Network error. Check your connection and try again.';
+      execMsg.classList.add('error');
+    } finally {
+      execAddBtn.disabled = false;
+      execAddBtn.textContent = editingExecId ? 'Save Changes' : 'Add Executive';
+    }
+  });
+
+  updateExecSubgroupOptions();
+
+  // ── Archive current executives ──────────────────────────────────────────
+  document.getElementById('archiveBtn').addEventListener('click', async function () {
+    const yearInput = document.getElementById('archiveYear');
+    const year = yearInput.value.trim();
+    const msg = document.getElementById('archiveMsg');
+    msg.className = 'post-msg';
+
+    if (!year) {
+      msg.textContent = '✗ Enter a year label first (e.g. 2024/2025).';
+      msg.classList.add('error');
+      return;
+    }
+    if (!confirm(`Archive all current executives under "${year}"? This copies everyone currently listed above into the Past Executives archive. The current list will NOT be changed or cleared.`)) return;
+
+    this.disabled = true;
+    this.textContent = 'Archiving…';
+
+    try {
+      const res = await fetch('/api/admin/executives-create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'archive', year }),
+        credentials: 'same-origin',
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        msg.textContent = '✗ ' + (data.error || 'Could not archive.');
+        msg.classList.add('error');
+        return;
+      }
+
+      msg.textContent = `✓ Archived ${data.archived} executives under "${data.year}".`;
+      msg.classList.add('success');
+      yearInput.value = '';
+      loadPastExecutives();
+    } catch {
+      msg.textContent = '✗ Network error. Check your connection and try again.';
+      msg.classList.add('error');
+    } finally {
+      this.disabled = false;
+      this.textContent = 'Archive Current Executives';
+    }
+  });
+
+  // ── Past executives management ──────────────────────────────────────────
+  let pastExecCache = [];
+  let pastExecYearFilterValue = '';
+  let editingPastExecId = null;
+
+  async function loadPastExecutives() {
+    const container = document.getElementById('pastExecListContainer');
+    try {
+      const res = await fetch('/api/past-executives?_=' + Date.now(), { credentials: 'same-origin' });
+      const data = await res.json();
+      if (!res.ok) {
+        container.innerHTML = '<div class="exec-empty">Could not load past executives.</div>';
+        return;
+      }
+      pastExecCache = data.pastExecutives || [];
+      updatePastExecYearOptions();
+      renderPastExecList();
+    } catch {
+      container.innerHTML = '<div class="exec-empty">Could not load past executives.</div>';
+    }
+  }
+
+  function updatePastExecYearOptions() {
+    const years = [...new Set(pastExecCache.map(e => e.year))]; // already sorted desc from API
+    const yearFilter = document.getElementById('pastExecYearFilter');
+    const currentFilterVal = yearFilter.value;
+    yearFilter.innerHTML = '<option value="">All years</option>' + years.map(y => `<option value="${esc(y)}">${esc(y)}</option>`).join('');
+    yearFilter.value = years.includes(currentFilterVal) ? currentFilterVal : '';
+
+    document.getElementById('pastExecYearList').innerHTML = years.map(y => `<option value="${esc(y)}"></option>`).join('');
+  }
+
+  document.getElementById('pastExecYearFilter').addEventListener('change', function () {
+    pastExecYearFilterValue = this.value;
+    renderPastExecList();
+  });
+
+  function renderPastExecList() {
+    const container = document.getElementById('pastExecListContainer');
+    const filtered = pastExecYearFilterValue
+      ? pastExecCache.filter(e => e.year === pastExecYearFilterValue)
+      : pastExecCache;
+
+    if (!filtered.length) {
+      container.innerHTML = '<div class="exec-empty">No past executives added yet.</div>';
+      return;
+    }
+
+    const years = [...new Set(filtered.map(e => e.year))];
+    let html = '';
+    years.forEach(yr => {
+      html += `<div class="exec-list-group"><h3 style="color:#c4b5fd;">${esc(yr)}</h3>`;
+      const inYear = filtered.filter(e => e.year === yr);
+
+      EXEC_CATEGORY_ORDER.forEach(cat => {
+        const inCat = inYear.filter(e => belongsToExecCategory(e, cat));
+        if (!inCat.length) return;
+        html += `<div style="font-size:11px;font-weight:700;color:rgba(238,242,255,.4);margin:12px 0 6px;text-transform:uppercase;letter-spacing:.5px;">${esc(EXEC_CATEGORY_LABELS[cat])}</div>`;
+
+        const subgroups = [...new Set(inCat.map(e => e.subgroup || ''))];
+        subgroups.forEach(sg => {
+          if (sg) html += `<div style="font-size:11px;font-weight:700;color:rgba(238,242,255,.5);margin:8px 0 6px;">${esc(sg)}</div>`;
+          inCat.filter(e => (e.subgroup || '') === sg).forEach(ex => {
+            html += `
+              <div class="exec-row" data-id="${esc(ex.id)}">
+                <div class="exec-row-left">
+                  ${ex.photo_url
+                    ? `<img class="exec-row-thumb" src="${esc(ex.photo_url)}" alt="">`
+                    : `<div class="exec-row-thumb">${esc(ex.initials || '')}</div>`}
+                  <div class="exec-row-text">
+                    <div class="exec-row-name">${esc(ex.name)}</div>
+                    <div class="exec-row-meta">${esc(ex.role)}${ex.school ? ' · ' + esc(ex.school) : ''}</div>
+                  </div>
+                </div>
+                <div style="display:flex; gap:8px; flex-shrink:0;">
+                  <button class="delete-btn past-exec-edit-btn" data-id="${esc(ex.id)}" style="background:rgba(124,58,237,.12); color:#c4b5fd; border-color:rgba(124,58,237,.25);">Edit</button>
+                  <button class="delete-btn past-exec-delete-btn" data-id="${esc(ex.id)}">Delete</button>
+                </div>
+              </div>`;
+          });
+        });
+      });
+
+      html += `</div>`;
+    });
+
+    container.innerHTML = html;
+
+    container.querySelectorAll('.past-exec-edit-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const ex = pastExecCache.find(e => e.id === this.dataset.id);
+        if (ex) enterPastEditMode(ex);
+      });
+    });
+
+    container.querySelectorAll('.past-exec-delete-btn').forEach(btn => {
+      btn.addEventListener('click', async function () {
+        const id = this.dataset.id;
+        if (!confirm('Remove this past executive entry? This cannot be undone.')) return;
+        this.disabled = true;
+        this.textContent = 'Removing…';
+        try {
+          const res = await fetch('/api/admin/past-executives-create', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id }),
+            credentials: 'same-origin',
+          });
+          if (res.ok) {
+            pastExecCache = pastExecCache.filter(e => e.id !== id);
+            updatePastExecYearOptions();
+            renderPastExecList();
+          } else {
+            alert('Could not remove entry. Try again.');
+            this.disabled = false;
+            this.textContent = 'Delete';
+          }
+        } catch {
+          alert('Network error. Try again.');
+          this.disabled = false;
+          this.textContent = 'Delete';
+        }
+      });
+    });
+  }
+
+  // Subgroup datalist for the past-exec form, scoped by selected category
+  const pastExecCategorySelect = document.getElementById('pastExecCategory');
+  const pastExecSubgroupWrap   = document.getElementById('pastExecSubgroupWrap');
+  const pastExecSubgroupInput  = document.getElementById('pastExecSubgroup');
+  const pastExecSubgroupList   = document.getElementById('pastExecSubgroupList');
+
+  function updatePastExecSubgroupOptions() {
+    const cat = pastExecCategorySelect.value;
+    const isRec = cat === 'rec' || cat === 'sec';
+    pastExecSubgroupWrap.style.opacity = isRec ? '0.4' : '1';
+    pastExecSubgroupInput.placeholder = isRec ? 'Not used for REC' : 'e.g. Zone 1';
+    pastExecSubgroupInput.disabled = isRec;
+
+      const options = [...new Set(pastExecCache.filter(e => belongsToExecCategory(e, cat) && e.subgroup).map(e => e.subgroup))];
+    pastExecSubgroupList.innerHTML = options.map(o => `<option value="${esc(o)}"></option>`).join('');
+  }
+  pastExecCategorySelect.addEventListener('change', updatePastExecSubgroupOptions);
+
+  // Photo upload — reuses the same compressImage()/ALLOWED_TYPES/MAX_IMAGE_BYTES helpers
+  // defined earlier for post covers and current-executive photos.
+  const pastExecImageInput        = document.getElementById('pastExecImageInput');
+  const pastExecImageDrop         = document.getElementById('pastExecImageDrop');
+  const pastExecImagePreviewWrap  = document.getElementById('pastExecImagePreviewWrap');
+  const pastExecImagePreviewImg   = document.getElementById('pastExecImagePreviewImg');
+  const pastExecImageRemoveBtn    = document.getElementById('pastExecImageRemoveBtn');
+  const pastExecImageUploadStatus = document.getElementById('pastExecImageUploadStatus');
+  const pastExecPhotoUrl          = document.getElementById('pastExecPhotoUrl');
+
+  function resetPastExecImageField() {
+    pastExecPhotoUrl.value = '';
+    pastExecImagePreviewWrap.style.display = 'none';
+    pastExecImagePreviewImg.src = '';
+    pastExecImageDrop.style.display = 'block';
+    pastExecImageInput.value = '';
+    pastExecImageUploadStatus.textContent = '';
+    pastExecImageUploadStatus.className = 'image-upload-status';
+  }
+
+  async function handlePastExecImageFile(file) {
+    if (!file) return;
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      pastExecImageUploadStatus.textContent = '✗ Only JPG, PNG or WEBP images are allowed.';
+      pastExecImageUploadStatus.className = 'image-upload-status error';
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      pastExecImageUploadStatus.textContent = '✗ Image is too large — max 5MB.';
+      pastExecImageUploadStatus.className = 'image-upload-status error';
+      return;
+    }
+
+    const localUrl = URL.createObjectURL(file);
+    pastExecImagePreviewImg.src = localUrl;
+    pastExecImagePreviewWrap.style.display = 'inline-block';
+    pastExecImageDrop.style.display = 'none';
+    pastExecImageUploadStatus.textContent = 'Compressing…';
+    pastExecImageUploadStatus.className = 'image-upload-status';
+
+    try {
+      const compressed = await compressImage(file);
+
+      pastExecImageUploadStatus.textContent = 'Uploading…';
+      const urlRes = await fetch('/api/admin/upload-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name, folder: 'past-executives' }),
+        credentials: 'same-origin',
+      });
+      const urlData = await urlRes.json();
+      if (!urlRes.ok) {
+        pastExecImageUploadStatus.textContent = '✗ ' + (urlData.error || 'Could not get upload URL.');
+        pastExecImageUploadStatus.className = 'image-upload-status error';
+        return;
+      }
+
+      const uploadRes = await fetch(urlData.signedUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'image/jpeg' },
+        body: compressed,
+      });
+      if (!uploadRes.ok) {
+        pastExecImageUploadStatus.textContent = '✗ Upload to storage failed. Check bucket policy.';
+        pastExecImageUploadStatus.className = 'image-upload-status error';
+        return;
+      }
+
+      pastExecPhotoUrl.value = urlData.publicUrl;
+      pastExecImageUploadStatus.textContent = '✓ Photo uploaded and ready.';
+      pastExecImageUploadStatus.className = 'image-upload-status success';
+    } catch (err) {
+      pastExecImageUploadStatus.textContent = '✗ ' + (err.message || 'Network error uploading photo.');
+      pastExecImageUploadStatus.className = 'image-upload-status error';
+    }
+  }
+
+  if (pastExecImageInput) {
+    pastExecImageInput.addEventListener('change', e => handlePastExecImageFile(e.target.files[0]));
+    ['dragenter', 'dragover'].forEach(evt =>
+      pastExecImageDrop.addEventListener(evt, e => { e.preventDefault(); pastExecImageDrop.classList.add('dragover'); })
+    );
+    ['dragleave', 'drop'].forEach(evt =>
+      pastExecImageDrop.addEventListener(evt, e => { e.preventDefault(); pastExecImageDrop.classList.remove('dragover'); })
+    );
+    pastExecImageDrop.addEventListener('drop', e => {
+      const file = e.dataTransfer.files[0];
+      if (file) handlePastExecImageFile(file);
+    });
+    pastExecImageRemoveBtn.addEventListener('click', resetPastExecImageField);
+  }
+
+  // Edit mode
+  function enterPastEditMode(ex) {
+    editingPastExecId = ex.id;
+
+    document.getElementById('pastExecYear').value = ex.year;
+    pastExecCategorySelect.value = ex.category;
+    updatePastExecSubgroupOptions();
+    pastExecSubgroupInput.value = ex.subgroup || '';
+    document.getElementById('pastExecName').value = ex.name || '';
+    document.getElementById('pastExecRole').value = ex.role || '';
+    document.getElementById('pastExecSchool').value = ex.school || '';
+    document.getElementById('pastExecInitials').value = ex.initials || '';
+
+    if (ex.photo_url) {
+      pastExecPhotoUrl.value = ex.photo_url;
+      pastExecImagePreviewImg.src = ex.photo_url;
+      pastExecImagePreviewWrap.style.display = 'inline-block';
+      pastExecImageDrop.style.display = 'none';
+    } else {
+      resetPastExecImageField();
+    }
+
+    document.getElementById('pastExecEditBannerText').textContent = `Editing: ${ex.name} (${ex.year})`;
+    document.getElementById('pastExecEditBanner').style.display = 'flex';
+    pastExecAddBtn.textContent = 'Save Changes';
+
+    document.getElementById('pastExecForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function exitPastEditMode() {
+    editingPastExecId = null;
+    document.getElementById('pastExecEditBanner').style.display = 'none';
+    pastExecAddBtn.textContent = 'Add Past Executive';
+
+    document.getElementById('pastExecYear').value = '';
+    document.getElementById('pastExecName').value = '';
+    document.getElementById('pastExecRole').value = '';
+    document.getElementById('pastExecSchool').value = '';
+    document.getElementById('pastExecInitials').value = '';
+    pastExecSubgroupInput.value = '';
+    resetPastExecImageField();
+  }
+
+  document.getElementById('pastExecCancelEditBtn').addEventListener('click', exitPastEditMode);
+
+  // Add / Save
+  const pastExecAddBtn = document.getElementById('pastExecAddBtn');
+  const pastExecMsg    = document.getElementById('pastExecMsg');
+
+  pastExecAddBtn.addEventListener('click', async function () {
+    const year     = document.getElementById('pastExecYear').value.trim();
+    const category = pastExecCategorySelect.value;
+    const subgroup = pastExecSubgroupInput.value.trim();
+    const name     = document.getElementById('pastExecName').value.trim();
+    const role     = document.getElementById('pastExecRole').value.trim();
+    const school   = document.getElementById('pastExecSchool').value.trim();
+    const initials = document.getElementById('pastExecInitials').value.trim();
+
+    pastExecMsg.className = 'post-msg';
+
+    if (!year) {
+      pastExecMsg.textContent = '✗ Year is required (e.g. 2021/2022).';
+      pastExecMsg.classList.add('error');
+      return;
+    }
+    if (!name || !role) {
+      pastExecMsg.textContent = '✗ Name and role are required.';
+      pastExecMsg.classList.add('error');
+      return;
+    }
+    if (category !== 'rec' && category !== 'sec' && !subgroup) {
+      pastExecMsg.textContent = '✗ Sub-group / committee name is required for this category.';
+      pastExecMsg.classList.add('error');
+      return;
+    }
+
+    const isEdit = !!editingPastExecId;
+    pastExecAddBtn.disabled = true;
+    pastExecAddBtn.textContent = isEdit ? 'Saving…' : 'Adding…';
+
+    try {
+      const res = await fetch('/api/admin/past-executives-create', {
+        method: isEdit ? 'PATCH' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...(isEdit ? { id: editingPastExecId } : {}),
+          year, category, subgroup, name, role, school, initials,
+          photo_url: pastExecPhotoUrl.value,
+        }),
+        credentials: 'same-origin',
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        pastExecMsg.textContent = '✗ ' + (data.error || (isEdit ? 'Could not save changes.' : 'Could not add entry.'));
+        pastExecMsg.classList.add('error');
+        return;
+      }
+
+      pastExecMsg.textContent = isEdit ? '✓ Changes saved.' : '✓ Past executive added.';
+      pastExecMsg.classList.add('success');
+
+      if (isEdit) {
+        exitPastEditMode();
+      } else {
+        document.getElementById('pastExecName').value = '';
+        document.getElementById('pastExecRole').value = '';
+        document.getElementById('pastExecSchool').value = '';
+        document.getElementById('pastExecInitials').value = '';
+        pastExecSubgroupInput.value = '';
+        resetPastExecImageField();
+        // Year + category are left as-is — admins usually add several
+        // people for the same year/committee back-to-back.
+      }
+
+      loadPastExecutives();
+      setTimeout(() => { pastExecMsg.className = 'post-msg'; }, 5000);
+    } catch {
+      pastExecMsg.textContent = '✗ Network error. Check your connection and try again.';
+      pastExecMsg.classList.add('error');
+    } finally {
+      pastExecAddBtn.disabled = false;
+      pastExecAddBtn.textContent = editingPastExecId ? 'Save Changes' : 'Add Past Executive';
+    }
+  });
+
+  updatePastExecSubgroupOptions();
+
+  // ── Student Engagement management ───────────────────────────────────────
+  const ZONE_LABELS = { z1: 'Zone 1', z2: 'Zone 2', z3: 'Zone 3', z4: 'Zone 4' };
+  const WING_LABELS = { wds: 'WDS', lg: 'LG' };
+  let engCache = { zones: {}, schools: {}, students: {}, events: {} };
+  let engEditingEventId = null;
+  let engEventPhotoUrls = [];
+
+  // Generic upload helper — reuses the same compressImage()/ALLOWED_TYPES/
+  // MAX_IMAGE_BYTES helpers defined earlier for post covers and executive photos.
+  async function uploadEngagementImage(file, statusEl) {
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      statusEl.textContent = '✗ Only JPG, PNG or WEBP images are allowed.';
+      statusEl.className = 'image-upload-status error';
+      return null;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      statusEl.textContent = '✗ Image is too large — max 5MB.';
+      statusEl.className = 'image-upload-status error';
+      return null;
+    }
+    try {
+      statusEl.textContent = 'Compressing…';
+      statusEl.className = 'image-upload-status';
+      const compressed = await compressImage(file);
+
+      statusEl.textContent = 'Uploading…';
+      const urlRes = await fetch('/api/admin/upload-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name, folder: 'engagement' }),
+        credentials: 'same-origin',
+      });
+      const urlData = await urlRes.json();
+      if (!urlRes.ok) {
+        statusEl.textContent = '✗ ' + (urlData.error || 'Could not get upload URL.');
+        statusEl.className = 'image-upload-status error';
+        return null;
+      }
+
+      const uploadRes = await fetch(urlData.signedUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'image/jpeg' },
+        body: compressed,
+      });
+      if (!uploadRes.ok) {
+        statusEl.textContent = '✗ Upload to storage failed. Check bucket policy.';
+        statusEl.className = 'image-upload-status error';
+        return null;
+      }
+
+      statusEl.textContent = '✓ Uploaded.';
+      statusEl.className = 'image-upload-status success';
+      return urlData.publicUrl;
+    } catch (err) {
+      statusEl.textContent = '✗ ' + (err.message || 'Network error uploading image.');
+      statusEl.className = 'image-upload-status error';
+      return null;
+    }
+  }
+
+  async function loadEngagement() {
+    try {
+      const res = await fetch('/api/engagement?_=' + Date.now(), { credentials: 'same-origin' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Could not load.');
+      engCache = { zones: data.zones || {}, schools: data.schools || {}, students: data.students || {}, events: data.events || {} };
+      renderEngZones();
+      renderEngSchools();
+      renderEngStudents();
+      renderEngEvents();
+    } catch {
+      document.getElementById('engZonesContainer').innerHTML = '<div class="exec-empty">Could not load engagement data.</div>';
+    }
+  }
+
+  // ── Zones ──────────────────────────────────────────────────────────────
+  function renderEngZones() {
+    const container = document.getElementById('engZonesContainer');
+    container.innerHTML = ['z1', 'z2', 'z3', 'z4'].map(z => {
+      const zone = engCache.zones[z] || {};
+      return `
+        <div class="exec-row" style="align-items:flex-start; flex-direction:column; gap:10px;">
+          <div style="display:flex; align-items:center; gap:12px; width:100%;">
+            <img id="engZoneLogoPreview_${z}" src="${zone.logo_url ? esc(zone.logo_url) : ''}"
+              style="width:44px; height:44px; border-radius:10px; object-fit:cover; background:rgba(255,255,255,.06); flex-shrink:0; ${zone.logo_url ? '' : 'display:none;'}">
+            <div style="flex:1;">
+              <div class="exec-row-name">${ZONE_LABELS[z]}</div>
+              <input type="text" id="engZoneSlogan_${z}" value="${esc(zone.slogan || '')}" placeholder="Zone slogan…" style="margin-top:6px;">
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; width:100%; flex-wrap:wrap;">
+            <label style="font-size:12px; color:#3b82f6; font-weight:700; cursor:pointer;">
+              Upload logo <input type="file" id="engZoneLogoInput_${z}" accept="image/png,image/jpeg,image/webp" style="display:none;">
+            </label>
+            <span class="image-upload-status" id="engZoneLogoStatus_${z}" style="margin:0;"></span>
+            <button class="publish-btn" style="padding:8px 16px; font-size:12px; margin-left:auto;" data-zone="${z}">Save</button>
+          </div>
+        </div>`;
+    }).join('');
+
+    ['z1', 'z2', 'z3', 'z4'].forEach(z => {
+      document.getElementById(`engZoneLogoInput_${z}`).addEventListener('change', async e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const statusEl = document.getElementById(`engZoneLogoStatus_${z}`);
+        const url = await uploadEngagementImage(file, statusEl);
+        if (url) {
+          engCache.zones[z] = engCache.zones[z] || {};
+          engCache.zones[z].logo_url = url;
+          const preview = document.getElementById(`engZoneLogoPreview_${z}`);
+          preview.src = url;
+          preview.style.display = '';
+        }
+      });
+    });
+
+    container.querySelectorAll('button[data-zone]').forEach(btn => {
+      btn.addEventListener('click', async function () {
+        const z = this.dataset.zone;
+        const slogan = document.getElementById(`engZoneSlogan_${z}`).value;
+        const logo_url = (engCache.zones[z] && engCache.zones[z].logo_url) || '';
+        this.disabled = true;
+        this.textContent = 'Saving…';
+        try {
+          const res = await fetch('/api/engagement', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'zone', zone_key: z, slogan, logo_url }),
+            credentials: 'same-origin',
+          });
+          const data = await res.json();
+          if (!res.ok) { alert(data.error || 'Could not save zone.'); return; }
+          engCache.zones[z] = { slogan: data.zone.slogan, logo_url: data.zone.logo_url };
+        } catch { alert('Network error.'); }
+        finally { this.disabled = false; this.textContent = 'Save'; }
+      });
+    });
+  }
+
+  // ── Schools ────────────────────────────────────────────────────────────
+  function renderEngSchools() {
+    const container = document.getElementById('engSchoolsListContainer');
+    let html = '';
+    ['z1', 'z2', 'z3', 'z4'].forEach(z => {
+      const shs = (engCache.schools[z] && engCache.schools[z].shs) || [];
+      const tech = (engCache.schools[z] && engCache.schools[z].tech) || [];
+      if (!shs.length && !tech.length) return;
+      html += `<div class="exec-list-group"><h3>${ZONE_LABELS[z]} (${shs.length + tech.length})</h3>`;
+      [...shs, ...tech].forEach(s => {
+        html += `
+          <div class="exec-row">
+            <div class="exec-row-left"><div class="exec-row-text">
+              <div class="exec-row-name">${esc(s.name)}</div>
+              <div class="exec-row-meta">${s.school_type === 'tech' ? 'Technical Institute' : 'SHS / SHTS'}</div>
+            </div></div>
+            <button class="delete-btn" data-id="${esc(s.id)}" data-kind="school">Delete</button>
+          </div>`;
+      });
+      html += `</div>`;
+    });
+    container.innerHTML = html || '<div class="exec-empty">No schools added yet — the page keeps showing its built-in list until you add some here.</div>';
+
+    container.querySelectorAll('[data-kind="school"]').forEach(btn => {
+      btn.addEventListener('click', async function () {
+        if (!confirm('Delete this school?')) return;
+        this.disabled = true;
+        try {
+          const res = await fetch('/api/engagement', {
+            method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'school', id: this.dataset.id }), credentials: 'same-origin',
+          });
+          if (res.ok) loadEngagement(); else { alert('Could not delete.'); this.disabled = false; }
+        } catch { alert('Network error.'); this.disabled = false; }
+      });
+    });
+  }
+
+  document.getElementById('engSchoolAddBtn').addEventListener('click', async function () {
+    const zone_key = document.getElementById('engSchoolZone').value;
+    const school_type = document.getElementById('engSchoolType').value;
+    const name = document.getElementById('engSchoolName').value.trim();
+    const msg = document.getElementById('engSchoolMsg');
+    msg.className = 'post-msg';
+    if (!name) { msg.textContent = '✗ School name is required.'; msg.classList.add('error'); return; }
+    this.disabled = true; this.textContent = 'Adding…';
+    try {
+      const res = await fetch('/api/engagement', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'school', zone_key, school_type, name }), credentials: 'same-origin',
+      });
+      const data = await res.json();
+      if (!res.ok) { msg.textContent = '✗ ' + (data.error || 'Could not add school.'); msg.classList.add('error'); return; }
+      msg.textContent = '✓ School added.'; msg.classList.add('success');
+      document.getElementById('engSchoolName').value = '';
+      await loadEngagement();
+      setTimeout(() => { msg.className = 'post-msg'; }, 4000);
+    } catch { msg.textContent = '✗ Network error.'; msg.classList.add('error'); }
+    finally { this.disabled = false; this.textContent = 'Add School'; }
+  });
+
+  // ── Student photos ────────────────────────────────────────────────────
+  function renderEngStudents() {
+    const container = document.getElementById('engStudentsListContainer');
+    let html = '';
+    ['z1', 'z2', 'z3', 'z4'].forEach(z => {
+      const list = engCache.students[z] || [];
+      if (!list.length) return;
+      html += `<div class="exec-list-group"><h3>${ZONE_LABELS[z]} (${list.length})</h3>`;
+      list.forEach(s => {
+        html += `
+          <div class="exec-row">
+            <div class="exec-row-left">
+              <img class="exec-row-thumb" src="${esc(s.photo_url)}" alt="">
+              <div class="exec-row-text"><div class="exec-row-name">${esc(s.name || 'Student photo')}</div></div>
+            </div>
+            <button class="delete-btn" data-id="${esc(s.id)}" data-kind="student">Delete</button>
+          </div>`;
+      });
+      html += `</div>`;
+    });
+    container.innerHTML = html || '<div class="exec-empty">No student photos uploaded yet.</div>';
+
+    container.querySelectorAll('[data-kind="student"]').forEach(btn => {
+      btn.addEventListener('click', async function () {
+        if (!confirm('Delete this photo?')) return;
+        this.disabled = true;
+        try {
+          const res = await fetch('/api/engagement', {
+            method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'student', id: this.dataset.id }), credentials: 'same-origin',
+          });
+          if (res.ok) loadEngagement(); else { alert('Could not delete.'); this.disabled = false; }
+        } catch { alert('Network error.'); this.disabled = false; }
+      });
+    });
+  }
+
+  const engStudentImageInput = document.getElementById('engStudentImageInput');
+  const engStudentImageDrop = document.getElementById('engStudentImageDrop');
+  const engStudentImagePreviewWrap = document.getElementById('engStudentImagePreviewWrap');
+  const engStudentImagePreviewImg = document.getElementById('engStudentImagePreviewImg');
+  const engStudentImageRemoveBtn = document.getElementById('engStudentImageRemoveBtn');
+  const engStudentImageUploadStatus = document.getElementById('engStudentImageUploadStatus');
+  const engStudentPhotoUrl = document.getElementById('engStudentPhotoUrl');
+
+  function resetEngStudentImageField() {
+    engStudentPhotoUrl.value = '';
+    engStudentImagePreviewWrap.style.display = 'none';
+    engStudentImagePreviewImg.src = '';
+    engStudentImageDrop.style.display = 'block';
+    engStudentImageInput.value = '';
+    engStudentImageUploadStatus.textContent = '';
+    engStudentImageUploadStatus.className = 'image-upload-status';
+  }
+
+  engStudentImageInput.addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const localUrl = URL.createObjectURL(file);
+    engStudentImagePreviewImg.src = localUrl;
+    engStudentImagePreviewWrap.style.display = 'inline-block';
+    engStudentImageDrop.style.display = 'none';
+    const url = await uploadEngagementImage(file, engStudentImageUploadStatus);
+    if (url) engStudentPhotoUrl.value = url; else resetEngStudentImageField();
+  });
+  engStudentImageRemoveBtn.addEventListener('click', resetEngStudentImageField);
+
+  document.getElementById('engStudentAddBtn').addEventListener('click', async function () {
+    const zone_key = document.getElementById('engStudentZone').value;
+    const name = document.getElementById('engStudentName').value.trim();
+    const photo_url = engStudentPhotoUrl.value;
+    const msg = document.getElementById('engStudentMsg');
+    msg.className = 'post-msg';
+    if (!photo_url) { msg.textContent = '✗ Please upload a photo first.'; msg.classList.add('error'); return; }
+    this.disabled = true; this.textContent = 'Adding…';
+    try {
+      const res = await fetch('/api/engagement', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'student', zone_key, name, photo_url }), credentials: 'same-origin',
+      });
+      const data = await res.json();
+      if (!res.ok) { msg.textContent = '✗ ' + (data.error || 'Could not add photo.'); msg.classList.add('error'); return; }
+      msg.textContent = '✓ Student photo added.'; msg.classList.add('success');
+      document.getElementById('engStudentName').value = '';
+      resetEngStudentImageField();
+      await loadEngagement();
+      setTimeout(() => { msg.className = 'post-msg'; }, 4000);
+    } catch { msg.textContent = '✗ Network error.'; msg.classList.add('error'); }
+    finally { this.disabled = false; this.textContent = 'Add Student Photo'; }
+  });
+
+  // ── Events ─────────────────────────────────────────────────────────────
+  function renderEngEventThumbs() {
+    const wrap = document.getElementById('engEventPhotoThumbs');
+    wrap.innerHTML = engEventPhotoUrls.map((url, i) => `
+      <div style="position:relative;">
+        <img src="${esc(url)}" style="width:64px; height:64px; border-radius:8px; object-fit:cover; border:1px solid rgba(255,255,255,.1);">
+        <button type="button" data-idx="${i}" class="image-remove-btn" style="width:20px; height:20px; font-size:11px;">×</button>
+      </div>`).join('');
+    wrap.querySelectorAll('button[data-idx]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        engEventPhotoUrls.splice(Number(btn.dataset.idx), 1);
+        renderEngEventThumbs();
+      });
+    });
+  }
+
+  document.getElementById('engEventImageInput').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const statusEl = document.getElementById('engEventImageUploadStatus');
+    if (engEventPhotoUrls.length >= 6) { statusEl.textContent = '✗ Maximum 6 photos per event.'; statusEl.className = 'image-upload-status error'; return; }
+    const url = await uploadEngagementImage(file, statusEl);
+    if (url) { engEventPhotoUrls.push(url); renderEngEventThumbs(); }
+    document.getElementById('engEventImageInput').value = '';
+  });
+
+  function resetEngEventForm() {
+    engEditingEventId = null;
+    engEventPhotoUrls = [];
+    renderEngEventThumbs();
+    document.getElementById('engEventTitle').value = '';
+    document.getElementById('engEventDescription').value = '';
+    document.getElementById('engEventWing').value = 'wds';
+    document.getElementById('engEventEditBanner').style.display = 'none';
+    document.getElementById('engEventAddBtn').textContent = 'Add Event';
+  }
+  document.getElementById('engEventCancelEditBtn').addEventListener('click', resetEngEventForm);
+
+  function startEditEngEvent(ev) {
+    engEditingEventId = ev.id;
+    engEventPhotoUrls = Array.isArray(ev.photo_urls) ? [...ev.photo_urls] : [];
+    renderEngEventThumbs();
+    document.getElementById('engEventWing').value = ev.wing;
+    document.getElementById('engEventTitle').value = ev.title || '';
+    document.getElementById('engEventDescription').value = ev.description || '';
+    document.getElementById('engEventEditBannerText').textContent = `Editing: ${ev.title}`;
+    document.getElementById('engEventEditBanner').style.display = 'flex';
+    document.getElementById('engEventAddBtn').textContent = 'Save Changes';
+    document.getElementById('engEventTitle').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function renderEngEvents() {
+    const container = document.getElementById('engEventsListContainer');
+    let html = '';
+    ['wds', 'lg'].forEach(w => {
+      const list = engCache.events[w] || [];
+      if (!list.length) return;
+      html += `<div class="exec-list-group"><h3>${WING_LABELS[w]} (${list.length})</h3>`;
+      list.forEach(ev => {
+        html += `
+          <div class="exec-row">
+            <div class="exec-row-left"><div class="exec-row-text">
+              <div class="exec-row-name">${esc(ev.title)}</div>
+              <div class="exec-row-meta">${(ev.photo_urls || []).length} photo(s)</div>
+            </div></div>
+            <div style="display:flex; gap:8px;">
+              <button class="delete-btn" style="background:rgba(59,130,246,.12); color:#93c5fd; border-color:rgba(59,130,246,.2);" data-id="${esc(ev.id)}" data-kind="edit-event">Edit</button>
+              <button class="delete-btn" data-id="${esc(ev.id)}" data-kind="delete-event">Delete</button>
+            </div>
+          </div>`;
+      });
+      html += `</div>`;
+    });
+    container.innerHTML = html || '<div class="exec-empty">No events added yet — the page keeps showing its two example cards until you add some here.</div>';
+
+    container.querySelectorAll('[data-kind="edit-event"]').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const all = [...(engCache.events.wds || []), ...(engCache.events.lg || [])];
+        const ev = all.find(e => e.id === this.dataset.id);
+        if (ev) startEditEngEvent(ev);
+      });
+    });
+    container.querySelectorAll('[data-kind="delete-event"]').forEach(btn => {
+      btn.addEventListener('click', async function () {
+        if (!confirm('Delete this event?')) return;
+        this.disabled = true;
+        try {
+          const res = await fetch('/api/engagement', {
+            method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'event', id: this.dataset.id }), credentials: 'same-origin',
+          });
+          if (res.ok) loadEngagement(); else { alert('Could not delete.'); this.disabled = false; }
+        } catch { alert('Network error.'); this.disabled = false; }
+      });
+    });
+  }
+
+  document.getElementById('engEventAddBtn').addEventListener('click', async function () {
+    const wing = document.getElementById('engEventWing').value;
+    const title = document.getElementById('engEventTitle').value.trim();
+    const description = document.getElementById('engEventDescription').value.trim();
+    const msg = document.getElementById('engEventMsg');
+    msg.className = 'post-msg';
+    if (!title) { msg.textContent = '✗ Event title is required.'; msg.classList.add('error'); return; }
+    const isEdit = !!engEditingEventId;
+    this.disabled = true; this.textContent = isEdit ? 'Saving…' : 'Adding…';
+    try {
+      const res = await fetch('/api/engagement', {
+        method: isEdit ? 'PATCH' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(isEdit
+          ? { type: 'event', id: engEditingEventId, title, description, photo_urls: engEventPhotoUrls }
+          : { type: 'event', wing, title, description, photo_urls: engEventPhotoUrls }),
+        credentials: 'same-origin',
+      });
+      const data = await res.json();
+      if (!res.ok) { msg.textContent = '✗ ' + (data.error || 'Could not save event.'); msg.classList.add('error'); return; }
+      msg.textContent = isEdit ? '✓ Changes saved.' : '✓ Event added.'; msg.classList.add('success');
+      resetEngEventForm();
+      await loadEngagement();
+      setTimeout(() => { msg.className = 'post-msg'; }, 4000);
+    } catch { msg.textContent = '✗ Network error.'; msg.classList.add('error'); }
+    finally { this.disabled = false; this.textContent = engEditingEventId ? 'Save Changes' : 'Add Event'; }
+  });
+
+  const administrationInput = document.getElementById('administrationInput');
+  const saveAdministrationBtn = document.getElementById('saveAdministrationBtn');
+  const administrationMsg = document.getElementById('administrationMsg');
+  function showAdministrationMsg(text, kind=''){ if(!administrationMsg) return; administrationMsg.textContent=text; administrationMsg.className='setting-msg'+(kind?' '+kind:''); }
+  async function loadAdministrationSetting(){
+    try{
+      const res=await fetch('/api/settings?key=current_administration',{credentials:'same-origin'});
+      if(!res.ok) throw new Error('Unable to load setting');
+      const data=await res.json();
+      const value=String(data.value||data.setting?.value||'').trim();
+      if(value && administrationInput) administrationInput.value=value;
+    }catch(e){ showAdministrationMsg('Using the default: 29th Administration.'); }
+  }
+  if(saveAdministrationBtn) saveAdministrationBtn.addEventListener('click', async function(){
+    const value=administrationInput.value.trim();
+    if(!value){ showAdministrationMsg('Enter an administration label first.','error'); administrationInput.focus(); return; }
+    saveAdministrationBtn.disabled=true; saveAdministrationBtn.textContent='Saving…'; showAdministrationMsg('');
+    try{
+      const res=await fetch('/api/admin/settings',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({key:'current_administration',value})});
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok) throw new Error(data.error||'Could not save setting');
+      showAdministrationMsg('✓ Administration label saved.','success');
+    }catch(e){ showAdministrationMsg('✗ '+e.message+'. Add the settings API route before using this control.','error'); }
+    finally{ saveAdministrationBtn.disabled=false; saveAdministrationBtn.textContent='Save administration'; }
+  });
+  loadAdministrationSetting();
+  loadEngagement();
+</script>
+</body>
+</html>
