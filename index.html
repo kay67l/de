@@ -155,8 +155,8 @@
 
   /* ===== HERO ===== */
   .hero {
-    position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: flex-start;
-    text-align: left; overflow: hidden;
+    position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    text-align: center; overflow: hidden;
     background: var(--blue-deep); /* fallback shown before video loads / if video fails */
   }
 
@@ -214,7 +214,8 @@
   .hero-content {
     position: relative; z-index: 5; color: white;
     padding: 0 6vw; max-width: 2000px; width: 100%;
-    margin: 0; box-sizing: border-box;
+    margin: 0 auto; box-sizing: border-box;
+    display: flex; flex-direction: column; align-items: center;
   }
   .hero-badge {
     display: table; margin: 14px auto 10px; padding: 7px 18px; border-radius: 30px;
@@ -227,18 +228,18 @@
   .hero h1 {
     font-family: 'Permanent Marker', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
     font-size: clamp(3.1rem, 6.2vw, 5.6rem); font-weight: 400; line-height: 1.04;
-    max-width: 780px; margin-bottom: 24px; letter-spacing: 0.2px;
+    max-width: 780px; margin: 0 auto 24px; letter-spacing: 0.2px; text-align: center;
   }
   .hero h1 .word { display: inline-block; opacity: 0; transform: translateY(24px); animation: wordIn .7s ease forwards; }
   @keyframes wordIn { to { opacity: 1; transform: translateY(0); } }
 
   .hero p {
     font-size: clamp(1rem, 1.5vw, 1.18rem); color: rgba(255,255,255,0.88);
-    max-width: 590px; margin: 0 0 36px; animation: fadeInDown 1.2s ease both .4s;
+    max-width: 590px; margin: 0 auto 36px; animation: fadeInDown 1.2s ease both .4s; text-align: center;
   }
-  .hero-buttons { display: flex; gap: 18px; justify-content: flex-start; flex-wrap: wrap; animation: fadeInDown 1.2s ease both .6s; }
-  .hero-note { max-width: 250px; margin-top: 32px; padding-left: 14px; border-left: 1px solid #fca5a5; color: rgba(255,255,255,.72); font-size: 12px; line-height: 1.6; }
-  .hero-note strong { display: block; margin-bottom: 5px; color: #fca5a5; font-size: 11px; letter-spacing: 2px; }
+  .hero-buttons { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; animation: fadeInDown 1.2s ease both .6s; }
+  .hero-note { max-width: 420px; margin: 32px auto 0; padding: 12px 0 0; border-left: none; border-top: 1px solid #fca5a5; color: rgba(255,255,255,.72); font-size: 12px; line-height: 1.6; text-align: center; }
+  .hero-note strong { display: block; margin-bottom: 5px; color: #fca5a5; font-size: 11px; letter-spacing: 2px; text-align: center; }
 
   @media (max-width: 820px) {
     .hero { justify-content: center; text-align: center; }
