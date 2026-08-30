@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gallery · ARSRC</title>
+<meta name="description" content="Photos from ARSRC events, programmes and gatherings across the Ashanti Region, organized by event.">
+<link rel="icon" type="image/png" sizes="any" href="/favicon.png?v=2">
+<link rel="shortcut icon" href="/favicon.png?v=2">
+<link rel="apple-touch-icon" href="/favicon.png?v=2">
+<style>
+  :root {
+    --blue-deep: #102a6b;
+    --blue: #1d4ed8;
+    --blue-light: #3b82f6;
+    --red: #dc2626;
+    --red-deep: #9f1414;
+    --white: #ffffff;
+    --off-white: #f4f7fc;
+    --ink: #0f1c3f;
+    --gray: #64748b;
+    --shadow: 0 10px 30px rgba(16, 42, 107, 0.12);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; width: 100%; max-width: 100%; }
+  body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+    background: var(--off-white);
+    color: var(--ink);
+  }
+  a { text-decoration: none; color: inherit; }
+  ul { list-style: none; }
+  img { display: block; max-width: 100%; }
+
+  /* ===== NAV (matches index.html) ===== */
+  nav#navbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 6%;
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 24px rgba(16,42,107,0.08);
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-badge { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 3px 8px rgba(29,78,216,0.35)); }
+  .brand-text { font-weight: 800; font-size: 15px; line-height: 1.1; color: var(--blue-deep); }
+  .brand-text span { display: block; font-size: 10px; font-weight: 600; color: var(--red); letter-spacing: 1px; }
+  .nav-links { display: flex; gap: 28px; align-items: center; }
+  .nav-links a { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .nav-links a.current { color: var(--blue); }
+  .back-home { font-size: 13px; font-weight: 700; color: var(--blue); }
+  @media (max-width: 900px) { .nav-links { display: none; } }
+
+  /* ===== PAGE HERO ===== */
+  .gallery-hero {
+    padding: 140px 6% 60px;
+    background: linear-gradient(135deg, var(--blue-deep), var(--blue));
+    color: var(--white);
+  }
+  .gallery-hero .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.7); margin-bottom: 10px; }
+  .gallery-hero h1 { font-size: clamp(28px, 4vw, 42px); font-weight: 800; margin-bottom: 12px; }
+  .gallery-hero p { font-size: 15px; color: rgba(255,255,255,.85); max-width: 620px; line-height: 1.6; }
+
+  /* ===== EVENTS GRID ===== */
+  .gallery-wrap { max-width: 1200px; margin: 0 auto; padding: 56px 6% 100px; }
+  .events-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
+  .event-card {
+    background: var(--white); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow);
+    cursor: pointer; transition: transform .25s ease, box-shadow .25s ease;
+  }
+  .event-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(16,42,107,0.18); }
+  .event-cover { width: 100%; aspect-ratio: 4/3; background: var(--off-white) center/cover no-repeat; position: relative; }
+  .event-cover .count-pill {
+    position: absolute; bottom: 10px; right: 10px; background: rgba(15,28,63,.75); color: #fff;
+    font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
+  }
+  .event-body { padding: 16px 18px 20px; }
+  .event-body h3 { font-size: 16px; font-weight: 800; margin-bottom: 6px; }
+  .event-body p { font-size: 13px; color: var(--gray); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  .empty-state, .error-state { text-align: center; padding: 60px 20px; color: var(--gray); font-size: 14px; }
+  .error-state { color: var(--red); }
+  .skeleton { background: linear-gradient(90deg,#e8edf7 25%,#f4f7fc 37%,#e8edf7 63%); background-size: 400% 100%; animation: shimmer 1.4s ease infinite; border-radius: 14px; aspect-ratio: 4/3; }
+  @keyframes shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+
+  /* ===== LIGHTBOX / EVENT VIEWER ===== */
+  .gallery-modal {
+    position: fixed; inset: 0; z-index: 2000; background: rgba(9,14,32,.94);
+    display: none; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 40px 5% 60px;
+  }
+  .gallery-modal.open { display: flex; }
+  .modal-panel { width: 100%; max-width: 1080px; }
+  .modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
+  .modal-head h2 { color: #fff; font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+  .modal-head p { color: rgba(255,255,255,.65); font-size: 13px; line-height: 1.6; max-width: 640px; }
+  .modal-close {
+    flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%; border: none; cursor: pointer;
+    background: rgba(255,255,255,.12); color: #fff; font-size: 18px; display: flex; align-items: center; justify-content: center;
+  }
+  .modal-close:hover { background: rgba(255,255,255,.22); }
+  .modal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+  .modal-grid img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 10px; cursor: zoom-in; background: #1b2a52; }
+  .modal-grid img:hover { outline: 2px solid var(--blue-light); }
+
+  .lightbox-full {
+    position: fixed; inset: 0; z-index: 2100; background: rgba(0,0,0,.92);
+    display: none; align-items: center; justify-content: center; padding: 30px;
+  }
+  .lightbox-full.open { display: flex; }
+  .lightbox-full img { max-width: 100%; max-height: 90vh; border-radius: 6px; }
+  .lightbox-close { position: absolute; top: 24px; right: 30px; background: none; border: none; color: #fff; font-size: 30px; cursor: pointer; }
+
+  footer { background: var(--blue-deep); color: rgba(255,255,255,.75); padding: 50px 6% 24px; margin-top: 0; }
+  .footer-bottom { text-align: center; font-size: 12px; color: rgba(255,255,255,.5); margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.1); }
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <div class="brand">
+    <div class="brand-badge"><img src="assets/images/ar.png" width="100%" height="100%"></div>
+    <div class="brand-text">ARSRC<span>ASHANTI REGION</span></div>
+  </div>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/#news">News</a>
+    <a href="/student-engagement.html">Engagement</a>
+    <a href="/gallery.html" class="current">Gallery</a>
+  </div>
+  <a class="back-home" href="/">← Back to site</a>
+</nav>
+
+<header class="gallery-hero">
+  <div class="eyebrow">Photo Archive</div>
+  <h1>Gallery</h1>
+  <p>Moments from ARSRC programmes, summits and school engagements across the Ashanti Region, organized by event.</p>
+</header>
+
+<div class="gallery-wrap">
+  <div class="events-grid" id="eventsGrid">
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+  </div>
+</div>
+
+<div class="gallery-modal" id="galleryModal">
+  <div class="modal-panel">
+    <div class="modal-head">
+      <div>
+        <h2 id="modalTitle"></h2>
+        <p id="modalDescription"></p>
+      </div>
+      <button class="modal-close" id="modalCloseBtn" aria-label="Close">×</button>
+    </div>
+    <div class="modal-grid" id="modalGrid"></div>
+  </div>
+</div>
+
+<div class="lightbox-full" id="lightboxFull">
+  <button class="lightbox-close" id="lightboxCloseBtn" aria-label="Close image">×</button>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<footer>
+  <div style="max-width:1200px;margin:0 auto;">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <img src="assets/images/ar.png" width="44" height="44">
+      <div style="font-weight:800;color:#fff;">ARSRC</div>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 Ashanti Regional Students' Representative Council. All rights reserved.</div>
+</footer>
+
+<script>
+(function () {
+  const grid = document.getElementById('eventsGrid');
+  const modal = document.getElementById('galleryModal');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalDescription = document.getElementById('modalDescription');
+  const modalGrid = document.getElementById('modalGrid');
+  const lightbox = document.getElementById('lightboxFull');
+  const lightboxImg = document.getElementById('lightboxImg');
+
+  let eventsData = [];
+
+  function escapeHtml(str) {
+    return String(str || '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+
+  async function loadGallery() {
+    try {
+      const res = await fetch('/api/gallery');
+      if (!res.ok) throw new Error('Request failed: ' + res.status);
+      const data = await res.json();
+      eventsData = data.events || [];
+      renderEvents();
+    } catch (err) {
+      grid.innerHTML = '<div class="error-state">Could not load the gallery right now. Please try again shortly.</div>';
+      console.error('[Gallery] load failed:', err);
+    }
+  }
+
+  function renderEvents() {
+    if (!eventsData.length) {
+      grid.innerHTML = '<div class="empty-state">No photo galleries have been published yet — check back soon.</div>';
+      return;
+    }
+    grid.innerHTML = eventsData.map((ev, i) => {
+      const images = ev.gallery_images || [];
+      const cover = ev.cover_image_url || images[0]?.image_url || '';
+      const bg = cover ? `background-image:url('${cover}')` : '';
+      return `
+        <div class="event-card" data-index="${i}" tabindex="0" role="button" aria-label="View ${escapeHtml(ev.title)} gallery">
+          <div class="event-cover" style="${bg}">
+            <span class="count-pill">${images.length} photo${images.length === 1 ? '' : 's'}</span>
+          </div>
+          <div class="event-body">
+            <h3>${escapeHtml(ev.title)}</h3>
+            <p>${escapeHtml(ev.description || '')}</p>
+          </div>
+        </div>`;
+    }).join('');
+
+    grid.querySelectorAll('.event-card').forEach(card => {
+      card.addEventListener('click', () => openEvent(Number(card.dataset.index)));
+      card.addEventListener('keydown', e => { if (e.key === 'Enter') openEvent(Number(card.dataset.index)); });
+    });
+  }
+
+  function openEvent(index) {
+    const ev = eventsData[index];
+    if (!ev) return;
+    modalTitle.textContent = ev.title;
+    modalDescription.textContent = ev.description || '';
+    const images = ev.gallery_images || [];
+    modalGrid.innerHTML = images.length
+      ? images.map(img => `<img src="${img.image_url}" alt="${escapeHtml(img.caption || ev.title)}" loading="lazy">`).join('')
+      : '<div class="empty-state" style="color:rgba(255,255,255,.6);">No photos in this event yet.</div>';
+
+    modalGrid.querySelectorAll('img').forEach(imgEl => {
+      imgEl.addEventListener('click', () => {
+        lightboxImg.src = imgEl.src;
+        lightboxImg.alt = imgEl.alt;
+        lightbox.classList.add('open');
+      });
+    });
+
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+  document.getElementById('lightboxCloseBtn').addEventListener('click', () => lightbox.classList.remove('open'));
+  lightbox.addEventListener('click', e => { if (e.target === lightbox) lightbox.classList.remove('open'); });
+
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    if (lightbox.classList.contains('open')) lightbox.classList.remove('open');
+    else if (modal.classList.contains('open')) closeModal();
+  });
+
+  loadGallery();
+})();
+</script>
+
+</body>
+</html>

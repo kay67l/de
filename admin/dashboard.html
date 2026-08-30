@@ -570,6 +570,7 @@
         <a class="command-link" href="#pastExecutivesPanel" data-section="pastExecutivesPanel">Past terms</a>
         <a class="command-link" href="#resourcesPanel" data-section="resourcesPanel">Resources</a>
         <a class="command-link" href="#engagementPanel" data-section="engagementPanel">Engagement</a>
+        <a class="command-link" href="#galleryPanel" data-section="galleryPanel">Gallery</a>
       </div>
       <a class="quick-publish" href="#editorPanel">+ New post</a>
     </nav>
@@ -930,6 +931,47 @@
 
       <div id="pastExecListContainer">
         <div class="exec-empty">Loading past executives…</div>
+      </div>
+    </div>
+
+    <!-- Manage Gallery -->
+    <div class="panel create-post-section" id="galleryPanel">
+      <div class="panel-head">
+        <h2>🖼️ Manage Gallery</h2>
+        <span class="badge-pill" id="galleryBadge">Loading…</span>
+      </div>
+      <p class="panel-help">Create an event, then upload photos into it. Published events with at least one photo appear immediately on the public Gallery page.</p>
+
+      <div class="resource-admin-form">
+        <div class="form-row">
+          <div>
+            <label for="galleryEventTitle">Event title</label>
+            <input type="text" id="galleryEventTitle" placeholder="e.g. Ashanti Regional Inter-School Summit 2026">
+          </div>
+          <div>
+            <label for="galleryEventPublished">Visibility</label>
+            <select id="galleryEventPublished">
+              <option value="true">Published (visible on site)</option>
+              <option value="false">Draft (hidden)</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="galleryEventDescription">Description <span style="color:rgba(238,242,255,.4);font-weight:400;">(shown on the event card and gallery header)</span></label>
+          <textarea id="galleryEventDescription" rows="2" placeholder="Short description of the event…"></textarea>
+        </div>
+        <div id="galleryEventEditBanner" style="display:none; margin-bottom:4px; padding:10px 14px; background:rgba(59,130,246,.12); border:1px solid rgba(59,130,246,.3); border-radius:10px; font-size:13px; color:#93c5fd; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+          <span id="galleryEventEditBannerText">Editing event…</span>
+          <button type="button" id="galleryEventCancelEditBtn" style="background:none; border:1px solid rgba(147,197,253,.4); color:#93c5fd; border-radius:6px; padding:4px 10px; font-size:12px; font-weight:700; cursor:pointer; font-family:inherit;">Cancel</button>
+        </div>
+        <div>
+          <button class="publish-btn" id="galleryEventSaveBtn">Create event</button>
+          <div class="post-msg" id="galleryEventMsg"></div>
+        </div>
+      </div>
+
+      <div id="galleryEventsList" style="margin-top:26px;">
+        <div class="empty-state">Loading events…</div>
       </div>
     </div>
 
@@ -1850,6 +1892,242 @@
       try { const fileUrl=selectedFile?await uploadResourceFile(selectedFile):editingUrl; const payload={title,description,category,file_url:fileUrl,file_name:selectedFile?.name||fileHint.textContent,file_type:selectedFile?.type||null,file_size:selectedFile?.size||null}; const res=await fetch('/api/admin/resources',{method:editingId?'PATCH':'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(editingId?{...payload,id:editingId}:payload),credentials:'same-origin'}); await readApiResponse(res, 'Could not save resource.'); setMessage(editingId?'✓ Resource updated.':'✓ Resource published.', 'success'); resetResourceForm(); loadResources(); } catch(err) { setMessage('✗ '+(err.message||'Could not save resource.'),'error'); saveBtn.disabled=false; saveBtn.textContent=editingId?'Save resource changes':'Upload & publish resource'; }
     });
     loadResources();
+  })();
+
+  // ── Gallery management (events + photos) ───────────────────────────────────
+  (function initGalleryAdmin() {
+    const badge = document.getElementById('galleryBadge');
+    const listEl = document.getElementById('galleryEventsList');
+    const titleInput = document.getElementById('galleryEventTitle');
+    const descInput = document.getElementById('galleryEventDescription');
+    const publishedSelect = document.getElementById('galleryEventPublished');
+    const saveBtn = document.getElementById('galleryEventSaveBtn');
+    const msg = document.getElementById('galleryEventMsg');
+    const editBanner = document.getElementById('galleryEventEditBanner');
+    const editBannerText = document.getElementById('galleryEventEditBannerText');
+    const cancelEditBtn = document.getElementById('galleryEventCancelEditBtn');
+
+    let editingEventId = null;
+    let events = [];
+
+    function setMessage(text, state) { msg.textContent = text || ''; msg.className = 'post-msg' + (state ? ' ' + state : ''); }
+
+    async function readApiResponse(response, fallbackMessage) {
+      const raw = await response.text();
+      let data = null;
+      try { data = raw ? JSON.parse(raw) : {}; } catch { throw new Error(response.status === 404 ? 'Gallery API route not found. Deploy /api/admin/gallery and /api/gallery.' : 'The gallery API returned HTML instead of JSON. Check the server route or authentication redirect.'); }
+      if (!response.ok) throw new Error(data?.error || fallbackMessage);
+      return data;
+    }
+
+    function resetEventForm() {
+      editingEventId = null;
+      titleInput.value = '';
+      descInput.value = '';
+      publishedSelect.value = 'true';
+      editBanner.style.display = 'none';
+      saveBtn.textContent = 'Create event';
+      setMessage('');
+    }
+
+    function startEditEvent(ev) {
+      editingEventId = ev.id;
+      titleInput.value = ev.title || '';
+      descInput.value = ev.description || '';
+      publishedSelect.value = ev.published ? 'true' : 'false';
+      editBannerText.textContent = `Editing "${ev.title}"`;
+      editBanner.style.display = 'flex';
+      saveBtn.textContent = 'Save event changes';
+      document.getElementById('galleryPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    cancelEditBtn.addEventListener('click', resetEventForm);
+
+    saveBtn.addEventListener('click', async () => {
+      const title = titleInput.value.trim();
+      if (!title) { setMessage('Event title is required.', 'error'); return; }
+      saveBtn.disabled = true;
+      const originalLabel = saveBtn.textContent;
+      saveBtn.textContent = editingEventId ? 'Saving…' : 'Creating…';
+
+      const payload = {
+        title,
+        description: descInput.value.trim(),
+        published: publishedSelect.value === 'true',
+      };
+      if (editingEventId) payload.id = editingEventId;
+
+      try {
+        const res = await fetch('/api/admin/gallery?resource=events', {
+          method: editingEventId ? 'PATCH' : 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify(payload),
+        });
+        await readApiResponse(res, 'Could not save event.');
+        setMessage(editingEventId ? '✓ Event updated.' : '✓ Event created.', 'success');
+        resetEventForm();
+        loadEvents();
+      } catch (err) {
+        setMessage('✗ ' + (err.message || 'Could not save event.'), 'error');
+        saveBtn.disabled = false;
+        saveBtn.textContent = originalLabel;
+      }
+    });
+
+    async function deleteEvent(id, title) {
+      if (!confirm(`Delete "${title}" and all its photos? This cannot be undone.`)) return;
+      try {
+        const res = await fetch('/api/admin/gallery?resource=events', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ id }),
+        });
+        await readApiResponse(res, 'Could not delete event.');
+        loadEvents();
+      } catch (err) {
+        setMessage(err.message || 'Could not delete event.', 'error');
+      }
+    }
+
+    async function deleteImage(id) {
+      if (!confirm('Delete this photo?')) return;
+      try {
+        const res = await fetch('/api/admin/gallery?resource=images', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ id }),
+        });
+        await readApiResponse(res, 'Could not delete photo.');
+        loadEvents();
+      } catch (err) {
+        setMessage(err.message || 'Could not delete photo.', 'error');
+      }
+    }
+
+    // Reuses compressImage()/ALLOWED_TYPES/MAX_IMAGE_BYTES defined earlier for
+    // post covers, and the same signed-URL upload endpoint used everywhere else.
+    async function uploadOneImage(file) {
+      if (!ALLOWED_TYPES.includes(file.type)) throw new Error(`${file.name}: only JPG, PNG or WEBP allowed.`);
+      if (file.size > MAX_IMAGE_BYTES) throw new Error(`${file.name}: file is too large.`);
+      const compressed = await compressImage(file);
+      const urlRes = await fetch('/api/admin/upload-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ filename: file.name, folder: 'gallery' }),
+      });
+      const urlData = await readApiResponse(urlRes, 'Could not get an upload URL.');
+      const uploadRes = await fetch(urlData.signedUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'image/jpeg' },
+        body: compressed,
+      });
+      if (!uploadRes.ok) throw new Error(`${file.name}: upload to storage failed.`);
+      return urlData.publicUrl || urlData.url;
+    }
+
+    async function handlePhotoSelection(eventId, files, statusEl) {
+      const list = Array.from(files || []);
+      if (!list.length) return;
+      let done = 0, failed = 0;
+      for (const file of list) {
+        statusEl.textContent = `Uploading ${done + failed + 1} of ${list.length}: ${file.name}…`;
+        try {
+          const publicUrl = await uploadOneImage(file);
+          const res = await fetch('/api/admin/gallery?resource=images', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ event_id: eventId, image_url: publicUrl }),
+          });
+          await readApiResponse(res, 'Could not save photo.');
+          done++;
+        } catch (err) {
+          console.error('[Gallery] photo upload failed:', err);
+          failed++;
+        }
+      }
+      statusEl.textContent = failed
+        ? `Uploaded ${done} of ${list.length} — ${failed} failed. Check console for details.`
+        : `✓ Uploaded ${done} photo${done === 1 ? '' : 's'}.`;
+      loadEvents();
+    }
+
+    function renderEvents() {
+      if (!events.length) {
+        listEl.innerHTML = '<div class="empty-state">No events yet — create one above, then upload photos into it.</div>';
+        badge.textContent = '0 events';
+        return;
+      }
+      badge.textContent = `${events.length} event${events.length === 1 ? '' : 's'}`;
+
+      listEl.innerHTML = events.map(ev => {
+        const images = ev.gallery_images || [];
+        const thumbs = images.map(img => `
+          <div style="position:relative;">
+            <img src="${img.image_url}" alt="" style="width:72px;height:72px;object-fit:cover;border-radius:6px;">
+            <button type="button" class="image-remove-btn" data-delete-image="${img.id}" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;font-size:12px;">×</button>
+          </div>`).join('');
+
+        return `
+          <div class="panel" style="margin-bottom:16px;padding:18px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;">
+              <div>
+                <div style="font-weight:800;font-size:15px;">${ev.title}${ev.published ? '' : ' <span style="font-weight:600;font-size:11px;color:#fbbf24;">(draft)</span>'}</div>
+                <div style="font-size:12px;color:rgba(238,242,255,.55);margin-top:2px;">${images.length} photo${images.length === 1 ? '' : 's'} · /gallery.html#${ev.slug}</div>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button type="button" class="filter-btn" data-edit-event="${ev.id}">Edit</button>
+                <button type="button" class="filter-btn" data-delete-event="${ev.id}" data-title="${ev.title}" style="color:#f87171;">Delete</button>
+              </div>
+            </div>
+
+            <div style="margin-top:14px;">
+              <label style="font-size:12px;">Add photos</label>
+              <input type="file" accept="image/png,image/jpeg,image/webp" multiple data-upload-for="${ev.id}">
+              <div class="image-upload-status" data-status-for="${ev.id}"></div>
+            </div>
+
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">${thumbs || '<span style="font-size:12px;color:rgba(238,242,255,.4);">No photos yet.</span>'}</div>
+          </div>`;
+      }).join('');
+
+      listEl.querySelectorAll('[data-edit-event]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const ev = events.find(e => e.id === btn.dataset.editEvent);
+          if (ev) startEditEvent(ev);
+        });
+      });
+      listEl.querySelectorAll('[data-delete-event]').forEach(btn => {
+        btn.addEventListener('click', () => deleteEvent(btn.dataset.deleteEvent, btn.dataset.title));
+      });
+      listEl.querySelectorAll('[data-delete-image]').forEach(btn => {
+        btn.addEventListener('click', () => deleteImage(btn.dataset.deleteImage));
+      });
+      listEl.querySelectorAll('[data-upload-for]').forEach(input => {
+        input.addEventListener('change', () => {
+          const statusEl = listEl.querySelector(`[data-status-for="${input.dataset.uploadFor}"]`);
+          handlePhotoSelection(input.dataset.uploadFor, input.files, statusEl);
+        });
+      });
+    }
+
+    async function loadEvents() {
+      try {
+        const res = await fetch('/api/admin/gallery?resource=events&_=' + Date.now(), { credentials: 'same-origin', headers: { Accept: 'application/json' } });
+        const data = await readApiResponse(res, 'Could not load gallery events.');
+        events = data.events || [];
+        renderEvents();
+      } catch (err) {
+        listEl.innerHTML = `<div class="error-state">${err.message || 'Could not load gallery events.'}</div>`;
+        badge.textContent = 'Error';
+      }
+    }
+
+    loadEvents();
   })();
 
   // ── Executives management ───────────────────────────────────────────────────

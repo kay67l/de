@@ -263,6 +263,14 @@
   .btn-outline:hover { background: rgba(255,255,255,0.15); transform: translateY(-3px); }
   .btn-solid-red { background: var(--red); color: white; box-shadow: 0 8px 20px rgba(220,38,38,0.4); }
   .btn-solid-red:hover { background: var(--red-deep); transform: translateY(-3px); }
+  .btn-solid-blue { background: var(--blue); color: white; box-shadow: 0 8px 20px rgba(29,78,216,0.35); }
+  .btn-solid-blue:hover { background: var(--blue-deep); transform: translateY(-3px); }
+  a.btn { text-decoration: none; }
+
+  .section-link-row {
+    display: flex; flex-wrap: wrap; gap: 14px; justify-content: center;
+    padding: 36px 6%; max-width: 1200px; margin: 0 auto;
+  }
 
   .scroll-cue {
     position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
@@ -996,6 +1004,7 @@
     <a href="#magazines">Magazines</a>
     <a href="/student-engagement.html">Engagement</a>
     <a href="#news">News</a>
+    <a href="/gallery.html">Gallery</a>
     <a href="#contact" class="nav-cta">Contact Us</a>
   </div>
   <button class="site-search-button" id="siteSearchButton" type="button" aria-label="Search this page" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button>
@@ -1012,6 +1021,7 @@
   <a href="#magazines">Magazines</a>
   <a href="/student-engagement.html">Engagement</a>
   <a href="#news">News</a>
+  <a href="/gallery.html">Gallery</a>
   <a href="#contact">Contact Us</a>
 </div>
 
@@ -1191,8 +1201,8 @@
     <div class="administration-badge" id="currentAdministration" aria-label="Current administration">29th Administration</div>
     <h2>Meet Our Executives</h2>
     <p>Around 50 students serve in regional-level leadership roles defined by the constitution — across the Regional Executive Committee, the four Zonal Executive Committees, the Literary Group Executive Committee (LiGEC), the Writers &amp; Debaters Society, the Editorial Committee (EDICOM), and the Permanent Secretariat. Browse by body below, and drop in real names once the current term is announced.</p>
-    <a href="/past-executives.html" style="display:inline-block; margin-top:10px; font-size:13px; font-weight:700; color:#3b82f6; text-decoration:none;">View Past Executives →</a>
-    <a href="/student-engagement.html" style="display:inline-block; margin-top:10px; margin-left:18px; font-size:13px; font-weight:700; color:#dc2626; text-decoration:none;">View Student Engagement →</a>
+    <a href="/past-executives.html" class="btn btn-solid-blue" style="margin-top:16px;">View Past Executives →</a>
+
   </div>
 
   <div class="exec-tabs">
@@ -1298,6 +1308,12 @@
     <div class="life-photo life-block-photo" style="background-image: url('assets/images/apec.png'); background-size: cover; background-position: center;"></div>
   </div>
 </section>
+
+
+<div class="section-link-row">
+  <a href="/student-engagement.html" class="btn btn-solid-red">View Student Engagement →</a>
+  <a href="/gallery.html" class="btn btn-solid-blue">View Photo Gallery →</a>
+</div>
 
 <!-- STUDENT LIFE & PROGRAMMES -->
 <section id="programmes" style="background: var(--off-white);">
@@ -1550,6 +1566,7 @@
         <li><a href="#programmes">Student Life</a></li>
         <li><a href="#news">News &amp; Events</a></li>
         <li><a href="/student-engagement.html">Student Engagement</a></li>
+        <li><a href="/gallery.html">Gallery</a></li>
       </ul>
     </div>
     <div>

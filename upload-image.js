@@ -53,7 +53,7 @@ module.exports = async function handler(req, res) {
   if (!filename) return res.status(400).json({ error: 'Filename is required.' });
 
   // Restrict to known folders so callers can't write arbitrary paths into the bucket.
-  const ALLOWED_FOLDERS = ['posts', 'executives', 'past-executives', 'engagement', 'resources'];
+  const ALLOWED_FOLDERS = ['posts', 'executives', 'past-executives', 'engagement', 'resources', 'gallery'];
   const safeFolder = ALLOWED_FOLDERS.includes(folder) ? folder : 'posts';
   const isResource = safeFolder === 'resources';
   const bucket = isResource ? 'arsrc-resources' : 'post-images';

@@ -9,6 +9,7 @@ const handlers = {
   resources: require('../lib/handlers/admin/resources.js'),
   settings: require('../lib/handlers/admin/settings-admin.js'),
   'upload-image': require('../lib/handlers/admin/upload-image.js'),
+  gallery: require('../lib/handlers/admin/gallery.js'),
 };
 
 module.exports = async function handler(req, res) {
