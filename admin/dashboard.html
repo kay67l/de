@@ -523,6 +523,125 @@
     .quick-publish:hover { transform:translateY(-1px); box-shadow:0 8px 18px rgba(37,99,235,.3); }
     [id] { scroll-margin-top:92px; }
     @media (max-width:700px) { .admin-commandbar { top:0; gap:10px; padding:8px; } .commandbar-label { display:none; } .command-link { padding:8px 9px; } .quick-publish { padding:8px 10px; } }
+    /* ── Navigation and usability refresh ─────────────────────────────── */
+    :root {
+      --ink: #eef2ff;
+      --muted: rgba(238,242,255,.56);
+      --faint: rgba(238,242,255,.36);
+      --line: rgba(147,197,253,.16);
+      --surface: rgba(10,19,48,.78);
+      --surface-strong: rgba(15,27,63,.94);
+      --accent: #60a5fa;
+    }
+    body {
+      background:
+        radial-gradient(circle at 12% -8%, rgba(37,99,235,.23), transparent 34rem),
+        radial-gradient(circle at 100% 18%, rgba(124,58,237,.12), transparent 30rem),
+        #060c1f;
+    }
+    .admin-nav {
+      background: rgba(6,12,31,.88);
+      border-bottom-color: rgba(147,197,253,.14);
+      box-shadow: 0 10px 30px rgba(2,6,23,.18);
+    }
+    .main { max-width: 1180px; padding-top: 34px; }
+    html { scroll-padding-top: 142px; }
+    [id] { scroll-margin-top: 142px; }
+    .welcome { display:flex; justify-content:space-between; align-items:flex-end; gap:24px; margin-bottom:24px; }
+    .welcome p { color: var(--muted); }
+    .panels { gap: 18px; }
+    .panel {
+      border-color: var(--line);
+      background: linear-gradient(145deg, rgba(15,27,63,.82), rgba(8,16,40,.78));
+      box-shadow: 0 16px 42px rgba(2,6,23,.16);
+    }
+    .panel-head { gap:12px; padding-bottom: 13px; border-bottom: 1px solid rgba(147,197,253,.10); }
+    .panel-head h2 { letter-spacing: -.01em; }
+    .stat-card { border-color: var(--line); background: linear-gradient(145deg, rgba(15,27,63,.9), rgba(8,16,40,.76)); box-shadow: 0 12px 30px rgba(2,6,23,.14); }
+    .stat-card .value { text-shadow: 0 0 24px rgba(96,165,250,.22); }
+    .admin-commandbar {
+      position: fixed;
+      top: 60px;
+      left: 50%;
+      width: calc(100% - 48px);
+      max-width: 1180px;
+      transform: translateX(-50%);
+      margin-bottom: 0;
+      border-color: rgba(147,197,253,.2);
+      background: rgba(10,19,48,.92);
+      box-shadow: 0 14px 34px rgba(2,6,23,.28);
+    }
+    .stats-row { margin-top: 72px; }
+    .commandbar-links { flex:1; }
+    .command-link { position:relative; }
+    .command-link.active::after { content:''; position:absolute; left:10px; right:10px; bottom:2px; height:2px; border-radius:2px; background:#60a5fa; }
+    .create-post-section { margin-top: 22px; }
+    .posts-list, .msg-list, .resource-admin-list, .exec-list-group { gap: 10px; }
+    .post-item, .msg-item, .exec-row, .resource-admin-item { border-color: rgba(147,197,253,.11); }
+    .post-item:hover, .exec-row:hover, .resource-admin-item:hover { border-color: rgba(96,165,250,.28); background: rgba(59,130,246,.06); }
+    .publish-btn { min-height: 42px; }
+    /* Rich form controls: layered surfaces, inset depth, and intentional focus */
+    .post-form input:not([type="file"]), .post-form textarea, .post-form select,
+    .resource-admin-form input:not([type="file"]), .resource-admin-form textarea, .resource-admin-form select,
+    #engagementPanel input:not([type="file"]), #engagementPanel textarea, #engagementPanel select,
+    #archivePanel input:not([type="file"]), #archivePanel textarea, #archivePanel select {
+      appearance: none;
+      border: 1px solid rgba(147,197,253,.16);
+      border-radius: 12px;
+      background: linear-gradient(145deg, rgba(4,10,29,.74), rgba(18,32,73,.62));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.045), inset 0 0 0 1px rgba(2,6,23,.2), 0 8px 18px rgba(2,6,23,.12);
+      color: #f4f7ff;
+      transition: border-color .2s ease, box-shadow .2s ease, background .2s ease, transform .2s ease;
+    }
+    .post-form input:not([type="file"]), .post-form select,
+    .resource-admin-form input:not([type="file"]), .resource-admin-form select,
+    #engagementPanel input:not([type="file"]), #engagementPanel select,
+    #archivePanel input:not([type="file"]), #archivePanel select { min-height: 46px; }
+    .post-form textarea, .resource-admin-form textarea, #engagementPanel textarea { min-height: 112px; line-height: 1.65; resize: vertical; }
+    .post-form textarea#postContent { min-height: 210px; font-size: 14px; }
+    .post-form textarea#postExcerpt, #galleryEventDescription { min-height: 104px; }
+    .post-form input:not([type="file"]):hover, .post-form textarea:hover, .post-form select:hover,
+    .resource-admin-form input:not([type="file"]):hover, .resource-admin-form textarea:hover, .resource-admin-form select:hover,
+    #engagementPanel input:not([type="file"]):hover, #engagementPanel textarea:hover, #engagementPanel select:hover,
+    #archivePanel input:not([type="file"]):hover, #archivePanel textarea:hover, #archivePanel select:hover { border-color: rgba(96,165,250,.34); }
+    .post-form input:not([type="file"]):focus, .post-form textarea:focus, .post-form select:focus,
+    .resource-admin-form input:not([type="file"]):focus, .resource-admin-form textarea:focus, .resource-admin-form select:focus,
+    #engagementPanel input:not([type="file"]):focus, #engagementPanel textarea:focus, #engagementPanel select:focus,
+    #archivePanel input:not([type="file"]):focus, #archivePanel textarea:focus, #archivePanel select:focus {
+      outline: none;
+      border-color: rgba(96,165,250,.9);
+      background: linear-gradient(145deg, rgba(7,18,48,.9), rgba(21,43,92,.72));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 0 0 3px rgba(59,130,246,.14), 0 12px 24px rgba(2,6,23,.2);
+      transform: translateY(-1px);
+    }
+    .post-form textarea::placeholder, .resource-admin-form textarea::placeholder,
+    .post-form input::placeholder, .resource-admin-form input::placeholder,
+    #engagementPanel textarea::placeholder, #engagementPanel input::placeholder,
+    #archivePanel input::placeholder { color: rgba(191,219,254,.36); }
+    .post-form label, .resource-admin-form label, #engagementPanel label, #archivePanel label { display:block; margin-bottom:8px; letter-spacing:.08em; }
+    .char-hint { padding: 6px 2px 0; }
+    .inline-image-editor { border-color: rgba(96,165,250,.22); background: linear-gradient(145deg, rgba(25,56,119,.2), rgba(8,16,40,.45)); box-shadow: inset 0 1px 0 rgba(255,255,255,.04); }
+    .inline-image-fields input { min-height: 44px; }
+    .back-to-top {
+      position:fixed; right:24px; bottom:24px; z-index:120; width:42px; height:42px;
+      border:1px solid rgba(147,197,253,.24); border-radius:50%; background:rgba(15,27,63,.95);
+      color:#bfdbfe; cursor:pointer; font:800 18px/1 'Segoe UI',sans-serif; box-shadow:0 10px 24px rgba(2,6,23,.3);
+      opacity:0; pointer-events:none; transform:translateY(8px); transition:opacity .2s, transform .2s, background .2s;
+    }
+    .back-to-top.visible { opacity:1; pointer-events:auto; transform:translateY(0); }
+    .back-to-top:hover { background:#1d4ed8; }
+    @media (max-width:700px) {
+      .admin-nav { padding:0 16px; }
+      .admin-nav .site-link { display:none; }
+      .main { padding:24px 16px 36px; }
+      .welcome { display:block; margin-bottom:20px; }
+      .welcome h1 { font-size:24px; }
+      .admin-commandbar { top:60px; left:8px; width:calc(100% - 16px); transform:none; margin-left:0; margin-right:0; border-radius:12px; }
+      .stats-row { margin-top: 72px; }
+      .commandbar-links { padding-bottom:2px; }
+      .quick-publish { margin-left:0; }
+      .back-to-top { right:16px; bottom:16px; }
+    }
   </style>
 </head>
 <body>
@@ -574,6 +693,7 @@
       </div>
       <a class="quick-publish" href="#editorPanel">+ New post</a>
     </nav>
+    <button class="back-to-top" id="backToTop" type="button" aria-label="Back to top" title="Back to top">↑</button>
 
     <div id="overview"></div>
     <div class="stats-row">
@@ -2020,6 +2140,7 @@
         body: JSON.stringify({ filename: file.name, folder: 'gallery' }),
       });
       const urlData = await readApiResponse(urlRes, 'Could not get an upload URL.');
+      if (!urlData.signedUrl) throw new Error('Upload service did not return a signed URL.');
       const uploadRes = await fetch(urlData.signedUrl, {
         method: 'PUT',
         headers: { 'Content-Type': 'image/jpeg' },
@@ -2031,12 +2152,17 @@
 
     async function handlePhotoSelection(eventId, files, statusEl) {
       const list = Array.from(files || []);
-      if (!list.length) return;
-      let done = 0, failed = 0;
+      if (!list.length || !statusEl) return;
+      let done = 0;
+      const failures = [];
+
       for (const file of list) {
-        statusEl.textContent = `Uploading ${done + failed + 1} of ${list.length}: ${file.name}…`;
+        statusEl.textContent = `Uploading ${done + failures.length + 1} of ${list.length}: ${file.name}…`;
+        statusEl.className = 'image-upload-status';
         try {
           const publicUrl = await uploadOneImage(file);
+          if (!publicUrl) throw new Error('Upload completed without a public image URL.');
+
           const res = await fetch('/api/admin/gallery?resource=images', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -2046,14 +2172,20 @@
           await readApiResponse(res, 'Could not save photo.');
           done++;
         } catch (err) {
+          const reason = err && err.message ? err.message : 'Unknown upload error.';
           console.error('[Gallery] photo upload failed:', err);
-          failed++;
+          failures.push(`${file.name}: ${reason}`);
         }
       }
-      statusEl.textContent = failed
-        ? `Uploaded ${done} of ${list.length} — ${failed} failed. Check console for details.`
-        : `✓ Uploaded ${done} photo${done === 1 ? '' : 's'}.`;
-      loadEvents();
+
+      if (failures.length) {
+        statusEl.textContent = `Uploaded ${done} of ${list.length}. ${failures.join(' | ')}`;
+        statusEl.className = 'image-upload-status error';
+      } else {
+        statusEl.textContent = `✓ Uploaded ${done} photo${done === 1 ? '' : 's'}.`;
+        statusEl.className = 'image-upload-status success';
+      }
+      await loadEvents();
     }
 
     function renderEvents() {
@@ -2108,9 +2240,15 @@
         btn.addEventListener('click', () => deleteImage(btn.dataset.deleteImage));
       });
       listEl.querySelectorAll('[data-upload-for]').forEach(input => {
-        input.addEventListener('change', () => {
-          const statusEl = listEl.querySelector(`[data-status-for="${input.dataset.uploadFor}"]`);
-          handlePhotoSelection(input.dataset.uploadFor, input.files, statusEl);
+        input.addEventListener('change', async () => {
+          const eventId = input.dataset.uploadFor;
+          const statusEl = input.parentElement.querySelector(`[data-status-for="${eventId}"]`);
+          try {
+            await handlePhotoSelection(eventId, input.files, statusEl);
+          } finally {
+            // Clearing the value allows the same image to be selected and uploaded again.
+            input.value = '';
+          }
         });
       });
     }
@@ -3380,6 +3518,27 @@
   });
   loadAdministrationSetting();
   loadEngagement();
+
+  // ── Dashboard navigation polish ───────────────────────────────────────────
+  (function initNavigationPolish() {
+    const topButton = document.getElementById('backToTop');
+    const links = [...document.querySelectorAll('.command-link[data-section]')];
+    const sections = links.map(link => document.getElementById(link.dataset.section)).filter(Boolean);
+
+    window.addEventListener('scroll', () => {
+      topButton.classList.toggle('visible', window.scrollY > 420);
+    }, { passive: true });
+    topButton.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        const visible = entries.filter(entry => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) return;
+        links.forEach(link => link.classList.toggle('active', link.dataset.section === visible.target.id));
+      }, { rootMargin: '-86px 0px -58% 0px', threshold: [0, .2, .6] });
+      sections.forEach(section => observer.observe(section));
+    }
+  })();
 </script>
 </body>
 </html>
