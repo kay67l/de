@@ -401,7 +401,6 @@
   <div class="hero-video-wrap">
     <video class="hero-video" id="engagementVideo" autoplay muted loop playsinline poster="assets/videos/engagement-poster.jpg">
       <source src="assets/videos/hero-video.mp4" type="video/mp4">
-      <source src="assets/videos/engagement-video.webm" type="video/webm">
     </video>
   </div>
   <div class="hero-scrim"></div>
@@ -733,17 +732,17 @@
   // loads, fall back silently (placeholder stays) if no file is present. ──
   (function initHeroVideo() {
     const vid = document.getElementById('engagementVideo');
-    const ph = document.getElementById('videoPlaceholder');
-    if (!vid || !ph) return;
+    if (!vid) return;
 
+    // No separate placeholder element on this page — the gradient background
+    // on .hero-video-wrap / .hero already serves as the fallback, so we only
+    // need to reveal the video once it can actually play.
     vid.addEventListener('loadeddata', () => {
       vid.style.display = 'block';
-      ph.style.display = 'none';
-      vid.play().catch(() => { /* autoplay blocked — poster/placeholder stays visible */ });
+      vid.play().catch(() => { /* autoplay blocked — gradient fallback stays visible */ });
     });
     vid.addEventListener('error', () => {
       vid.style.display = 'none';
-      ph.style.display = 'flex';
     });
   })();
 })();
