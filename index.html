@@ -956,14 +956,14 @@
 </style>
 <style>
   /* Executive portrait-card refinement */
-  #executives .exec-grid{grid-template-columns:repeat(4,minmax(235px,1fr)) !important;gap:24px;align-items:stretch;}
-  #executives .exec-card{min-height:430px;height:100%;display:flex;flex-direction:column;padding-bottom:28px;}
+  #executives .exec-grid{display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:24px;max-width:var(--content-max,1240px);margin:0 auto;}
+  #executives .exec-card{flex:0 1 260px;min-height:430px;height:auto;display:flex;flex-direction:column;padding-bottom:28px;}
   #executives .exec-photo{height:305px;min-height:305px;margin-bottom:58px;flex-shrink:0;}
   #executives .exec-cover-photo{object-fit:cover;object-position:center top;}
   #executives .exec-card h4{padding:0 18px;line-height:1.25;}
   #executives .exec-school{line-height:1.5;}
-  @media (max-width:1100px){#executives .exec-grid{grid-template-columns:repeat(2,minmax(240px,1fr)) !important;max-width:760px;}#executives .exec-photo{height:315px;min-height:315px;}}
-  @media (max-width:640px){#executives .exec-grid{grid-template-columns:minmax(0,1fr) !important;max-width:420px;gap:22px;}#executives .exec-card{min-height:460px;}#executives .exec-photo{height:340px;min-height:340px;margin-bottom:62px;}#executives .exec-card h4{font-size:17px;}}
+  @media (max-width:1100px){#executives .exec-grid{max-width:760px;}#executives .exec-card{flex-basis:calc(50% - 12px);}#executives .exec-photo{height:315px;min-height:315px;}}
+  @media (max-width:640px){#executives .exec-grid{max-width:420px;gap:22px;}#executives .exec-card{flex-basis:100%;min-height:460px;}#executives .exec-photo{height:340px;min-height:340px;margin-bottom:62px;}#executives .exec-card h4{font-size:17px;}}
 </style>
 <style>
   /* Mobile editorial width refinement */
@@ -1201,7 +1201,7 @@
     <div class="administration-badge" id="currentAdministration" aria-label="Current administration">29th Administration</div>
     <h2>Meet Our Executives</h2>
     <p>Around 50 students serve in regional-level leadership roles defined by the constitution — across the Regional Executive Committee, the four Zonal Executive Committees, the Literary Group Executive Committee (LiGEC), the Writers &amp; Debaters Society, the Editorial Committee (EDICOM), and the Permanent Secretariat. Browse by body below, and drop in real names once the current term is announced.</p>
-    <a href="/past-executives.html" class="btn btn-solid-blue" style="margin-top:16px;">View Past Executives →</a>
+    <a href="/past-executives.html" class="btn btn-solid-blue" style="margin-top:16px; justify-self:start; width:fit-content;">View Past Executives →</a>
 
   </div>
 
