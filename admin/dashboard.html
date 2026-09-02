@@ -1197,6 +1197,10 @@
         <textarea id="engEventDescription" rows="3" placeholder="What happened, who took part, where…"></textarea>
       </div>
       <div style="margin-top:10px;">
+        <label for="engEventVideoUrl">Video link <span style="color:rgba(238,242,255,.4);font-weight:400;">(optional — YouTube, Vimeo, or a direct .mp4 link)</span></label>
+        <input type="url" id="engEventVideoUrl" placeholder="https://youtube.com/watch?v=... or https://.../video.mp4">
+      </div>
+      <div style="margin-top:10px;">
         <label for="engEventImageInput">Photos <span style="color:rgba(238,242,255,.4);font-weight:400;">(add one at a time, up to 6)</span></label>
         <div class="image-drop" id="engEventImageDrop">
           <input type="file" id="engEventImageInput" accept="image/png,image/jpeg,image/webp">
@@ -3398,6 +3402,7 @@
     renderEngEventThumbs();
     document.getElementById('engEventTitle').value = '';
     document.getElementById('engEventDescription').value = '';
+    document.getElementById('engEventVideoUrl').value = '';
     document.getElementById('engEventWing').value = 'wds';
     document.getElementById('engEventEditBanner').style.display = 'none';
     document.getElementById('engEventAddBtn').textContent = 'Add Event';
@@ -3411,6 +3416,7 @@
     document.getElementById('engEventWing').value = ev.wing;
     document.getElementById('engEventTitle').value = ev.title || '';
     document.getElementById('engEventDescription').value = ev.description || '';
+    document.getElementById('engEventVideoUrl').value = ev.video_url || '';
     document.getElementById('engEventEditBannerText').textContent = `Editing: ${ev.title}`;
     document.getElementById('engEventEditBanner').style.display = 'flex';
     document.getElementById('engEventAddBtn').textContent = 'Save Changes';
@@ -3429,7 +3435,7 @@
           <div class="exec-row">
             <div class="exec-row-left"><div class="exec-row-text">
               <div class="exec-row-name">${esc(ev.title)}</div>
-              <div class="exec-row-meta">${(ev.photo_urls || []).length} photo(s)</div>
+              <div class="exec-row-meta">${(ev.photo_urls || []).length} photo(s)${ev.video_url ? ' · 🎬 video' : ''}</div>
             </div></div>
             <div style="display:flex; gap:8px;">
               <button class="delete-btn" style="background:rgba(59,130,246,.12); color:#93c5fd; border-color:rgba(59,130,246,.2);" data-id="${esc(ev.id)}" data-kind="edit-event">Edit</button>
@@ -3467,9 +3473,14 @@
     const wing = document.getElementById('engEventWing').value;
     const title = document.getElementById('engEventTitle').value.trim();
     const description = document.getElementById('engEventDescription').value.trim();
+    const video_url = document.getElementById('engEventVideoUrl').value.trim();
     const msg = document.getElementById('engEventMsg');
     msg.className = 'post-msg';
     if (!title) { msg.textContent = '✗ Event title is required.'; msg.classList.add('error'); return; }
+    if (video_url) {
+      try { new URL(video_url); }
+      catch { msg.textContent = '✗ Video link must be a full URL (starting with https://).'; msg.classList.add('error'); return; }
+    }
     const isEdit = !!engEditingEventId;
     this.disabled = true; this.textContent = isEdit ? 'Saving…' : 'Adding…';
     try {
@@ -3477,8 +3488,8 @@
         method: isEdit ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(isEdit
-          ? { type: 'event', id: engEditingEventId, title, description, photo_urls: engEventPhotoUrls }
-          : { type: 'event', wing, title, description, photo_urls: engEventPhotoUrls }),
+          ? { type: 'event', id: engEditingEventId, title, description, photo_urls: engEventPhotoUrls, video_url }
+          : { type: 'event', wing, title, description, photo_urls: engEventPhotoUrls, video_url }),
         credentials: 'same-origin',
       });
       const data = await res.json();
