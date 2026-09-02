@@ -624,8 +624,9 @@
       </div>`).join('');
   }
 
-  // Turns a plain link (YouTube, Vimeo, or a direct .mp4/.webm file) into
-  // an embeddable player. Admin only ever pastes a URL — no file upload.
+  // Turns a plain link (YouTube, Vimeo, Instagram, or a direct .mp4/.webm
+  // file) into an embeddable player. Admin only ever pastes a URL — no file upload.
+  let usesInstagramEmbed = false;
   function embedVideoHtml(url) {
     try {
       const u = new URL(url);
@@ -641,9 +642,28 @@
         const id = u.pathname.split('/').filter(Boolean).pop();
         if (id) return `<div class="event-video-wrap"><iframe src="https://player.vimeo.com/video/${esc(id)}" title="Event video" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>`;
       }
+      if (host.includes('instagram.com') && /\/(p|reel|tv)\//.test(u.pathname)) {
+        usesInstagramEmbed = true;
+        // Instagram's own embed widget sizes and styles this itself — it
+        // isn't a fixed 16:9 frame like YouTube/Vimeo, so no event-video-wrap.
+        return `<blockquote class="instagram-media event-instagram-embed" data-instgrm-permalink="${esc(url)}" data-instgrm-version="14" style="width:100%;"></blockquote>`;
+      }
     } catch { /* not a parseable absolute URL — fall through to direct-file handling */ }
     // Fallback: treat it as a direct video file link (mp4/webm/etc.)
     return `<div class="event-video-wrap"><video controls preload="metadata" src="${esc(url)}"></video></div>`;
+  }
+
+  // Loads Instagram's embed script once, or asks it to re-scan the page for
+  // new .instagram-media blockquotes if it's already loaded.
+  function processInstagramEmbeds() {
+    if (!usesInstagramEmbed) return;
+    if (window.instgrm && window.instgrm.Embeds) { window.instgrm.Embeds.process(); return; }
+    if (document.getElementById('ig-embed-script')) return; // already loading
+    const s = document.createElement('script');
+    s.id = 'ig-embed-script';
+    s.src = 'https://www.instagram.com/embed.js';
+    s.async = true;
+    document.body.appendChild(s);
   }
 
   function renderEventCard(ev, colorVar) {
@@ -705,6 +725,7 @@
     document.getElementById('lg-event-grid').innerHTML = lgEvents.length
       ? lgEvents.map(ev => renderEventCard(ev, 'var(--red)')).join('')
       : eventEmptyHtml;
+    processInstagramEmbeds();
 
     initRevealObserver();
   }
