@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="https://www.xml-sitemaps.com/css/sitemap.css"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <url>
+       <loc>https://www.ashsrc.org/</loc>
+       <lastmod>2026-09-12T11:33:00+00:00</lastmod>
+       <priority>1.0000</priority>
+  </url>
+  <url>
+       <loc>https://www.ashsrc.org/student-engagement.html</loc>
+       <lastmod>2026-09-12T20:44:48+00:00</lastmod>
+       <priority>0.8000</priority>
+  </url>
+  <url>
+       <loc>https://www.ashsrc.org/gallery.html</loc>
+       <lastmod>2026-09-12T20:44:48+00:00</lastmod>
+       <priority>0.8000</priority>
+  </url>
+  <url>
+       <loc>https://www.ashsrc.org/past-executives.html</loc>
+       <lastmod>2026-09-12T20:44:48+00:00</lastmod>
+       <priority>0.8000</priority>
+  </url>
+  <url>
+       <loc>https://www.ashsrc.org/post.html?slug=student-leader-field-guide</loc>
+       <lastmod>2026-09-12T20:44:48+00:00</lastmod>
+       <priority>0.8000</priority>
+  </url>
+  <url>
+       <loc>https://www.ashsrc.org/post.html?slug=four-zones-one-voice</loc>
+       <lastmod>2026-09-12T20:44:48+00:00</lastmod>
+       <priority>0.8000</priority>
+  </url>
+  <url>
+       <loc>https://www.ashsrc.org/post.html?slug=questions-are-leadership</loc>
+       <lastmod>2026-09-12T20:44:48+00:00</lastmod>
+       <priority>0.8000</priority>
+  </url>
+  <url>
+       <loc>https://www.ashsrc.org/post.html?slug=notes-from-the-road-ahead</loc>
+       <lastmod>2026-09-12T20:44:48+00:00</lastmod>
+       <priority>0.8000</priority>
+  </url>
+</urlset>
