@@ -804,6 +804,15 @@
 
   .exec-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; max-width: var(--content-max); margin: 0 auto; }
   .exec-card { min-height: 300px; flex: 0 1 280px; width: 280px; }
+  #execGrid-rec { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  #execGrid-rec > .exec-card { grid-column: span 3; width: auto; }
+  #execGrid-rec > .exec-card:nth-child(1) { grid-column: 2 / span 3; }
+  #execGrid-rec > .exec-card:nth-child(2) { grid-column: 5 / span 3; }
+  #execGrid-rec > .exec-card:nth-child(3) { grid-column: 8 / span 3; }
+  #execGrid-rec > .exec-card:nth-child(4) { grid-column: 1 / span 3; }
+  #execGrid-rec > .exec-card:nth-child(5) { grid-column: 4 / span 3; }
+  #execGrid-rec > .exec-card:nth-child(6) { grid-column: 7 / span 3; }
+  #execGrid-rec > .exec-card:nth-child(7) { grid-column: 10 / span 3; }
   .exec-tabs { max-width: var(--content-max); margin: 0 auto 24px; justify-content: flex-start; }
   .schools-grid { max-width: var(--content-max); margin: 0 auto; grid-template-columns: repeat(4, 1fr) !important; gap: 14px; }
   .school-card { min-height: 126px; padding: 22px; }
@@ -849,6 +858,9 @@
     .objectives, .schools-grid { grid-template-columns: repeat(2, 1fr) !important; }
     .exec-grid { display: flex; }
     .exec-card { flex-basis: calc(50% - 10px); width: calc(50% - 10px); }
+    #execGrid-rec { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    #execGrid-rec > .exec-card,
+    #execGrid-rec > .exec-card:nth-child(n) { grid-column: auto; width: auto; }
     .constitution-inner, #apec .apec-inner { grid-template-columns: 1fr; }
     .life-photo, .life-mosaic { min-height: 340px; }
     .resource-grid { grid-template-columns: repeat(2, 1fr) !important; }
@@ -861,6 +873,7 @@
     .objectives, .schools-grid { grid-template-columns: 1fr !important; }
     .exec-grid { display: flex; }
     .exec-card { flex-basis: 100%; width: 100%; }
+    #execGrid-rec { display: grid; grid-template-columns: 1fr; }
     .resource-grid { grid-template-columns: 1fr !important; }
     .resource-card, .resource-card:nth-child(2) { border-right: 0; border-bottom: 1px solid var(--line); }
     .resource-card:last-child { border-bottom: 0; }
