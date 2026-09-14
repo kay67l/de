@@ -134,12 +134,17 @@
       font-size: 12px; color: rgba(238,242,255,0.4); margin-top: 6px;
     }
 
-    /* Section panels */
-    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-
-    @media (max-width: 700px) { .panels { grid-template-columns: 1fr; } }
+    /* Section panels
+       Messages and Posts used to sit side-by-side in a 2-col grid while every
+       other dashboard section (editor, executives, archive, resources, etc.)
+       is a full-width standalone .panel. That mismatch is why these two never
+       lined up with the rest of the page — stacking them full-width fixes it,
+       and also removes the "grid column forced wider than the viewport by its
+       content" mechanism that was pushing them off-screen on mobile. */
+    .panels { display: flex; flex-direction: column; gap: 20px; }
 
     .panel {
+      min-width: 0;
       background: rgba(10,19,48,0.7);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 18px; padding: 28px;
@@ -328,6 +333,7 @@
       border:1px solid rgba(255,255,255,.06); border-radius:10px;
     }
     .post-item-left { flex:1; min-width:0; }
+    .post-item-actions { display:flex; gap:8px; flex-shrink:0; flex-wrap:wrap; justify-content:flex-end; }
     .post-item .post-title { font-size:13px; font-weight:700; color:#eef2ff;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .post-item .post-meta { font-size:11px; color:rgba(238,242,255,.4); margin-top:3px; }
@@ -374,7 +380,7 @@
     .setting-msg{margin-top:9px;font-size:12px;font-weight:700;color:rgba(238,242,255,.5);}
     .setting-msg.success{color:#34d399;}.setting-msg.error{color:#fca5a5;}
     @media(max-width:700px){.admin-setting-row{grid-template-columns:1fr}.admin-setting-btn{width:100%}.admin-setting-card{padding:18px}}
-    @media (max-width:700px) { .inline-image-grid { grid-template-columns:1fr; } .resource-admin-item { align-items:flex-start; flex-direction:column; } .resource-admin-actions { width:100%; } }
+    @media (max-width:700px) { .inline-image-grid { grid-template-columns:1fr; } .resource-admin-item, .post-item { align-items:flex-start; flex-direction:column; } .resource-admin-actions, .post-item-actions { width:100%; justify-content:flex-start; } }
 
     .delete-btn {
       padding:6px 12px; border-radius:7px; border:none; cursor:pointer;
@@ -424,11 +430,12 @@
     }
     .msg-item .msg-meta {
       display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 4px 10px;
       margin-bottom: 4px;
     }
-    .msg-name-row { display: flex; align-items: center; }
-    .msg-name   { font-size: 13px; font-weight: 700; color: #eef2ff; }
-    .msg-time   { font-size: 11px; color: rgba(238,242,255,0.35); }
+    .msg-name-row { display: flex; align-items: center; min-width: 0; }
+    .msg-name   { font-size: 13px; font-weight: 700; color: #eef2ff; overflow-wrap: anywhere; }
+    .msg-time   { font-size: 11px; color: rgba(238,242,255,0.35); flex-shrink: 0; }
     .msg-subject { font-size: 12px; color: rgba(238,242,255,0.55); margin-bottom: 3px; }
     .msg-preview {
       font-size: 12px; color: rgba(238,242,255,0.35);
@@ -1540,7 +1547,7 @@
             </div>
           </div>
         </div>
-        <div class="post-item-actions" style="display:flex; gap:8px;">
+        <div class="post-item-actions">
           ${p.slug ? `<a class="view-btn" href="/post.html?slug=${encodeURIComponent(p.slug)}" target="_blank" rel="noopener">View</a>` : ''}
           <button class="edit-btn" data-id="${esc(p.id)}">Edit</button>
           <button class="delete-btn" data-id="${esc(p.id)}">Delete</button>

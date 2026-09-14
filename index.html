@@ -430,6 +430,30 @@
   .exec-role { color: var(--red); font-weight: 700; font-size: 12.5px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
   .exec-school { color: var(--gray); font-size: 13px; padding: 0 16px; }
 
+  /* Past-executives callout — a small card with a cover image so the link into the
+     archive reads as its own destination rather than a plain inline button. */
+  .past-exec-cta {
+    display: block; width: 100%; max-width: 300px;
+    background: white; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow);
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .past-exec-cta:hover { transform: translateY(-6px); box-shadow: 0 18px 36px rgba(16,42,107,0.2); }
+  .past-exec-cta-media {
+    height: 110px; background: linear-gradient(135deg, var(--blue-light), var(--blue-deep));
+    background-size: cover; background-position: center; position: relative;
+  }
+  .past-exec-cta-media::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(16,42,107,0) 45%, rgba(10,20,50,.68) 100%);
+  }
+  .past-exec-cta-body { padding: 16px 18px 18px; }
+  .past-exec-cta-eyebrow { display: block; font-size: 10.5px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: var(--red); margin-bottom: 6px; }
+  .past-exec-cta-body h4 { font-size: 15.5px; font-weight: 800; color: var(--ink); margin-bottom: 6px; }
+  .past-exec-cta-body p { font-size: 12.5px; color: var(--gray); line-height: 1.55; margin-bottom: 10px; }
+  .past-exec-cta-link { font-size: 12.5px; font-weight: 700; color: var(--blue); display: inline-flex; align-items: center; gap: 6px; }
+  .past-exec-cta-link svg { width: 13px; transition: transform .3s; }
+  .past-exec-cta:hover .past-exec-cta-link svg { transform: translateX(4px); }
+
   @media (max-width: 980px) { .exec-grid { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 560px) { .exec-grid { grid-template-columns: 1fr; } }
 
@@ -1230,7 +1254,15 @@
     <div class="administration-badge" id="currentAdministration" aria-label="Current administration">29th Administration</div>
     <h2>Meet Our Executives</h2>
     <p>Around 50 students serve in regional-level leadership roles defined by the constitution — across the Regional Executive Committee, the four Zonal Executive Committees, the Literary Group Executive Committee (LiGEC), the Writers &amp; Debaters Society, the Editorial Committee (EDICOM), and the Permanent Secretariat. Browse by body below, and drop in real names once the current term is announced.</p>
-    <a href="/past-executives.html" class="btn btn-solid-blue" style="margin-top:16px; justify-self:start; width:fit-content;">View Past Executives →</a>
+    <a href="/past-executives.html" class="past-exec-cta" style="margin-top:16px; justify-self:start;" aria-label="View Past Executives">
+      <div class="past-exec-cta-media" style="background-image:url('assets/images/us.png);"></div>
+      <div class="past-exec-cta-body">
+        <span class="past-exec-cta-eyebrow">Leadership Archive</span>
+        <h4>Past Executives</h4>
+        <p>Browse every ARSRC administration that came before the current one.</p>
+        <span class="past-exec-cta-link">View the archive <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+    </a>
 
   </div>
 
@@ -1422,7 +1454,7 @@
         </div>
       </div>
       <div class="story-card">
-        <div class="story-thumb" style="background-image: url('images/handover.jpg'); background-size: cover; background-position: center;"></div>
+        <div class="story-thumb" style="background-image: url('assets/images/franklin.png'); background-size: cover; background-position: center;"></div>
         <div class="story-body">
           <div class="eyebrow-row"><span class="eb">Ceremony</span><span class="eb-bar"></span><span class="eb muted">Annual</span></div>
           <h5>Hand-Over &amp; Awards Ceremony</h5>
@@ -1683,7 +1715,7 @@
   // Pointer tilt is intentionally subtle and disabled for touch/reduced-motion contexts.
   (function () {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !window.matchMedia('(hover: hover)').matches) return;
-    var selectors = '.obj-card, .const-card, .exec-card, .news-card, .resource-card, .contact-form, .contact-info-card, .about-illustration, .chapter-photo, .life-photo, .life-mosaic, .editorial-feature, .editorial-card';
+    var selectors = '.obj-card, .const-card, .exec-card, .news-card, .resource-card, .contact-form, .contact-info-card, .about-illustration, .chapter-photo, .life-photo, .life-mosaic, .editorial-feature, .editorial-card, .past-exec-cta';
     document.querySelectorAll(selectors).forEach(function (el) {
       el.setAttribute('data-tilt', '');
       el.addEventListener('pointermove', function (event) {
