@@ -426,29 +426,39 @@
   .exec-role { color: var(--red); font-weight: 700; font-size: 12.5px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
   .exec-school { color: var(--gray); font-size: 13px; padding: 0 16px; }
 
-  /* Past-executives callout — a small card with a cover image so the link into the
-     archive reads as its own destination rather than a plain inline button. */
+  /* Past-executives callout — a prominent archive banner between the intro and
+     current executive tabs, using the site's blue/red leadership palette. */
   .past-exec-cta {
-    display: block; width: 100%; max-width: 300px;
-    background: white; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow);
-    transition: transform .3s ease, box-shadow .3s ease;
+    display: grid; grid-template-columns: minmax(230px, .7fr) 1.3fr; width: min(100% - 32px, 980px);
+    min-height: 178px; margin: 30px auto 36px; position: relative; overflow: hidden;
+    background: linear-gradient(110deg, #102a6b 0%, #173e9a 58%, #9f1414 100%);
+    border: 1px solid rgba(255,255,255,.32); border-radius: 22px; color: white;
+    box-shadow: 0 18px 42px rgba(16,42,107,.22); transition: transform .3s ease, box-shadow .3s ease;
   }
-  .past-exec-cta:hover { transform: translateY(-6px); box-shadow: 0 18px 36px rgba(16,42,107,0.2); }
+  .past-exec-cta::after { content: ''; position: absolute; width: 240px; height: 240px; right: -70px; top: -108px; border: 1px solid rgba(255,255,255,.16); border-radius: 50%; box-shadow: 0 0 0 22px rgba(255,255,255,.04), 0 0 0 44px rgba(255,255,255,.03); pointer-events: none; }
+  .past-exec-cta:hover { transform: translateY(-7px); box-shadow: 0 26px 54px rgba(16,42,107,.3); }
+  .past-exec-cta:focus-visible { outline: 3px solid #fca5a5; outline-offset: 5px; }
   .past-exec-cta-media {
-    height: 110px; background: linear-gradient(135deg, var(--blue-light), var(--blue-deep));
-    background-size: cover; background-position: center; position: relative;
+    min-height: 178px; background: linear-gradient(135deg, rgba(29,78,216,.15), rgba(220,38,38,.34));
+    background-size: cover; background-position: center; position: relative; isolation: isolate;
   }
   .past-exec-cta-media::after {
     content: ''; position: absolute; inset: 0;
-    background: linear-gradient(180deg, rgba(16,42,107,0) 45%, rgba(10,20,50,.68) 100%);
+    z-index: 0; background: linear-gradient(90deg, rgba(16,42,107,.08), rgba(16,42,107,.78));
   }
-  .past-exec-cta-body { padding: 16px 18px 18px; }
-  .past-exec-cta-eyebrow { display: block; font-size: 10.5px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: var(--red); margin-bottom: 6px; }
-  .past-exec-cta-body h4 { font-size: 15.5px; font-weight: 800; color: var(--ink); margin-bottom: 6px; }
-  .past-exec-cta-body p { font-size: 12.5px; color: var(--gray); line-height: 1.55; margin-bottom: 10px; }
-  .past-exec-cta-link { font-size: 12.5px; font-weight: 700; color: var(--blue); display: inline-flex; align-items: center; gap: 6px; }
+  .past-exec-cta-stamp { position: absolute; left: 22px; bottom: 20px; z-index: 1; padding: 7px 10px; border: 1px solid rgba(255,255,255,.55); border-radius: 999px; color: white; background: rgba(8,18,49,.36); font-size: 10px; font-weight: 900; letter-spacing: 1.4px; text-transform: uppercase; }
+  .past-exec-cta-body { display: flex; flex-direction: column; justify-content: center; padding: 28px 36px; position: relative; z-index: 1; }
+  .past-exec-cta-eyebrow { display: block; font-size: 10.5px; font-weight: 900; letter-spacing: 1.6px; text-transform: uppercase; color: #fca5a5; margin-bottom: 8px; }
+  .past-exec-cta-body h4 { font-family: 'Source Serif 4', Georgia, serif; font-size: clamp(1.55rem, 3vw, 2.2rem); line-height: 1.05; font-weight: 700; color: white; margin-bottom: 8px; }
+  .past-exec-cta-body p { max-width: 48ch; font-size: 13.5px; color: rgba(255,255,255,.78); line-height: 1.55; margin-bottom: 15px; }
+  .past-exec-cta-link { font-size: 12.5px; font-weight: 900; color: white; display: inline-flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: .7px; }
   .past-exec-cta-link svg { width: 13px; transition: transform .3s; }
   .past-exec-cta:hover .past-exec-cta-link svg { transform: translateX(4px); }
+  @media (max-width: 640px) {
+    .past-exec-cta { grid-template-columns: 1fr; min-height: 0; margin-top: 24px; }
+    .past-exec-cta-media { min-height: 130px; }
+    .past-exec-cta-body { padding: 24px 24px 26px; }
+  }
 
   @media (max-width: 980px) { .exec-grid { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 560px) { .exec-grid { grid-template-columns: 1fr; } }
@@ -1250,17 +1260,21 @@
     <div class="administration-badge" id="currentAdministration" aria-label="Current administration">29th Administration</div>
     <h2>Meet Our Executives</h2>
     <p>Around 50 students serve in regional-level leadership roles defined by the constitution — across the Regional Executive Committee, the four Zonal Executive Committees, the Literary Group Executive Committee (LiGEC), the Writers &amp; Debaters Society, the Editorial Committee (EDICOM), and the Permanent Secretariat. Browse by body below, and drop in real names once the current term is announced.</p>
-    <a href="/past-executives.html" class="past-exec-cta" style="margin-top:16px; justify-self:start;" aria-label="View Past Executives">
-      <div class="past-exec-cta-media" style="background-image:url('assets/images/us.png');"></div>
-      <div class="past-exec-cta-body">
-        <span class="past-exec-cta-eyebrow">Leadership Archive</span>
-        <h4>Past Executives</h4>
-        <p>Browse every ARSRC administration that came before the current one.</p>
-        <span class="past-exec-cta-link">View the archive <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-      </div>
-    </a>
-
   </div>
+
+  <a href="/past-executives.html" class="past-exec-cta" aria-label="View Past Executives">
+    <div class="past-exec-cta-media" style="background-image:url('assets/images/us.png');">
+      <span class="past-exec-cta-stamp">Leadership archive</span>
+    </div>
+    <div class="past-exec-cta-body">
+      <div>
+        <span class="past-exec-cta-eyebrow">Institutional memory</span>
+        <h4>Explore Past Executives</h4>
+        <p>Meet the administrations that shaped ARSRC before the current leadership.</p>
+      </div>
+      <span class="past-exec-cta-link">Open the archive <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </div>
+  </a>
 
   <div class="exec-tabs">
     <button class="exec-tab-btn active" data-tab="tab-rec">REC</button>
@@ -1671,6 +1685,34 @@
   })();
 </script>
 <script src="app.js"></script>
+<script>
+  // Keep the REC hierarchy visually ordered: regional officers first, then trustees.
+  (function () {
+    var grid = document.getElementById('execGrid-rec');
+    if (!grid) return;
+
+    var rank = function (card) {
+      var role = (card.textContent || '').toLowerCase().replace(/[–—]/g, '-');
+      if (/\b(regional\s+)?president\b/.test(role) && !/vice[-\s]?president/.test(role)) return 1;
+      if (/\b(regional\s+)?vice[-\s]?president\b/.test(role)) return 2;
+      if (/\b(regional\s+)?secretary\b/.test(role)) return 3;
+      var trustee = role.match(/\b(regional\s+)?trustee\s*(\d+)/);
+      if (trustee) return 3 + Number(trustee[2]);
+      return 999;
+    };
+
+    var sortCards = function () {
+      var cards = Array.prototype.slice.call(grid.children);
+      var ordered = cards.slice().sort(function (a, b) { return rank(a) - rank(b); });
+      if (ordered.some(function (card, index) { return card !== cards[index]; })) {
+        ordered.forEach(function (card) { grid.appendChild(card); });
+      }
+    };
+
+    sortCards();
+    new MutationObserver(sortCards).observe(grid, { childList: true });
+  })();
+</script>
 <script src="contact-api.js"></script>
 <script src="search.js"></script>
 <script>
