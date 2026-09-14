@@ -949,9 +949,6 @@
   .editorial-card .eyebrow-row { pointer-events: none; }
   .editorial-thumb { aspect-ratio: 16/10; flex-shrink: 0; position: relative; background-color: var(--blue-deep); background-size: cover; background-position: center; overflow: hidden; }
   .editorial-thumb::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 42%, rgba(8,18,49,.6)); }
-  .editorial-card:nth-child(2) .editorial-thumb { background-image: linear-gradient(135deg, rgba(220,38,38,.18), rgba(16,42,107,.2)), url('assets/images/7.jpg'); }
-  .editorial-card:nth-child(3) .editorial-thumb { background-image: linear-gradient(135deg, rgba(29,78,216,.16), rgba(220,38,38,.16)), url('assets/images/8.jpg'); }
-  .editorial-card:nth-child(4) .editorial-thumb { background-image: linear-gradient(135deg, rgba(220,38,38,.22), rgba(16,42,107,.12)), url('images/wds.jpg'); }
   .editorial-thumb-label { position: absolute; left: 16px; bottom: 14px; z-index: 1; color: #fff; font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; font-weight: 800; }
   .editorial-card-body { min-height: 210px; padding: 20px 21px 22px; display: flex; flex-direction: column; flex: 1; }
   .editorial-card-body h4 { color: var(--blue-deep); font-family: 'Source Serif 4', Georgia, serif; font-size: 1.48rem; line-height: 1.08; margin: 10px 0 10px; }
@@ -1039,9 +1036,6 @@
   }
 </style>
 <style>
-  /* Magazine cover resilience: support both legacy image folders used by ARSRC deployments. */
-  #magazineRail .editorial-card:first-child .editorial-thumb{background-color:#102a6b;background-image:linear-gradient(135deg,rgba(29,78,216,.18),rgba(220,38,38,.18)),url('assets/images/5.jpg'),url('images/5.jpg') !important;background-size:cover,cover,cover;background-position:center,center,center;}
-  #magazineRail .editorial-card:first-child .editorial-thumb::before{content:'ARSRC\A MAGAZINE';white-space:pre;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.88);font:900 clamp(20px,4vw,40px)/.9 'Segoe UI',sans-serif;letter-spacing:2px;text-align:center;text-shadow:0 8px 20px rgba(0,0,0,.25);opacity:.16;pointer-events:none;}
 </style>
 </head>
 <body>

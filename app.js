@@ -303,7 +303,7 @@ function downloadFile(fileName) {
     const category = editorialTypes.has(post.category) ? post.category : 'Story';
     const label = category === 'Magazine' ? 'Magazine' : 'Story';
     const image = post.image_url
-      ? `background-image:linear-gradient(135deg,rgba(16,42,107,.18),rgba(220,38,38,.18)),url("${escEditorial(post.image_url)}");`
+      ? `background-image:linear-gradient(135deg,rgba(16,42,107,.18),rgba(220,38,38,.18)),url('${String(post.image_url).replace(/'/g, '%27')}');`
       : '';
     const date = post.created_at ? new Date(post.created_at).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }) : 'New';
     const slug = post.slug ? encodeURIComponent(post.slug) : '';
