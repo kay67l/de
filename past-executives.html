@@ -29,6 +29,13 @@
     .page-head span.tag { display:inline-block; padding:6px 16px; border-radius:20px; background:rgba(29,78,216,0.1); color:var(--blue); font-size:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase; margin-bottom:16px; }
     .page-head h1 { font-size:clamp(1.8rem,3.6vw,2.6rem); font-weight:900; color:var(--blue-deep); margin-bottom:14px; }
     .page-head p { color:var(--gray); font-size:15px; line-height:1.6; }
+    .archive-listing-label { display:flex; align-items:center; gap:12px; max-width:1240px; margin:0 auto 18px; padding:14px 18px; border-left:5px solid var(--red); border-radius:0 12px 12px 0; background:linear-gradient(90deg,rgba(29,78,216,.1),rgba(220,38,38,.04)); color:var(--blue-deep); }
+    .archive-listing-label strong { font-family:Georgia,serif; font-size:1.15rem; }
+    .archive-listing-label span { font-size:10px; font-weight:900; letter-spacing:1.5px; text-transform:uppercase; color:var(--red); }
+    .selected-archive-administration { display:flex; align-items:center; justify-content:space-between; gap:16px; max-width:1240px; margin:0 auto 24px; padding:15px 20px; border-radius:14px; background:linear-gradient(110deg,var(--blue-deep),#173e9a 65%,var(--red-deep)); color:white; box-shadow:0 10px 24px rgba(16,42,107,.16); }
+    .selected-archive-administration span { font-size:10px; font-weight:900; letter-spacing:1.5px; text-transform:uppercase; color:#fca5a5; }
+    .selected-archive-administration strong { font-family:Georgia,serif; font-size:1.15rem; }
+    @media (max-width:560px) { .selected-archive-administration { align-items:flex-start; flex-direction:column; gap:6px; } }
 
     .year-tabs { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:40px; }
     .year-tab-btn {
@@ -96,6 +103,8 @@
   <div id="loadingState" class="state-screen"><div class="spinner"></div><p style="color:var(--gray);font-size:14px;">Loading past executives…</p></div>
 
   <div id="pageContent" style="display:none;">
+    <div class="archive-listing-label"><span>Archive</span><strong>Archived administrations</strong></div>
+    <div class="selected-archive-administration" id="selectedArchiveAdministration" aria-live="polite"></div>
     <div class="year-tabs" id="yearTabs"></div>
     <div class="cat-tabs" id="catTabs"></div>
     <div id="execContent"></div>
@@ -148,6 +157,11 @@
 
   function renderYearTabs() {
     const years = [...new Set(allData.map(e => e.year))]; // API already sorts newest-first
+    const selected = allData.find(e => e.year === currentYear);
+    const administration = selected && (selected.administration || selected.administration_name || selected.admin_name);
+    const administrationLabel = administration || (String(currentYear).toLowerCase().includes('administration') ? currentYear : `${currentYear} Administration`);
+    document.getElementById('selectedArchiveAdministration').innerHTML =
+      `<span>Archived administration</span><strong>${esc(administrationLabel)}</strong>`;
     document.getElementById('yearTabs').innerHTML = years.map(y =>
       `<button class="year-tab-btn ${y === currentYear ? 'active' : ''}" data-year="${esc(y)}">${esc(y)}</button>`
     ).join('');
