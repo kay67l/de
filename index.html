@@ -802,17 +802,8 @@
   .constitution-inner { display: grid; grid-template-columns: .8fr 1.2fr; gap: 24px; margin: 0 auto; }
   .const-card { min-height: 300px; }
 
-  .exec-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; max-width: var(--content-max); margin: 0 auto; }
-  .exec-card { min-height: 300px; flex: 0 1 280px; width: 280px; }
-  #execGrid-rec { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); }
-  #execGrid-rec > .exec-card { grid-column: span 3; width: auto; }
-  #execGrid-rec > .exec-card:nth-child(1) { grid-column: 2 / span 3; }
-  #execGrid-rec > .exec-card:nth-child(2) { grid-column: 5 / span 3; }
-  #execGrid-rec > .exec-card:nth-child(3) { grid-column: 8 / span 3; }
-  #execGrid-rec > .exec-card:nth-child(4) { grid-column: 1 / span 3; }
-  #execGrid-rec > .exec-card:nth-child(5) { grid-column: 4 / span 3; }
-  #execGrid-rec > .exec-card:nth-child(6) { grid-column: 7 / span 3; }
-  #execGrid-rec > .exec-card:nth-child(7) { grid-column: 10 / span 3; }
+  .exec-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 20px; max-width: var(--content-max); margin: 0 auto; }
+  .exec-card { min-height: 300px; }
   .exec-tabs { max-width: var(--content-max); margin: 0 auto 24px; justify-content: flex-start; }
   .schools-grid { max-width: var(--content-max); margin: 0 auto; grid-template-columns: repeat(4, 1fr) !important; gap: 14px; }
   .school-card { min-height: 126px; padding: 22px; }
@@ -856,11 +847,7 @@
     .section-head { grid-template-columns: 1fr; gap: 14px; }
     .section-head h2 { max-width: 680px; }
     .objectives, .schools-grid { grid-template-columns: repeat(2, 1fr) !important; }
-    .exec-grid { display: flex; }
-    .exec-card { flex-basis: calc(50% - 10px); width: calc(50% - 10px); }
-    #execGrid-rec { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    #execGrid-rec > .exec-card,
-    #execGrid-rec > .exec-card:nth-child(n) { grid-column: auto; width: auto; }
+    .exec-grid { grid-template-columns: repeat(2, 1fr) !important; }
     .constitution-inner, #apec .apec-inner { grid-template-columns: 1fr; }
     .life-photo, .life-mosaic { min-height: 340px; }
     .resource-grid { grid-template-columns: repeat(2, 1fr) !important; }
@@ -870,10 +857,7 @@
   @media (max-width: 640px) {
     section { padding-left: 5%; padding-right: 5%; }
     .section-head { margin-bottom: 34px; }
-    .objectives, .schools-grid { grid-template-columns: 1fr !important; }
-    .exec-grid { display: flex; }
-    .exec-card { flex-basis: 100%; width: 100%; }
-    #execGrid-rec { display: grid; grid-template-columns: 1fr; }
+    .objectives, .schools-grid, .exec-grid { grid-template-columns: 1fr !important; }
     .resource-grid { grid-template-columns: 1fr !important; }
     .resource-card, .resource-card:nth-child(2) { border-right: 0; border-bottom: 1px solid var(--line); }
     .resource-card:last-child { border-bottom: 0; }
@@ -1028,13 +1012,6 @@
   .miss-src-card .story-link::after{content:'↗';font-size:15px;}
   .administration-badge{display:inline-flex;align-items:center;gap:9px;margin:0 auto 16px;padding:8px 14px;border-radius:999px;background:linear-gradient(135deg,rgba(220,38,38,.1),rgba(29,78,216,.1));border:1px solid rgba(220,38,38,.22);color:var(--red);font-size:11px;font-weight:900;letter-spacing:1.4px;text-transform:uppercase;box-shadow:0 8px 18px rgba(16,42,107,.06)}
   .administration-badge::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 0 4px rgba(220,38,38,.1)}
-  .current-admin-banner{width:min(100% - 32px,980px);margin:26px auto 22px;padding:18px 24px;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;border-radius:18px;background:linear-gradient(110deg,#102a6b,#173e9a 62%,#9f1414);box-shadow:0 14px 32px rgba(16,42,107,.2);color:#fff;text-align:center;position:relative;overflow:hidden}
-  .current-admin-banner::after{content:'';position:absolute;width:180px;height:180px;right:-62px;top:-92px;border:1px solid rgba(255,255,255,.18);border-radius:50%;box-shadow:0 0 0 18px rgba(255,255,255,.04),0 0 0 36px rgba(255,255,255,.03);pointer-events:none}
-  .current-admin-kicker{font-size:10px;font-weight:900;letter-spacing:1.8px;text-transform:uppercase;color:#fca5a5}
-  .current-admin-banner .administration-badge{margin:0;padding:10px 16px;background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.42);color:#fff;box-shadow:none;position:relative;z-index:1}
-  .current-admin-banner .administration-badge::before{background:#fca5a5;box-shadow:0 0 0 4px rgba(252,165,165,.16)}
-  .current-admin-note{font-size:12px;color:rgba(255,255,255,.72)}
-  @media (max-width:640px){.current-admin-banner{gap:8px;padding:16px 14px}.current-admin-note{width:100%}}
 </style>
 <style>
   /* Executive portrait-card refinement */
@@ -1046,39 +1023,6 @@
   #executives .exec-school{line-height:1.5;}
   @media (max-width:1100px){#executives .exec-grid{max-width:760px;}#executives .exec-card{flex-basis:calc(50% - 12px);}#executives .exec-photo{height:315px;min-height:315px;}}
   @media (max-width:640px){#executives .exec-grid{max-width:420px;gap:22px;}#executives .exec-card{flex-basis:100%;min-height:460px;}#executives .exec-photo{height:340px;min-height:340px;margin-bottom:62px;}#executives .exec-card h4{font-size:17px;}}
-</style>
-<style>
-  /* REC hierarchy: the three regional officers always sit above the four trustees. */
-  #execGrid-rec { display:grid !important; grid-template-columns:repeat(4,minmax(0,1fr)); gap:24px; max-width:1240px; }
-  #execGrid-rec .exec-card { flex:none; grid-column:span 1; width:100% !important; min-width:0; }
-  #execGrid-rec .rec-president,
-  #execGrid-rec .rec-vice-president,
-  #execGrid-rec .rec-secretary { grid-column:span 1; grid-row:1; }
-  #execGrid-rec .rec-trustee-1,
-  #execGrid-rec .rec-trustee-2,
-  #execGrid-rec .rec-trustee-3,
-  #execGrid-rec .rec-trustee-4 { grid-row:2; }
-  @media (max-width:1100px) {
-    #execGrid-rec { grid-template-columns:repeat(6,minmax(0,1fr)); max-width:760px; }
-    #execGrid-rec .rec-president,
-    #execGrid-rec .rec-vice-president,
-    #execGrid-rec .rec-secretary { grid-column:span 2; grid-row:1; }
-    #execGrid-rec .rec-trustee-1,
-    #execGrid-rec .rec-trustee-2,
-    #execGrid-rec .rec-trustee-3,
-    #execGrid-rec .rec-trustee-4 { grid-column:span 3; grid-row:2; }
-  }
-  @media (max-width:640px) {
-    #execGrid-rec { grid-template-columns:1fr; max-width:420px; }
-    #execGrid-rec .exec-card,
-    #execGrid-rec .rec-president,
-    #execGrid-rec .rec-vice-president,
-    #execGrid-rec .rec-secretary,
-    #execGrid-rec .rec-trustee-1,
-    #execGrid-rec .rec-trustee-2,
-    #execGrid-rec .rec-trustee-3,
-    #execGrid-rec .rec-trustee-4 { grid-column:1; grid-row:auto; }
-  }
 </style>
 <style>
   /* Mobile editorial width refinement */
@@ -1313,14 +1257,9 @@
 <section id="executives">
   <div class="section-head reveal">
     <span class="section-tag">Leadership</span>
+    <div class="administration-badge" id="currentAdministration" aria-label="Current administration">29th Administration</div>
     <h2>Meet Our Executives</h2>
     <p>Around 50 students serve in regional-level leadership roles defined by the constitution — across the Regional Executive Committee, the four Zonal Executive Committees, the Literary Group Executive Committee (LiGEC), the Writers &amp; Debaters Society, the Editorial Committee (EDICOM), and the Permanent Secretariat. Browse by body below, and drop in real names once the current term is announced.</p>
-  </div>
-
-  <div class="current-admin-banner" aria-label="Current administration">
-    <span class="current-admin-kicker">Current leadership</span>
-    <strong class="administration-badge" id="currentAdministration">29th Administration</strong>
-    <span class="current-admin-note">Serving executives and committees</span>
   </div>
 
   <a href="/past-executives.html" class="past-exec-cta" aria-label="View Past Executives">
@@ -1762,21 +1701,8 @@
       return 999;
     };
 
-    var markRole = function (card) {
-      var role = (card.textContent || '').toLowerCase().replace(/[–—]/g, '-');
-      card.classList.remove('rec-president', 'rec-vice-president', 'rec-secretary', 'rec-trustee', 'rec-trustee-1', 'rec-trustee-2', 'rec-trustee-3', 'rec-trustee-4');
-      if (/\b(regional\s+)?president\b/.test(role) && !/vice[-\s]?president/.test(role)) card.classList.add('rec-president');
-      else if (/\b(regional\s+)?vice[-\s]?president\b/.test(role)) card.classList.add('rec-vice-president');
-      else if (/\b(regional\s+)?secretary\b/.test(role)) card.classList.add('rec-secretary');
-      else {
-        var trustee = role.match(/\b(regional\s+)?trustee\s*(\d+)/);
-        if (trustee) card.classList.add('rec-trustee', 'rec-trustee-' + trustee[2]);
-      }
-    };
-
     var sortCards = function () {
       var cards = Array.prototype.slice.call(grid.children);
-      cards.forEach(markRole);
       var ordered = cards.slice().sort(function (a, b) { return rank(a) - rank(b); });
       if (ordered.some(function (card, index) { return card !== cards[index]; })) {
         ordered.forEach(function (card) { grid.appendChild(card); });
