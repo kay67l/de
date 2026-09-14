@@ -431,7 +431,7 @@
   .past-exec-cta {
     display: grid; grid-template-columns: minmax(230px, .7fr) 1.3fr; width: min(100% - 32px, 980px);
     min-height: 178px; margin: 30px auto 36px; position: relative; overflow: hidden;
-    background: #102a6b;
+    background: linear-gradient(110deg, #102a6b 0%, #173e9a 58%, #9f1414 100%);
     border: 1px solid rgba(255,255,255,.32); border-radius: 22px; color: white;
     box-shadow: 0 18px 42px rgba(16,42,107,.22); transition: transform .3s ease, box-shadow .3s ease;
   }
@@ -439,21 +439,20 @@
   .past-exec-cta:hover { transform: translateY(-7px); box-shadow: 0 26px 54px rgba(16,42,107,.3); }
   .past-exec-cta:focus-visible { outline: 3px solid #fca5a5; outline-offset: 5px; }
   .past-exec-cta-media {
-    min-height: 178px; background: rgba(29,78,216,.18);
+    min-height: 178px; background: linear-gradient(135deg, rgba(29,78,216,.15), rgba(220,38,38,.34));
     background-size: cover; background-position: center; position: relative; isolation: isolate;
   }
   .past-exec-cta-media::after {
     content: ''; position: absolute; inset: 0;
-    z-index: 0; background: rgba(16,42,107,.42);
+    z-index: 0; background: linear-gradient(90deg, rgba(16,42,107,.08), rgba(16,42,107,.78));
   }
   .past-exec-cta-stamp { position: absolute; left: 22px; bottom: 20px; z-index: 1; padding: 7px 10px; border: 1px solid rgba(255,255,255,.55); border-radius: 999px; color: white; background: rgba(8,18,49,.36); font-size: 10px; font-weight: 900; letter-spacing: 1.4px; text-transform: uppercase; }
   .past-exec-cta-body { display: flex; flex-direction: column; justify-content: center; padding: 28px 36px; position: relative; z-index: 1; }
   .past-exec-cta-eyebrow { display: block; font-size: 10.5px; font-weight: 900; letter-spacing: 1.6px; text-transform: uppercase; color: #fca5a5; margin-bottom: 8px; }
   .past-exec-cta-body h4 { font-family: 'Source Serif 4', Georgia, serif; font-size: clamp(1.55rem, 3vw, 2.2rem); line-height: 1.05; font-weight: 700; color: white; margin-bottom: 8px; }
   .past-exec-cta-body p { max-width: 48ch; font-size: 13.5px; color: rgba(255,255,255,.78); line-height: 1.55; margin-bottom: 15px; }
-  .past-exec-cta-link { align-self: flex-start; padding: 10px 15px; border-radius: 999px; background: white; color: var(--blue-deep); font-size: 12.5px; font-weight: 900; display: inline-flex; align-items: center; gap: 7px; text-transform: uppercase; letter-spacing: .7px; box-shadow: 0 7px 16px rgba(0,0,0,.16); transition: background .25s ease, color .25s ease, transform .25s ease; }
+  .past-exec-cta-link { font-size: 12.5px; font-weight: 900; color: white; display: inline-flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: .7px; }
   .past-exec-cta-link svg { width: 13px; transition: transform .3s; }
-  .past-exec-cta-link:hover { background: #fca5a5; color: #541313; transform: translateY(-2px); }
   .past-exec-cta:hover .past-exec-cta-link svg { transform: translateX(4px); }
   @media (max-width: 640px) {
     .past-exec-cta { grid-template-columns: 1fr; min-height: 0; margin-top: 24px; }
@@ -950,9 +949,6 @@
   .editorial-card .eyebrow-row { pointer-events: none; }
   .editorial-thumb { aspect-ratio: 16/10; flex-shrink: 0; position: relative; background-color: var(--blue-deep); background-size: cover; background-position: center; overflow: hidden; }
   .editorial-thumb::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 42%, rgba(8,18,49,.6)); }
-  .editorial-card:nth-child(2) .editorial-thumb { background-image: linear-gradient(135deg, rgba(220,38,38,.18), rgba(16,42,107,.2)), url('assets/images/7.jpg'); }
-  .editorial-card:nth-child(3) .editorial-thumb { background-image: linear-gradient(135deg, rgba(29,78,216,.16), rgba(220,38,38,.16)), url('assets/images/8.jpg'); }
-  .editorial-card:nth-child(4) .editorial-thumb { background-image: linear-gradient(135deg, rgba(220,38,38,.22), rgba(16,42,107,.12)), url('images/wds.jpg'); }
   .editorial-thumb-label { position: absolute; left: 16px; bottom: 14px; z-index: 1; color: #fff; font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; font-weight: 800; }
   .editorial-card-body { min-height: 210px; padding: 20px 21px 22px; display: flex; flex-direction: column; flex: 1; }
   .editorial-card-body h4 { color: var(--blue-deep); font-family: 'Source Serif 4', Georgia, serif; font-size: 1.48rem; line-height: 1.08; margin: 10px 0 10px; }
@@ -1040,9 +1036,6 @@
   }
 </style>
 <style>
-  /* Magazine cover resilience: support both legacy image folders used by ARSRC deployments. */
-  #magazineRail .editorial-card:first-child .editorial-thumb{background-color:#102a6b;background-image:linear-gradient(135deg,rgba(29,78,216,.18),rgba(220,38,38,.18)),url('assets/images/5.jpg'),url('images/5.jpg') !important;background-size:cover,cover,cover;background-position:center,center,center;}
-  #magazineRail .editorial-card:first-child .editorial-thumb::before{content:'ARSRC\A MAGAZINE';white-space:pre;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.88);font:900 clamp(20px,4vw,40px)/.9 'Segoe UI',sans-serif;letter-spacing:2px;text-align:center;text-shadow:0 8px 20px rgba(0,0,0,.25);opacity:.16;pointer-events:none;}
 </style>
 </head>
 <body>
@@ -1265,15 +1258,15 @@
 
   <a href="/past-executives.html" class="past-exec-cta" aria-label="View Past Executives">
     <div class="past-exec-cta-media" style="background-image:url('assets/images/us.png');">
-      <span class="past-exec-cta-stamp">Past leadership</span>
+      <span class="past-exec-cta-stamp">Leadership archive</span>
     </div>
     <div class="past-exec-cta-body">
       <div>
-        <span class="past-exec-cta-eyebrow">ARSRC records</span>
-        <h4>Past Executives</h4>
-        <p>See the leaders who served ARSRC before the current administration.</p>
+        <span class="past-exec-cta-eyebrow">Institutional memory</span>
+        <h4>Explore Past Executives</h4>
+        <p>Meet the administrations that shaped ARSRC before the current leadership.</p>
       </div>
-      <span class="past-exec-cta-link">View the archive <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      <span class="past-exec-cta-link">Open the archive <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
     </div>
   </a>
 
@@ -1515,10 +1508,6 @@
     </div>
   </div>
   <div class="editorial-rail reveal" id="magazineRail" tabindex="0" aria-label="Magazines and stories carousel">
-    <a class="editorial-card" href="redesign-process.html">
-      <div class="editorial-thumb" style="background: #102a6b;"><span class="editorial-thumb-label">Behind the scenes</span></div>
-      <div class="editorial-card-body"><div class="eyebrow-row"><span class="eb">The redesign</span><span class="eb-bar"></span><span class="eb muted">7 min read</span></div><h4>How this website came together</h4><p>A behind-the-scenes record of the batch’s goals, challenges, decisions, and contributions.</p><div class="editorial-card-meta"><span>Case study</span><span>Archive</span></div></div>
-    </a>
     <a class="editorial-card" href="post.html?slug=student-leader-field-guide">
       <div class="editorial-thumb" style="background-image: linear-gradient(135deg, rgba(29,78,216,.18), rgba(220,38,38,.18)), url('assets/images/5.jpg');"><span class="editorial-thumb-label">Cover story</span></div>
       <div class="editorial-card-body"><div class="eyebrow-row"><span class="eb">Leadership</span><span class="eb-bar"></span><span class="eb muted">6 min read</span></div><h4>What makes a student leader?</h4><p>A practical field guide to listening, showing up, and turning shared concerns into collective action.</p><div class="editorial-card-meta"><span>ARSRC Stories</span><span>Issue 01</span></div></div>
