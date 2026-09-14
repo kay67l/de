@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A behind-the-scenes record of the ARSRC website redesign: the goals, challenges, and contributions that shaped the new site.">
+  <title>How This Website Came Together | ARSRC Stories</title>
+  <link rel="icon" type="image/png" href="/favicon.png?v=2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+  <style>
+    :root{--blue-deep:#102a6b;--blue:#1d4ed8;--red:#dc2626;--ink:#0f1c3f;--gray:#64748b;--paper:#f4f7fc;--white:#fff;--line:#dbe4f2}
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,Arial,sans-serif;background:var(--paper);color:var(--ink);line-height:1.7}
+    a{color:inherit;text-decoration:none}
+    .topbar{padding:18px 6%;display:flex;align-items:center;justify-content:space-between;background:var(--white);border-bottom:1px solid var(--line)}
+    .brand{display:flex;align-items:center;gap:12px;color:var(--blue-deep);font-weight:800;letter-spacing:.2px}
+    .brand img{width:42px;height:42px;object-fit:contain}
+    .back{color:var(--blue-deep);font-size:13px;font-weight:800;border-bottom:2px solid var(--red);padding-bottom:3px}
+    .article-wrap{max-width:920px;margin:0 auto;padding:78px 24px 100px}
+    .kicker{display:inline-block;color:var(--red);font-size:11px;font-weight:900;letter-spacing:1.7px;text-transform:uppercase;margin-bottom:18px}
+    h1,h2{font-family:'Source Serif 4',Georgia,serif;color:var(--blue-deep)}
+    h1{font-size:clamp(2.7rem,7vw,5.8rem);line-height:1.02;max-width:850px;letter-spacing:-.04em;margin-bottom:24px}
+    .dek{font-size:clamp(1.05rem,2vw,1.3rem);color:#40516f;max-width:720px;line-height:1.65;margin-bottom:28px}
+    .byline{display:flex;flex-wrap:wrap;gap:12px 22px;color:var(--gray);font-size:13px;border-top:1px solid var(--line);padding-top:16px}
+    .hero-note{margin:52px 0 58px;background:var(--blue-deep);color:var(--white);padding:34px 38px;border-left:6px solid var(--red)}
+    .hero-note p{font-family:'Source Serif 4',Georgia,serif;font-size:clamp(1.25rem,2.4vw,1.7rem);line-height:1.4}
+    article{max-width:720px;margin:0 auto}
+    article p{font-size:16px;color:#33425f;margin:0 0 23px}
+    article h2{font-size:clamp(1.8rem,3vw,2.5rem);line-height:1.15;margin:58px 0 17px}
+    article h2:first-child{margin-top:0}
+    .contributions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:26px 0 32px}
+    .contribution{background:var(--white);border:1px solid var(--line);padding:22px 22px 20px;border-top:4px solid var(--blue)}
+    .contribution:nth-child(even){border-top-color:var(--red)}
+    .contribution h3{font-family:'Source Serif 4',Georgia,serif;color:var(--blue-deep);font-size:1.25rem;line-height:1.2;margin-bottom:8px}
+    .contribution p{font-size:14px;line-height:1.6;margin:0}
+    .pullquote{margin:40px 0;padding:24px 0 24px 25px;border-left:3px solid var(--red);font-family:'Source Serif 4',Georgia,serif;font-size:clamp(1.35rem,2.5vw,1.8rem);line-height:1.4;color:var(--blue-deep)}
+    .archive-note{margin-top:58px;padding:24px;background:#e8eef9;border:1px solid #c9d7ed;color:#33425f;font-size:14px}
+    .article-footer{max-width:720px;margin:55px auto 0;padding-top:25px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;font-size:13px;font-weight:800;color:var(--blue-deep)}
+    @media(max-width:620px){.topbar{padding:14px 5%}.brand span{font-size:13px}.article-wrap{padding:55px 20px 70px}.hero-note{padding:25px 23px;margin:38px 0 44px}.contributions{grid-template-columns:1fr}article p{font-size:15px}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="ARSRC home"><img src="assets/images/ar.png" alt="ARSRC logo"><span>Ashanti Regional Students' Representative Council</span></a>
+    <a class="back" href="index.html#magazines">Back to Stories</a>
+  </header>
+
+  <main class="article-wrap">
+    <span class="kicker">Behind the scenes · Case study · Permanent archive</span>
+    <h1>How this website came together</h1>
+    <p class="dek">A record of the batch that helped turn ARSRC’s website into a clearer, more useful home for student leadership, regional programmes, institutional memory, and student voice.</p>
+    <div class="byline"><span>ARSRC Stories</span><span>7 min read</span><span>Published 14 September 2026</span></div>
+
+    <div class="hero-note"><p>“The goal was not simply to make a newer-looking website. It was to make the work of the Council easier to see, understand, and carry forward.”</p></div>
+
+    <article>
+      <h2>The brief behind the redesign</h2>
+      <p>ARSRC needed a digital home that could do more than announce the next event. The new site had to explain the Council, make its constitution easier to navigate, introduce its leadership structures, celebrate student life, and give past and present executives a place in the same story.</p>
+      <p>That meant balancing several audiences at once: students looking for opportunities, schools looking for official information, executives handing over responsibilities, and former leaders whose work should not disappear when a term ends. The batch approached the redesign as a public record as much as a communications project.</p>
+
+      <h2>What the batch had to solve</h2>
+      <p>The first challenge was structure. A large organisation can quickly become a long list of names, committees, dates, and documents. The team had to create a path through that information without flattening the Council’s complexity. Sections for the constitution, executives, APEC, programmes, stories, news, and resources were shaped to feel connected rather than scattered.</p>
+      <p>The second challenge was trust. Official information should feel clear and grounded, while student stories should still feel human. The redesign therefore paired direct explanations with editorial features, photo-led programme sections, searchable content, and permanent archive links.</p>
+      <p>The third challenge was continuity. Leadership changes, but the institution remains. The past-executives archive and this article are part of that answer: they preserve the decisions, people, and effort behind each phase instead of treating a launch as the end of the work.</p>
+
+      <div class="pullquote">A website for student leadership should not only show what is happening now. It should help the next group understand what came before.</div>
+
+      <h2>How the contributions came together</h2>
+      <p>The batch worked across different kinds of contribution. Some of the work was visible in the final interface; some of it happened in the less visible decisions that make a site dependable over time.</p>
+      <div class="contributions">
+        <div class="contribution"><h3>Direction and priorities</h3><p>The leadership and project direction clarified what the site needed to represent: student voice, regional reach, constitutional grounding, active programmes, and a record that would outlast one administration.</p></div>
+        <div class="contribution"><h3>Content and institutional memory</h3><p>Research, writing, and review turned committees, programmes, ceremonies, and archives into language students and member schools can actually use.</p></div>
+        <div class="contribution"><h3>Visual identity and storytelling</h3><p>The visual work established a recognisable ARSRC rhythm: deep blue for trust, red for emphasis, editorial serif headings, student-life imagery, and layouts that give important stories room to breathe.</p></div>
+        <div class="contribution"><h3>Build, testing, and polish</h3><p>Implementation brought the pieces together across desktop and mobile, while testing focused on navigation, readable type, visible calls to action, working links, and a site that remains useful beyond launch day.</p></div>
+      </div>
+
+      <h2>Why the archive matters</h2>
+      <p>A launch announcement can be exciting, but it can also disappear quickly in a feed. This case study is deliberately different. It remains in the ARSRC archive as a historical record of how this version of the website was shaped, what the batch valued, and what future contributors may want to improve.</p>
+      <p>Future administrations can add names, dates, photographs, stories, and new chapters without losing the foundation. The website is designed to grow with the Council: current enough to serve today’s students, and structured enough to remember yesterday’s work.</p>
+
+      <div class="archive-note"><strong>Archive note:</strong> This article is part of the permanent ARSRC Stories collection. It documents the redesign as a shared batch contribution rather than attributing institutional work to a single person.</div>
+    </article>
+
+    <div class="article-footer"><a href="index.html#magazines">← Explore more stories</a><a href="index.html">Return to ARSRC home</a></div>
+  </main>
+</body>
+</html>
+פ
+
