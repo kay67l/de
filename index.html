@@ -802,8 +802,8 @@
   .constitution-inner { display: grid; grid-template-columns: .8fr 1.2fr; gap: 24px; margin: 0 auto; }
   .const-card { min-height: 300px; }
 
-  .exec-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 20px; max-width: var(--content-max); margin: 0 auto; }
-  .exec-card { min-height: 300px; }
+  .exec-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; max-width: var(--content-max); margin: 0 auto; }
+  .exec-card { min-height: 300px; flex: 0 1 280px; width: 280px; }
   .exec-tabs { max-width: var(--content-max); margin: 0 auto 24px; justify-content: flex-start; }
   .schools-grid { max-width: var(--content-max); margin: 0 auto; grid-template-columns: repeat(4, 1fr) !important; gap: 14px; }
   .school-card { min-height: 126px; padding: 22px; }
@@ -847,7 +847,8 @@
     .section-head { grid-template-columns: 1fr; gap: 14px; }
     .section-head h2 { max-width: 680px; }
     .objectives, .schools-grid { grid-template-columns: repeat(2, 1fr) !important; }
-    .exec-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .exec-grid { display: flex; }
+    .exec-card { flex-basis: calc(50% - 10px); width: calc(50% - 10px); }
     .constitution-inner, #apec .apec-inner { grid-template-columns: 1fr; }
     .life-photo, .life-mosaic { min-height: 340px; }
     .resource-grid { grid-template-columns: repeat(2, 1fr) !important; }
@@ -857,7 +858,9 @@
   @media (max-width: 640px) {
     section { padding-left: 5%; padding-right: 5%; }
     .section-head { margin-bottom: 34px; }
-    .objectives, .schools-grid, .exec-grid { grid-template-columns: 1fr !important; }
+    .objectives, .schools-grid { grid-template-columns: 1fr !important; }
+    .exec-grid { display: flex; }
+    .exec-card { flex-basis: 100%; width: 100%; }
     .resource-grid { grid-template-columns: 1fr !important; }
     .resource-card, .resource-card:nth-child(2) { border-right: 0; border-bottom: 1px solid var(--line); }
     .resource-card:last-child { border-bottom: 0; }
