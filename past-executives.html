@@ -56,6 +56,14 @@
   .administration-banner strong { font-family:'Source Serif 4',Georgia,serif; font-size:1.2rem; display:block; }
   @media (max-width:560px) { .administration-banner { align-items:flex-start; flex-direction:column; } }
 
+  /* Year selector — distinct from committee tabs: smaller, outlined, with a label */
+  .year-selector-wrap { display:flex; align-items:center; gap:14px; justify-content:center; flex-wrap:wrap; margin-bottom:14px; }
+  .year-selector-label { font-size:11px; font-weight:900; letter-spacing:1.5px; text-transform:uppercase; color:var(--gray); }
+  .year-selector { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+  .year-btn { padding:8px 18px; border-radius:20px; border:1.5px solid #e3e9f7; background:white; font-weight:700; font-size:13px; color:var(--blue-deep); cursor:pointer; transition:.25s ease; }
+  .year-btn:hover { border-color:var(--blue-light); color:var(--blue); }
+  .year-btn.active { background:var(--blue-deep); color:white; border-color:var(--blue-deep); }
+
   /* Exec tabs — exact copy of index.html exec-tabs + exec-tab-btn */
   .exec-tabs { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:50px; }
   .exec-tab-btn { padding:10px 22px; border-radius:30px; border:2px solid #e3e9f7; background:white; font-weight:700; font-size:13px; color:var(--blue-deep); cursor:pointer; transition:.25s ease; }
@@ -139,8 +147,14 @@
   </div>
 
   <div id="pageContent" style="display:none;">
-    <!-- Year administration banner (replaces old year-tab strip) -->
+    <!-- Year administration banner -->
     <div id="administrationBanner" class="administration-banner" aria-live="polite"></div>
+
+    <!-- Year selector — visually distinct from the committee tabs below -->
+    <div class="year-selector-wrap">
+      <span class="year-selector-label">Select year</span>
+      <div class="year-selector" id="yearSelector"></div>
+    </div>
 
     <!-- Executive body tabs — same as index.html #executives -->
     <div class="exec-tabs" id="execTabs"></div>
@@ -226,15 +240,13 @@
   }
 
   // ── State ──────────────────────────────────────────────────────────────────
-  let allData        = [];
-  let currentYear    = null;
-  let currentCat     = 'rec';
-  let yearTabsEl     = null;
-  let tabsEl         = null;
+  let allData     = [];
+  let currentYear = null;
+  let currentCat  = 'rec';
 
-  // ── Year tabs ──────────────────────────────────────────────────────────────
-  function renderYearTabs() {
-    const years = [...new Set(allData.map(e => e.year))];
+  // ── Year selector (visually distinct from committee tabs) ──────────────────
+  function renderYearSelector() {
+    const years = [...new Set(allData.map(e => e.year))].sort().reverse();
     const selected = allData.find(e => e.year === currentYear);
     const administration = selected && (selected.administration || selected.administration_name || selected.admin_name);
     const label = administration
@@ -246,55 +258,37 @@
     document.getElementById('administrationBanner').innerHTML =
       `<span>Archived administration</span><strong>${esc(label)}</strong>`;
 
-    yearTabsEl.innerHTML = years.map(y =>
-      `<button class="exec-tab-btn ${y === currentYear ? 'active' : ''}" data-year="${esc(y)}">${esc(y)}</button>`
+    document.getElementById('yearSelector').innerHTML = years.map(y =>
+      `<button class="year-btn ${y === currentYear ? 'active' : ''}" data-year="${esc(y)}">${esc(y)}</button>`
     ).join('');
-
-    yearTabsEl.querySelectorAll('[data-year]').forEach(btn => {
-      btn.addEventListener('click', function () {
-        currentYear = this.dataset.year;
-        currentCat  = CATEGORY_ORDER[0];
-        renderYearTabs();
-        renderTabs();
-        renderAllPanels();
-      });
-    });
   }
 
   // ── Category tabs (exec body tabs) ─────────────────────────────────────────
-  function renderTabs() {
+  function renderCategoryTabs() {
     const inYear = allData.filter(e => e.year === currentYear);
     const catsPresent = CATEGORY_ORDER.filter(c => inYear.some(e => belongsToCategory(e, c)));
     if (!catsPresent.includes(currentCat)) currentCat = catsPresent[0] || 'rec';
 
-    tabsEl.innerHTML = catsPresent.map(c =>
+    document.getElementById('execTabs').innerHTML = catsPresent.map(c =>
       `<button class="exec-tab-btn ${c === currentCat ? 'active' : ''}" data-cat="${c}">${esc(CATEGORY_LABELS[c])}</button>`
     ).join('');
-
-    tabsEl.querySelectorAll('[data-cat]').forEach(btn => {
-      btn.addEventListener('click', function () {
-        currentCat = this.dataset.cat;
-        renderTabs();
-        renderAllPanels();
-      });
-    });
   }
 
   // ── Panel rendering — mirrors app.js logic exactly ─────────────────────────
   function renderAllPanels() {
-    renderFlatGrid('tab-rec',  'execGrid-rec',  e => e.category === 'rec');
-    renderFlatGrid('tab-sec',  'execGrid-sec',  e => e.category === 'sec');
-    renderGrouped('tab-zec',   'execGroups-zec', 'zec');
-    renderGrouped('tab-ligec', 'execGroups-ligec','ligec');
-    renderGrouped('tab-wds',   'execGroups-wds', 'wds');
-    renderGrouped('tab-edicom','execGroups-edicom','edicom');
-    renderGrouped('tab-adhoc', 'execGroups-adhoc','adhoc');
+    renderFlatGrid('execGrid-rec',  e => e.category === 'rec');
+    renderFlatGrid('execGrid-sec',  e => e.category === 'sec');
+    renderGrouped('execGroups-zec',   'zec');
+    renderGrouped('execGroups-ligec', 'ligec');
+    renderGrouped('execGroups-wds',   'wds');
+    renderGrouped('execGroups-edicom','edicom');
+    renderGrouped('execGroups-adhoc', 'adhoc');
 
     // .reveal cards injected after observer initial pass start visible immediately
     document.querySelectorAll('#pageContent .reveal').forEach(el => el.classList.add('visible'));
   }
 
-  function renderFlatGrid(tabId, gridId, predicate) {
+  function renderFlatGrid(gridId, predicate) {
     const grid = document.getElementById(gridId);
     if (!grid) return;
     const items = allData.filter(e => e.year === currentYear && predicate(e));
@@ -303,7 +297,7 @@
       : '<div class="news-empty">No members recorded for this body in this year.</div>';
   }
 
-  function renderGrouped(tabId, containerId, cat) {
+  function renderGrouped(containerId, cat) {
     const container = document.getElementById(containerId);
     if (!container) return;
     const items = allData.filter(e => e.year === currentYear && belongsToCategory(e, cat));
@@ -322,18 +316,6 @@
     `).join('');
   }
 
-  // ── Tab switching (exec-tab-btn → exec-panel) — same as app.js ─────────────
-  function initTabSwitching() {
-    tabsEl.querySelectorAll('.exec-tab-btn').forEach(btn => {
-      btn.addEventListener('click', function () {
-        tabsEl.querySelectorAll('.exec-tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.exec-panel').forEach(p => p.classList.remove('active'));
-        this.classList.add('active');
-        document.getElementById('tab-' + this.dataset.cat).classList.add('active');
-      });
-    });
-  }
-
   // ── Load ───────────────────────────────────────────────────────────────────
   fetch('/api/past-executives')
     .then(r => r.ok ? r.json() : Promise.reject(r.status))
@@ -347,26 +329,42 @@
       }
 
       currentYear = allData[0].year; // most recent year first (API sorts newest-first)
-      yearTabsEl  = document.getElementById('execTabs'); // will be replaced by year tabs initially
-      tabsEl      = document.getElementById('execTabs');
 
-      // Start with year tabs shown, exec body tabs hidden until a year is picked
-      yearTabsEl.innerHTML = allData.map(e => e.year).filter((v,i,a) => a.indexOf(v)===i).sort().reverse().map(y =>
-        `<button class="exec-tab-btn ${y === currentYear ? 'active' : ''}" data-year="${esc(y)}">${esc(y)}</button>`
-      ).join('');
+      renderYearSelector();
+      renderCategoryTabs();
+      renderAllPanels();
 
-      yearTabsEl.querySelectorAll('[data-year]').forEach(btn => {
-        btn.addEventListener('click', function () {
-          currentYear = this.dataset.year;
-          currentCat  = CATEGORY_ORDER[0];
-          renderYearTabs();
-          // Swap: hide year tabs, show exec body tabs
-          yearTabsEl.style.display = 'none';
-          tabsEl.style.display     = 'flex';
-          renderTabs();
-          initTabSwitching();
-          renderAllPanels();
-        });
+      // Wire year selector via event delegation (one listener, survives re-renders)
+      document.getElementById('yearSelector').addEventListener('click', (e) => {
+        const btn = e.target.closest('.year-btn');
+        if (!btn) return;
+        currentYear = btn.dataset.year;
+        currentCat  = 'rec';
+        renderYearSelector();
+        renderCategoryTabs();
+        renderAllPanels();
+        // Activate REC tab
+        document.querySelectorAll('.exec-tab-btn[data-cat]').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.exec-panel').forEach(p => p.classList.remove('active'));
+        const recBtn = document.querySelector('.exec-tab-btn[data-cat="rec"]');
+        if (recBtn) {
+          recBtn.classList.add('active');
+          document.getElementById('tab-rec').classList.add('active');
+        }
+      });
+
+      // Wire committee tabs via event delegation (one listener, survives re-renders)
+      document.getElementById('execTabs').addEventListener('click', (e) => {
+        const btn = e.target.closest('.exec-tab-btn[data-cat]');
+        if (!btn) return;
+        currentCat = btn.dataset.cat;
+        renderCategoryTabs();
+        renderAllPanels();
+        // Switch active panel
+        document.querySelectorAll('.exec-tab-btn[data-cat]').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.exec-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.cat).classList.add('active');
       });
 
       document.getElementById('pageContent').style.display = 'block';
