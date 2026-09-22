@@ -14,7 +14,7 @@ BEGIN
   FROM pg_constraint
   WHERE conrelid = 'past_executives'::regclass
     AND contype = 'c'
-    AND conkey = (SELECT attnum FROM pg_attribute WHERE attrelid = 'past_executives'::regclass AND attname = 'category');
+    AND conkey = ARRAY[(SELECT attnum FROM pg_attribute WHERE attrelid = 'past_executives'::regclass AND attname = 'category')];
 
   IF con_name IS NOT NULL THEN
     EXECUTE 'ALTER TABLE past_executives DROP CONSTRAINT ' || con_name;
