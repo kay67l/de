@@ -274,9 +274,9 @@
     /* Mobile hero: start just under the fixed nav instead of vertically centering,
        and let the title stack one word per line, sized by JS to fill the width. */
     .hero { align-items: flex-start; min-height: 100vh; min-height: 100svh; padding-top: 92px; padding-bottom: 36px; box-sizing: border-box; }
-    .hero-content { padding-left: 5vw; padding-right: 5vw; }
+    .hero-content { padding-left: 5vw; padding-right: 5vw; min-width: 0; max-width: 100%; }
     .hero-badge { margin: 0 auto 18px; }
-    .hero h1 { font-size: 9vw; line-height: 1.1; letter-spacing: 0; margin: 0 auto 22px; }
+    .hero h1 { max-width: 100%; font-size: 9vw; line-height: 1.1; letter-spacing: 0; margin: 0 auto 22px; }
     .hero h1 .tw { display: block; }
     .hero-buttons { justify-content: center; }
     .hero-note {
@@ -1810,14 +1810,14 @@
     if (!h) return;
     if (window.innerWidth > 820) { h.style.fontSize = ''; return; }
     var box = h.parentElement, cs = getComputedStyle(box);
-    var avail = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-    h.style.fontSize = '100px';
+    var avail = Math.min(box.clientWidth, document.documentElement.clientWidth) - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    h.style.fontSize = '40px';
     var widest = 0;
     h.querySelectorAll('.tw').forEach(function (w) {
       var r = document.createRange(); r.selectNodeContents(w);
       widest = Math.max(widest, r.getBoundingClientRect().width);
     });
-    if (widest > 0) h.style.fontSize = (100 * avail / widest * 0.985) + 'px';
+    if (widest > 0) h.style.fontSize = (40 * avail / widest * 0.985) + 'px';
   }
   fitHeroTitle();
   window.addEventListener('resize', fitHeroTitle);
